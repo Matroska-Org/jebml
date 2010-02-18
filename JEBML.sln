@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{E6FDF86B-F3D1-11D4-8576-0002A516ECE8}") = "JEBML", "JEBML.vjsproj", "{2FE45AE7-D916-497F-9035-B6EDA1C9E34C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{E6FDF86B-F3D1-11D4-8576-0002A516ECE8}") = "CommandLineSample", "CommandLineSample.vjsproj", "{D60EB8EA-93B5-4DF7-B793-B54B1BFC4753}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{2FE45AE7-D916-497F-9035-B6EDA1C9E34C}.Debug.ActiveCfg = Debug|.NET
+		{2FE45AE7-D916-497F-9035-B6EDA1C9E34C}.Debug.Build.0 = Debug|.NET
+		{2FE45AE7-D916-497F-9035-B6EDA1C9E34C}.Release.ActiveCfg = Release|.NET
+		{2FE45AE7-D916-497F-9035-B6EDA1C9E34C}.Release.Build.0 = Release|.NET
+		{D60EB8EA-93B5-4DF7-B793-B54B1BFC4753}.Debug.ActiveCfg = Debug|.NET
+		{D60EB8EA-93B5-4DF7-B793-B54B1BFC4753}.Debug.Build.0 = Debug|.NET
+		{D60EB8EA-93B5-4DF7-B793-B54B1BFC4753}.Release.ActiveCfg = Release|.NET
+		{D60EB8EA-93B5-4DF7-B793-B54B1BFC4753}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
