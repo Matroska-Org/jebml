@@ -98,7 +98,8 @@ public class EBMLReader {
       return null;
 
     //Read the size.
-    long elementSize = readEBMLCode(source);
+    byte[] data = getEBMLCodeAsBytes(source);
+    long elementSize = parseEBMLCode(data);
     if (elementSize == 0)
       // Failed to read element size
       return null;
@@ -117,6 +118,7 @@ public class EBMLReader {
 
     //Set it's size
     elem.setSize(elementSize);
+    elem.setHeaderSize(data.length);
 
     //Setup a buffer for it's data
     //byte[] elementData = new byte[(int)elementSize];
@@ -125,12 +127,48 @@ public class EBMLReader {
     //Set the data property on the element
     //elem.setData(elementData);
 
-    //System.out.println("EBMLReader.readNextElement() returning element " + elem.getElementType().name + " with size " + Long.toString(elementSize));
+    //System.out.println("EBMLReader.readNextElement() returning element " + elem.getElementType().name + " with size " + Long.toString(elementSize)+" "+Long.toString(elem.getTotalSize()));
 
     //Return the element
     return elem;
   }
 
+  static public byte[] getEBMLCodeAsBytes(DataSource source) {
+	    //Begin loop with byte set to newly read byte.
+	    byte firstByte = source.readByte();
+	    int numBytes = 0;
+
+	    //Begin by counting the bits unset before the first '1'.
+	    long mask = 0x0080;
+	    for (int i = 0; i < 8; i++) {
+	      //Start at left, shift to right.
+	      if ((firstByte & mask) == mask) { //One found
+	        //Set number of bytes in size = i+1 ( we must count the 1 too)
+	        numBytes = i + 1;
+	        //exit loop by pushing i out of the limit
+	        i = 8;
+	      }
+	      mask >>>= 1;
+	    }
+	    if (numBytes == 0)
+	      // Invalid size
+	      return null;
+
+	    //Setup space to store the bits
+	    byte[] data = new byte[numBytes];
+
+	    //Clear the 1 at the front of this byte, all the way to the beginning of the size
+	    data[0] = (byte)(firstByte & ((0xFF >>> (numBytes))));
+
+	    if (numBytes > 1) {
+	      //Read the rest of the size.
+	      source.read(data, 1, numBytes - 1);
+	    }
+
+	    return data;
+	  }
+  
+  
   /**
    * Reads an (Unsigned) EBML code from the DataSource and encodes it into a long.  This size should be
    * cast into an int for actual use as Java only allows upto 32-bit file I/O operations.
@@ -174,6 +212,19 @@ public class EBMLReader {
     long n = 0;
     for (int i = 0; i < numBytes; i++) {
       n = ((long)data[numBytes - 1 - i] << 56) >>> 56;
+      size = size | (n << (8 * i));
+    }
+    return size;
+  }
+  
+  public static long parseEBMLCode(byte[] data) {
+	if(data==null)
+		return 0;
+    //Put this into a long
+    long size = 0;
+    long n = 0;
+    for (int i = 0; i < data.length; i++) {
+      n = ((long)data[data.length - 1 - i] << 56) >>> 56;
       size = size | (n << (8 * i));
     }
     return size;

@@ -42,6 +42,7 @@ public class Element {
   protected long size = 0;
   protected byte[] data;
   protected boolean dataRead = false;
+  private int headerSize;
 
   /** Creates a new instance of Element */
   public Element(byte[] type) {
@@ -146,7 +147,8 @@ public class Element {
   {
     long totalSize = 0;
     totalSize += getType().length;
-    totalSize += Element.codedSizeLength(getSize());
+    //totalSize += Element.codedSizeLength(getSize());
+    totalSize += this.headerSize;
     totalSize += getSize();    
     return totalSize;
   }
@@ -325,4 +327,9 @@ public class Element {
     }
     return ret;
   }
+
+public void setHeaderSize(int headerSize) {
+	this.headerSize = headerSize;
+	
+}
 }

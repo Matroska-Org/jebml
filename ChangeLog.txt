@@ -1,0 +1,8 @@
+2011-03-6
+version 2011-03-06:
+    - Add webm doctype
+    - Add support for SimpleBlock
+    - Add keyframe interface to Frames/Blocks
+    - Add WebMExtractor.java to samples
+    - Fix header size problem stopping WebM tracks being parsed
+    - Remove header from non-laced data before returning it

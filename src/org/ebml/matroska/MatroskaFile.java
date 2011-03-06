@@ -78,7 +78,7 @@ public class MatroskaFile {
         level1.readData(ioDS);
         if (level1.equals(MatroskaDocType.DocType_Id)) {
           String DocType = ((StringElement)level1).getValue();
-          if (DocType.compareTo("matroska") != 0) {
+          if (DocType.compareTo("matroska") != 0 && DocType.compareTo("webm") != 0) {
             throw new java.lang.RuntimeException("Error: DocType is not matroska, \"" + ((StringElement)level1).getValue() + "\"");
           }
         }
@@ -245,6 +245,34 @@ public class MatroskaFile {
       if (level2.equals(MatroskaDocType.ClusterTimecode_Id)) {
         level2.readData(ioDS);
         ClusterTimecode = ((UnsignedIntegerElement)level2).getValue();
+
+      }else if(level2.equals(MatroskaDocType.ClusterSimpleBlock_Id)) {
+    	  MatroskaBlock block = null;
+    	  long BlockDuration = 0;
+    	  long BlockReference = 0;
+    	  block = (MatroskaBlock)level2;
+    	  block.readData(ioDS);
+    	  block.parseBlock();
+    	  MatroskaFileFrame frame = new MatroskaFileFrame();
+    	  frame.TrackNo = block.getTrackNo();
+    	  frame.Timecode = block.getAdjustedBlockTimecode(ClusterTimecode, this.TimecodeScale);
+    	  frame.Duration = BlockDuration;
+    	  frame.Reference = BlockReference;
+    	  frame.Data = block.getFrame(0);
+    	  frame.KeyFrame = block.isKeyFrame();
+    	  synchronized (FrameQueue) {
+    		  FrameQueue.addLast(new MatroskaFileFrame(frame));
+    	  }
+
+    	  if (block.getFrameCount() > 1) {
+    		  for (int f = 1; f < block.getFrameCount(); f++) {
+    			  frame.Data = block.getFrame(f);
+    			  synchronized (FrameQueue) {
+    				  FrameQueue.addLast(new MatroskaFileFrame(frame));
+    			  }
+    		  }
+    	  }
+    	  level2.skipData(ioDS);
 
       } else if (level2.equals(MatroskaDocType.ClusterBlockGroup_Id)) {
         MatroskaBlock block = null;
@@ -450,9 +478,9 @@ public class MatroskaFile {
         }
         TrackList.add(track);
       }
-
       level2.skipData(ioDS);
       level2 = ((MasterElement)level1).readNextChild(reader);
+
     }
   }
   private void _parseTags(Element level1, Element level2) {

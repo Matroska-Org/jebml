@@ -103,6 +103,7 @@ public class MatroskaDocType implements DocType
       static public byte[] ClusterTimecode_Id = {(byte)0xE7};
       static public byte[] ClusterBlockGroup_Id = {(byte)0xA0};
         static public byte[] ClusterBlock_Id = {(byte)0xA1};
+        static public byte[] ClusterSimpleBlock_Id = {(byte)0xA3};
         static public byte[] ClusterBlockDuration_Id = {(byte)0x9B};
         static public byte[] ClusterReferenceBlock_Id = {(byte)0xFB};
 
@@ -659,6 +660,16 @@ public class MatroskaDocType implements DocType
       level2.children.add(level3);
 
       // Add ClusterBlockGroup Element
+      level1.children.add(level2);
+      
+
+      level2 = new ElementType("SimpleBlock",
+              (short)2,
+              ClusterSimpleBlock_Id,
+              MatroskaDocType.BLOCK_ELEMENT,
+              new ArrayList());
+
+      // Add SimpleBlock Element
       level1.children.add(level2);
 
       // Add Cluster Element

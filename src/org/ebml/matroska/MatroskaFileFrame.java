@@ -58,8 +58,9 @@ public class MatroskaFileFrame
    * The frame data
    */
   public byte [] Data;
+  public boolean KeyFrame;
 
-  /**
+/**
    * MatroskaFrame Default constructor
    */
   public MatroskaFileFrame() 
@@ -78,6 +79,7 @@ public class MatroskaFileFrame
     this.Timecode = copy.Timecode;
     this.Duration = copy.Duration;
     this.Reference = copy.Reference;
+    this.KeyFrame = copy.KeyFrame;
     if (copy.References != null) 
     {
       this.References = new long[copy.References.length];
@@ -88,5 +90,9 @@ public class MatroskaFileFrame
       this.Data = new byte[copy.Data.length];
       ArrayCopy.arraycopy(copy.Data, 0, this.Data, 0, copy.Data.length);
     }
+  }
+  
+  public boolean isKeyFrame() {
+    return KeyFrame;
   }
 }

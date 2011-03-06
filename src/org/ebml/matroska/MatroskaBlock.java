@@ -27,8 +27,11 @@ public class MatroskaBlock extends BinaryElement {
   protected int HeaderSize = 0;
   protected int BlockTimecode = 0;
   protected int TrackNo = 0;
+  private boolean keyFrame;
 
-  public MatroskaBlock(byte[] type) {
+
+
+public MatroskaBlock(byte[] type) {
     super(type);
   }
 
@@ -47,8 +50,16 @@ public class MatroskaBlock extends BinaryElement {
     if (BlockTimecode1 != 0 || BlockTimecode2 != 0) {
       BlockTimecode = (BlockTimecode1 << 8) | BlockTimecode2;
     }
-
-    int LaceFlag = data[index++] & 0x06;
+    
+    
+    int keyFlag = data[index] & 0x80;
+    if(keyFlag > 0)
+    	this.keyFrame = true;
+    else
+    	this.keyFrame = false;
+    
+    int LaceFlag = data[index] & 0x06;
+    index++;
     // Increase the HeaderSize by the number of bytes we have read
     HeaderSize += 3;
     if (LaceFlag != 0x00) {
@@ -69,7 +80,7 @@ public class MatroskaBlock extends BinaryElement {
       } else {
         throw new RuntimeException("Unsupported lacing type flag.");
       }
-    }
+    } 
     //data = new byte[(int)(this.getSize() - HeaderSize)];
     //source.read(data, 0, data.length);
     //this.dataRead = true;
@@ -144,7 +155,10 @@ public class MatroskaBlock extends BinaryElement {
       if (frame != 0) {
         throw new IllegalArgumentException("Tried to read laced frame on non-laced Block. MatroskaBlock.getFrame(frame > 0)");
       }
-      return data;
+      byte [] FrameData = new byte[data.length-HeaderSize];
+      ArrayCopy.arraycopy(data, HeaderSize, FrameData, 0, FrameData.length);
+      
+      return FrameData;
     }
     byte [] FrameData = new byte[Sizes[frame]];
 
@@ -175,5 +189,8 @@ public class MatroskaBlock extends BinaryElement {
   public void setFrameData(short trackNo, int timecode, byte [] data) 
   {
 
+  }
+  public boolean isKeyFrame() {
+    return keyFrame;
   }
 }
