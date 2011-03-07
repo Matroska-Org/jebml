@@ -101,8 +101,8 @@ public class EBMLReader {
     byte[] data = getEBMLCodeAsBytes(source);
     long elementSize = parseEBMLCode(data);
     if (elementSize == 0)
-      // Failed to read element size
-      return null;
+      // Zero sized element is valid
+      ;//return null;
 
     Element elem = null;
     //lastElementType = elementTypes.findElement(elementType);
@@ -127,7 +127,7 @@ public class EBMLReader {
     //Set the data property on the element
     //elem.setData(elementData);
 
-    //System.out.println("EBMLReader.readNextElement() returning element " + elem.getElementType().name + " with size " + Long.toString(elementSize)+" "+Long.toString(elem.getTotalSize()));
+    //System.out.println("EBMLReader.readNextElement() returning element " + elem.getElementType().name + " with size " + Long.toString(elem.getTotalSize()-elementSize)+" "+Long.toString(elementSize));
 
     //Return the element
     return elem;
