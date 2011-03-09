@@ -1,6 +1,7 @@
 package org.ebml.matroska.jmf;
 
-import org.ebml.*;
+import javax.media.protocol.SourceStream;
+
 import org.ebml.io.*;
 
 /**
@@ -73,7 +74,7 @@ public class JMFPullSourceStreamDataSource implements DataSource {
 
   public long length() {
     long length = source.getContentLength();
-    if (length == source.LENGTH_UNKNOWN)
+    if (length == SourceStream.LENGTH_UNKNOWN)
       return -1;
 
     return length;

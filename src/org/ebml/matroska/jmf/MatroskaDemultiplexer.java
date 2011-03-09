@@ -133,7 +133,7 @@ public class MatroskaDemultiplexer
       }
       seekable = file.isSeekable();
     }
-    ArrayList demuxTracks = new ArrayList();
+    ArrayList<MatroskaDemultiplexerTrack> demuxTracks = new ArrayList<MatroskaDemultiplexerTrack>();
     MatroskaFileTrack [] fileTracks = file.getTrackList();
     for (int t = 0; t < fileTracks.length; t++) {
       MatroskaDemultiplexerTrack track = new MatroskaDemultiplexerTrack(file, fileTracks[t].TrackNo);
@@ -264,7 +264,7 @@ public class MatroskaDemultiplexer
     }
 
     this.source = source;
-    this.streams = streams;
+    //this.streams = streams;
 
     //positionable =  (streams[0] instanceof Seekable);
     //seekable =  positionable && ((Seekable) streams[0]).isRandomAccess();

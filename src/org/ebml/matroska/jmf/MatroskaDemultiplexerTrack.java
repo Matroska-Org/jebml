@@ -77,17 +77,17 @@ public class MatroskaDemultiplexerTrack implements Track {
     if (frame.Duration != 0) {
       buffer.setDuration(frame.Duration * 1000000);
     } else {
-      buffer.setDuration(buffer.TIME_UNKNOWN);
+      buffer.setDuration(Buffer.TIME_UNKNOWN);
     }
-    Object data = buffer.getData();
+    buffer.getData();
     buffer.setData(frame.Data);
     buffer.setLength(frame.Data.length);
   }
   public int mapTimeToFrame(Time time) {
-    return this.FRAME_UNKNOWN;
+    return MatroskaDemultiplexerTrack.FRAME_UNKNOWN;
   }
   public Time mapFrameToTime(int frame) {
-    return this.TIME_UNKNOWN;
+    return MatroskaDemultiplexerTrack.TIME_UNKNOWN;
   }
   public void setTrackListener(TrackListener listen) {
     /**@todo Implement this javax.media.Track method*/
