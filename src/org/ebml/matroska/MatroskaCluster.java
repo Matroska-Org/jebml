@@ -96,7 +96,8 @@ public class MatroskaCluster extends MasterElement
     TLinkedList.IteratorImpl iter = frames.first();
     while (iter.hasNext()) 
     {
-      MatroskaFileFrame frame = (MatroskaFileFrame)iter.next();
+      //MatroskaFileFrame frame = (MatroskaFileFrame)
+    	iter.next();
     }
     
   }

@@ -20,6 +20,7 @@
 package org.ebml.matroska;
 
 import org.ebml.*;
+
 import java.util.*;
 
 /**
@@ -170,7 +171,7 @@ public class MatroskaDocType implements DocType
   protected void init() {
     try {
       ElementType baseLevel = new ElementType("", (short)0, (byte[])null,
-                                              (short)0, new ArrayList());
+                                              (short)0, new ArrayList<ElementType>());
       ElementType level0 = null;
       ElementType level1 = null;
       ElementType level2 = null;
@@ -182,62 +183,62 @@ public class MatroskaDocType implements DocType
                                (short)1,
                                Void_Id,
                                ElementType.BINARY_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       baseLevel.children.add(level0);
 
       level0 = new ElementType("EBMLHeader",
                                (short)0,
                                EBMLHeader_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level1 = new ElementType("EBMLVersion",
                                (short)1,
                                EBMLVersion_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level0.children.add(level1);
 
       level1 = new ElementType("EBMLReadVersion",
                                (short)1,
                                EBMLReadVersion_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level0.children.add(level1);
 
       level1 = new ElementType("EBMLMaxIDLength",
                                (short)1,
                                EBMLMaxIDLength_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level0.children.add(level1);
 
       level1 = new ElementType("EBMLMaxSizeLength",
                                (short)1,
                                EBMLMaxSizeLength_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level0.children.add(level1);
 
       level1 = new ElementType("DocType",
                                (short)1,
                                DocType_Id,
                                ElementType.STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level0.children.add(level1);
 
       level1 = new ElementType("DocTypeVersion",
                                (short)1,
                                DocTypeVersion_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level0.children.add(level1);
 
       level1 = new ElementType("DocTypeReadVersion",
                                (short)1,
                                DocTypeReadVersion_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level0.children.add(level1);
 
       baseLevel.children.add(level0);
@@ -246,32 +247,32 @@ public class MatroskaDocType implements DocType
                                (short)0,
                                Segment_Id,
                                MatroskaDocType.SEGMENT_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level1 = new ElementType("SeekHead",
                                (short)1,
                                SeekHead_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level2 = new ElementType("SeekEntry",
                                (short)2,
                                SeekEntry_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level3 = new ElementType("SeekID",
                                (short)3,
                                SeekID_Id,
                                ElementType.BINARY_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("SeekPosition",
                                (short)3,
                                SeekPosition_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
       // Add Seek Element
       level1.children.add(level2);
@@ -282,62 +283,62 @@ public class MatroskaDocType implements DocType
                                (short)1,
                                SegmentInfo_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level2 = new ElementType("SegmentUID",
                                (short)2,
                                SegmentUID_Id,
                                ElementType.BINARY_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level1.children.add(level2);
 
       level2 = new ElementType("SegmentFilename",
                                (short)2,
                                SegmentFilename_Id,
                                ElementType.STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level1.children.add(level2);
 
       level2 = new ElementType("TimecodeScale",
                                (short)2,
                                TimecodeScale_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level1.children.add(level2);
 
       level2 = new ElementType("Duration",
                                (short)2,
                                Duration_Id,
                                ElementType.FLOAT_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level1.children.add(level2);
 
       level2 = new ElementType("DateUTC",
                                (short)2,
                                DateUTC_Id,
                                ElementType.DATE_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level1.children.add(level2);
 
       level2 = new ElementType("Title",
                                (short)2,
                                Title_Id,
                                ElementType.STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level1.children.add(level2);
 
       level2 = new ElementType("MuxingApp",
                                (short)2,
                                MuxingApp_Id,
                                ElementType.STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level1.children.add(level2);
 
       level2 = new ElementType("WritingApp",
                                (short)2,
                                WritingApp_Id,
                                ElementType.STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level1.children.add(level2);
 
       // Add Segment Infomation Element
@@ -347,102 +348,102 @@ public class MatroskaDocType implements DocType
                                (short)1,
                                Tracks_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level2 = new ElementType("TrackEntry",
                                (short)2,
                                TrackEntry_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level3 = new ElementType("TrackNumber",
                                (short)3,
                                TrackNumber_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("TrackUID",
                                (short)3,
                                TrackUID_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("TrackType",
                                (short)3,
                                TrackType_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("TrackDefaultDuration",
                                (short)3,
                                TrackDefaultDuration_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("TrackName",
                                (short)3,
                                TrackName_Id,
                                ElementType.STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("TrackLanguage",
                                (short)3,
                                TrackLanguage_Id,
                                ElementType.ASCII_STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("TrackCodecID",
                                (short)3,
                                TrackCodecID_Id,
                                ElementType.ASCII_STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("TrackCodecPrivate",
                                (short)3,
                                TrackCodecPrivate_Id,
                                ElementType.BINARY_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("TrackVideo",
                                (short)3,
                                TrackVideo_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level4 = new ElementType("PixelWidth",
                                (short)4,
                                PixelWidth_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("PixelHeight",
                                (short)4,
                                PixelHeight_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("DisplayWidth",
                                (short)4,
                                DisplayWidth_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("DisplayHeight",
                                (short)4,
                                DisplayHeight_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       // Add TrackVideo Element
@@ -452,34 +453,34 @@ public class MatroskaDocType implements DocType
                                (short)3,
                                TrackAudio_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level4 = new ElementType("SamplingFrequency",
                                (short)4,
                                SamplingFrequency_Id,
                                ElementType.FLOAT_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("OutputSamplingFrequency",
                                (short)4,
                                OutputSamplingFrequency_Id,
                                ElementType.FLOAT_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("Channels",
                                (short)4,
                                Channels_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("BitDepth",
                                (short)4,
                                BitDepth_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       // Add TrackAudio Element
@@ -494,47 +495,47 @@ public class MatroskaDocType implements DocType
                                (short)1,
                                Attachments_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level2 = new ElementType("AttachedFile",
                                (short)2,
                                AttachedFile_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level3 = new ElementType("AttachedFileDescription",
                                (short)3,
                                AttachedFileDescription_Id,
                                ElementType.STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("AttachedFileName",
                                (short)3,
                                AttachedFileName_Id,
                                ElementType.STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("AttachedFileMimeType",
                                (short)3,
                                AttachedFileMimeType_Id,
                                ElementType.ASCII_STRING_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("AttachedFileData",
                                (short)3,
                                AttachedFileData_Id,
                                ElementType.BINARY_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("AttachedFileUID",
                                (short)3,
                                AttachedFileUID_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       // Add AttachedFile Element
@@ -546,39 +547,39 @@ public class MatroskaDocType implements DocType
                                (short)1,
                                Tags_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level2 = new ElementType("Tag",
                                (short)2,
                                Tag_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level3 = new ElementType("TagTargets",
                                (short)3,
                                TagTargets_Id,
                                ElementType.MASTER_ELEMENT,
-                              new ArrayList());
+                              new ArrayList<ElementType>());
 
      level4 = new ElementType("TagTargetTrackUID",
                               (short)4,
                               TagTargetTrackUID_Id,
                               ElementType.UINTEGER_ELEMENT,
-                              (ArrayList)null);
+                              (ArrayList<ElementType>)null);
      level3.children.add(level4);
 
      level4 = new ElementType("TagTargetChapterUID",
                               (short)4,
                               TagTargetChapterUID_Id,
                               ElementType.UINTEGER_ELEMENT,
-                              (ArrayList)null);
+                              (ArrayList<ElementType>)null);
      level3.children.add(level4);
 
      level4 = new ElementType("TagTargetAttachmentUID",
                               (short)4,
                               TagTargetAttachmentUID_Id,
                               ElementType.UINTEGER_ELEMENT,
-                              (ArrayList)null);
+                              (ArrayList<ElementType>)null);
      level3.children.add(level4);
 
      // Add Targets
@@ -588,27 +589,27 @@ public class MatroskaDocType implements DocType
                                (short)3,
                                TagSimpleTag_Id,
                                ElementType.MASTER_ELEMENT,
-                              new ArrayList());
+                              new ArrayList<ElementType>());
 
      level4 = new ElementType("TagSimpleTagName",
                               (short)4,
                               TagSimpleTagName_Id,
                               ElementType.STRING_ELEMENT,
-                              (ArrayList)null);
+                              (ArrayList<ElementType>)null);
      level3.children.add(level4);
 
      level4 = new ElementType("TagSimpleTagString",
                               (short)4,
                               TagSimpleTagString_Id,
                               ElementType.STRING_ELEMENT,
-                              (ArrayList)null);
+                              (ArrayList<ElementType>)null);
      level3.children.add(level4);
 
      level4 = new ElementType("TagSimpleTagBinary",
                               (short)4,
                               TagSimpleTagBinary_Id,
                               ElementType.BINARY_ELEMENT,
-                              (ArrayList)null);
+                              (ArrayList<ElementType>)null);
      level3.children.add(level4);
 
      // Add SimpleTag
@@ -623,40 +624,40 @@ public class MatroskaDocType implements DocType
                                (short)1,
                                Cluster_Id,
                                MatroskaDocType.CLUSTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level2 = new ElementType("ClusterTimecode",
                                (short)2,
                                ClusterTimecode_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level1.children.add(level2);
 
       level2 = new ElementType("ClusterBlockGroup",
                                (short)2,
                                ClusterBlockGroup_Id,
                                ElementType.MASTER_ELEMENT,
-                               new ArrayList());
+                               new ArrayList<ElementType>());
 
       level3 = new ElementType("ClusterBlock",
                                (short)3,
                                ClusterBlock_Id,
                                MatroskaDocType.BLOCK_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("ClusterBlockDuration",
                                (short)3,
                                ClusterBlockDuration_Id,
                                ElementType.UINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("ClusterReferenceBlock",
                                (short)3,
                                ClusterReferenceBlock_Id,
                                ElementType.SINTEGER_ELEMENT,
-                               (ArrayList)null);
+                               (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       // Add ClusterBlockGroup Element
@@ -667,7 +668,7 @@ public class MatroskaDocType implements DocType
               (short)2,
               ClusterSimpleBlock_Id,
               MatroskaDocType.BLOCK_ELEMENT,
-              new ArrayList());
+              new ArrayList<ElementType>());
 
       // Add SimpleBlock Element
       level1.children.add(level2);
@@ -679,101 +680,101 @@ public class MatroskaDocType implements DocType
         (short)1,
         Chapters_Id,
         ElementType.MASTER_ELEMENT,
-        new ArrayList());
+        new ArrayList<ElementType>());
 
       level2 = new ElementType("ChapterEditionEntry",
         (short)2,
         ChapterEditionEntry_Id,
         ElementType.MASTER_ELEMENT,
-        new ArrayList());
+        new ArrayList<ElementType>());
 
       level3 = new ElementType("ChapterEditionUID",
         (short)3,
         ChapterEditionUID_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("ChapterEditionFlagHidden",
         (short)3,
         ChapterEditionFlagHidden_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("ChapterEditionFlagDefault",
         (short)3,
         ChapterEditionFlagDefault_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("ChapterEditionManaged",
         (short)3,
         ChapterEditionManaged_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level2.children.add(level3);
 
       level3 = new ElementType("ChapterAtom",
         (short)3,
         ChapterAtom_Id,
         ElementType.MASTER_ELEMENT,
-        new ArrayList());      
+        new ArrayList<ElementType>());      
 
       level4 = new ElementType("ChapterAtomChapterUID",
         (short)4,
         ChapterAtomChapterUID_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("ChapterAtomChapterTimeStart",
         (short)4,
         ChapterAtomChapterTimeStart_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("ChapterAtomChapterTimeEnd",
         (short)4,
         ChapterAtomChapterTimeEnd_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("ChapterAtomChapterFlagHidden",
         (short)4,
         ChapterAtomChapterFlagHidden_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("ChapterAtomChapterFlagEnabled",
         (short)4,
         ChapterAtomChapterFlagEnabled_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("ChapterAtomChapterPhysicalEquiv",
         (short)4,
         ChapterAtomChapterPhysicalEquiv_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level3.children.add(level4);
 
       level4 = new ElementType("ChapterAtomChapterTrack",
         (short)4,
         ChapterAtomChapterTrack_Id,
         ElementType.MASTER_ELEMENT,
-        new ArrayList());      
+        new ArrayList<ElementType>());      
 
       level5 = new ElementType("ChapterAtomChapterTrackNumber",
         (short)5,
         ChapterAtomChapterTrackNumber_Id,
         ElementType.UINTEGER_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level4.children.add(level5);
 
       // Add ChapterAtomChapterTrack Element
@@ -783,27 +784,27 @@ public class MatroskaDocType implements DocType
         (short)4,
         ChapterAtomChapterDisplay_Id,
         ElementType.MASTER_ELEMENT,
-        new ArrayList());      
+        new ArrayList<ElementType>());      
 
       level5 = new ElementType("ChapterAtomChapString",
         (short)5,
         ChapterAtomChapString_Id,
         ElementType.STRING_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level4.children.add(level5);
 
       level5 = new ElementType("ChapterAtomChapLanguage",
         (short)5,
         ChapterAtomChapLanguage_Id,
         ElementType.ASCII_STRING_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level4.children.add(level5);
 
       level5 = new ElementType("ChapterAtomChapCountry",
         (short)5,
         ChapterAtomChapCountry_Id,
         ElementType.ASCII_STRING_ELEMENT,
-        (ArrayList)null);
+        (ArrayList<ElementType>)null);
       level4.children.add(level5);
 
       // Add ChapterAtomChapterDisplay Element
@@ -859,7 +860,7 @@ public class MatroskaDocType implements DocType
       {
         elem = new MatroskaCluster(type.id);        
       } 
-      else if (type.type == type.UNKNOWN_ELEMENT) 
+      else if (type.type == ElementType.UNKNOWN_ELEMENT) 
       {
         elem = new BinaryElement(type.id);
 

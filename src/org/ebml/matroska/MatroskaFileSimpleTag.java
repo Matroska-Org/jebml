@@ -19,14 +19,13 @@
  */
 package org.ebml.matroska;
 
-import org.ebml.util.*;
-import java.util.*;
+import java.util.ArrayList;
 
 public class MatroskaFileSimpleTag 
 {
   public String Name;
   public String Value;
-  public ArrayList Children = new ArrayList();
+  public ArrayList<MatroskaFileSimpleTag> Children = new ArrayList<MatroskaFileSimpleTag>();
 
   public String toString(int depth) 
   {

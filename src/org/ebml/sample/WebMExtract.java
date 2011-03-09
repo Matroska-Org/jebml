@@ -1,9 +1,12 @@
 package org.ebml.sample;
 
-import org.ebml.matroska.*;
-import org.ebml.*;
-import org.ebml.io.*;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.ebml.io.FileDataSource;
+import org.ebml.matroska.MatroskaFile;
+import org.ebml.matroska.MatroskaFileFrame;
+import org.ebml.matroska.MatroskaFileTrack;
 
 /**
  * <p>Title: JEBML</p>
@@ -41,7 +44,7 @@ public class WebMExtract {
 		mF.readFile();
 
 		System.out.println(mF.getReport());
-		MatroskaFileTrack[] tl = mF.getTrackList();
+
 		MatroskaFileTrack track=null;
 		for(MatroskaFileTrack t : mF.getTrackList() ) {
 			if(t.CodecID.compareTo("V_VP8")==0)

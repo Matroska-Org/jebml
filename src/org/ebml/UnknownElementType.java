@@ -23,6 +23,6 @@ import java.util.*;
 
 public class UnknownElementType extends ElementType {
   public UnknownElementType(byte [] id) {
-    super("Unknown", (short)0, id, ElementType.UNKNOWN_ELEMENT, (ArrayList)null);
+    super("Unknown", (short)0, id, ElementType.UNKNOWN_ELEMENT, (ArrayList<ElementType>)null);
   }
 }

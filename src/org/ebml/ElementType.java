@@ -39,12 +39,12 @@ public class ElementType {
   public byte [] id;
   public short type;
   //public HashMap child;
-  public ArrayList children;
+  public ArrayList<ElementType> children;
 
   public ElementType() {
 
   }
-  public ElementType(String name, short level, byte [] id, short type, ArrayList children) {
+  public ElementType(String name, short level, byte [] id, short type, ArrayList<ElementType> children) {
     this.name = name;
     this.level = level;
     this.id = id;

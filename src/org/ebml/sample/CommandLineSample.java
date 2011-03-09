@@ -1,9 +1,14 @@
 package org.ebml.sample;
 
-import org.ebml.matroska.*;
-import org.ebml.*;
-import org.ebml.io.*;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.ebml.io.FileDataSource;
+import org.ebml.io.FileDataWriter;
+import org.ebml.matroska.MatroskaFile;
+import org.ebml.matroska.MatroskaFileFrame;
+import org.ebml.matroska.MatroskaFileTrack;
+import org.ebml.matroska.MatroskaFileWriter;
 
 /**
  * <p>Title: JEBML</p>

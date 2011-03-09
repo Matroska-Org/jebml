@@ -24,7 +24,7 @@ import java.util.*;
 
 public class MasterElement extends Element {
   protected long usedSize;
-  protected ArrayList children = new ArrayList();
+  protected ArrayList<Element> children = new ArrayList<Element>();
 
   public MasterElement(byte[] type) {
     super(type);

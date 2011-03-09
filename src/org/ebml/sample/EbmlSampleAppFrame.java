@@ -1,13 +1,10 @@
 package org.ebml.sample;
 
 import java.io.*;
-import java.lang.*;
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import org.ebml.*;
 import org.ebml.io.*;
 import org.ebml.matroska.*;
 
@@ -22,6 +19,8 @@ import org.ebml.matroska.*;
 
 public class EbmlSampleAppFrame
     extends JFrame {
+
+  private static final long serialVersionUID = 1L;
   JPanel contentPane;
   JMenuBar jMenuBar1 = new JMenuBar();
   JMenu jMenuFile = new JMenu();
@@ -95,7 +94,7 @@ public class EbmlSampleAppFrame
           outFS1.write(buffer, 0, len);
         }
         */
-        FileOutputStream outFS = new FileOutputStream(jFileChooser1.getSelectedFile() + ".mp3");
+        //FileOutputStream outFS = new FileOutputStream(jFileChooser1.getSelectedFile() + ".mp3");
         FileInputStream ioF = new FileInputStream(jFileChooser1.getSelectedFile());
         jTextArea1.append("Scanning file: " + jFileChooser1.getSelectedFile().toString() + "\n");
 
@@ -114,9 +113,6 @@ public class EbmlSampleAppFrame
       }
     } catch (java.io.FileNotFoundException ex) {
       jTextArea1.append("File Not Found!\n");
-      ex.printStackTrace();
-    } catch (java.io.IOException ex) {
-      jTextArea1.append("File IO Error!\n");
       ex.printStackTrace();
     } catch (java.lang.RuntimeException ex) {
       jTextArea1.append("Error: " + ex.toString() + ex.getMessage() + "\"\n");

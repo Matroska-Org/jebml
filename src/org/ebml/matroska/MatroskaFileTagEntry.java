@@ -19,15 +19,14 @@
  */
 package org.ebml.matroska;
 
-import org.ebml.util.*;
-import java.util.*;
+import java.util.ArrayList;
 
 public class MatroskaFileTagEntry 
 {
-  public ArrayList TrackUID = new ArrayList();
-  public ArrayList ChapterUID = new ArrayList();
-  public ArrayList AttachmentUID = new ArrayList();
-  public ArrayList SimpleTags = new ArrayList();
+  public ArrayList<Long> TrackUID = new ArrayList<Long>();
+  public ArrayList<Long> ChapterUID = new ArrayList<Long>();
+  public ArrayList<Long> AttachmentUID = new ArrayList<Long>();
+  public ArrayList<MatroskaFileSimpleTag> SimpleTags = new ArrayList<MatroskaFileSimpleTag>();
 
   public String toString() 
   {

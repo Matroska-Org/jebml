@@ -40,8 +40,8 @@ public class MatroskaFile {
   protected String WritingApp;
   protected long TimecodeScale = 1000000;
   protected double Duration;
-  protected ArrayList TrackList = new ArrayList();
-  protected ArrayList TagList = new ArrayList();
+  protected ArrayList<MatroskaFileTrack> TrackList = new ArrayList<MatroskaFileTrack>();
+  protected ArrayList<MatroskaFileTagEntry> TagList = new ArrayList<MatroskaFileTagEntry>();
   protected TLinkedList FrameQueue = new TLinkedList();
 	protected boolean ScanFirstCluster = true;
 
@@ -63,8 +63,8 @@ public class MatroskaFile {
   public void readFile() {
     Element level1 = null;
     Element level2 = null;
-    Element level3 = null;
-    Element level4 = null;
+//    Element level3 = null;
+//    Element level4 = null;
 
     level0 = reader.readNextElement();
     if (level0 == null) {
