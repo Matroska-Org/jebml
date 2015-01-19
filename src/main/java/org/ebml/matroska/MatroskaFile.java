@@ -670,7 +670,7 @@ public class MatroskaFile
     for (int t = 0; t < TrackList.size(); t++)
     {
       final MatroskaFileTrack track = TrackList.get(t);
-      if (track.TrackNo == TrackNo)
+      if (track.getTrackNo() == TrackNo)
         return track;
     }
     return null;

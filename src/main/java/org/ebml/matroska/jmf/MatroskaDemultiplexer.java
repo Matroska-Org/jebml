@@ -136,7 +136,7 @@ public class MatroskaDemultiplexer
     ArrayList<MatroskaDemultiplexerTrack> demuxTracks = new ArrayList<MatroskaDemultiplexerTrack>();
     MatroskaFileTrack [] fileTracks = file.getTrackList();
     for (int t = 0; t < fileTracks.length; t++) {
-      MatroskaDemultiplexerTrack track = new MatroskaDemultiplexerTrack(file, fileTracks[t].TrackNo);
+      MatroskaDemultiplexerTrack track = new MatroskaDemultiplexerTrack(file, fileTracks[t].getTrackNo());
       if (track.isEnabled())
         demuxTracks.add(track);
     }

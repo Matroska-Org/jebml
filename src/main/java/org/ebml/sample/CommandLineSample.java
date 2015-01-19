@@ -73,7 +73,7 @@ public class CommandLineSample
     System.out.println(mF.getReport());
 
     final MatroskaFileTrack track = mF.getTrack(1);
-    if (track.CodecID.compareTo("A_MPEG/L3") == 0)
+    if (track.getCodecID().compareTo("A_MPEG/L3") == 0)
     {
       System.out.println("Extracting mp3 track");
       final String outputFilename = filename + ".mp3";// + ".wav";
@@ -111,12 +111,12 @@ public class CommandLineSample
     for (int i = 0; i < 5; i++)
     {
       final MatroskaFileTrack track = new MatroskaFileTrack();
-      track.TrackNo = (short) i;
-      track.TrackUID = new java.util.Random().nextLong();
-      track.TrackType = 1;
-      track.Name = "Track " + Integer.toString(i);
-      track.video.PixelWidth = 320;
-      track.video.PixelHeight = 240;
+      track.setTrackNo((short) i);
+      track.setTrackUID(new java.util.Random().nextLong());
+      track.setTrackType((byte) 1);
+      track.setName("Track " + Integer.toString(i));
+      track.getVideo().setPixelWidth((short) 320);
+      track.getVideo().setPixelHeight((short) 240);
       mFW.addTrack(track);
     }
     mFW.init();

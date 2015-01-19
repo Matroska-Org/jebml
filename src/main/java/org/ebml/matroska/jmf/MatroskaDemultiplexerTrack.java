@@ -45,23 +45,23 @@ public class MatroskaDemultiplexerTrack implements Track
   public void init()
   {
     final MatroskaFileTrack track = file.getTrack(TrackNo);
-    if (track.CodecID.compareTo("V_MS/VFW/FOURCC") == 0)
+    if (track.getCodecID().compareTo("V_MS/VFW/FOURCC") == 0)
     {
 
     }
-    else if (track.CodecID.compareTo("A_MPEG/L3") == 0)
+    else if (track.getCodecID().compareTo("A_MPEG/L3") == 0)
     {
-      if (track.audio.BitDepth == 0)
-        track.audio.BitDepth = 16;
-      format = new AudioFormat(AudioFormat.MPEGLAYER3, track.audio.SamplingFrequency, track.audio.BitDepth, track.audio.Channels);
+      if (track.getAudio().bitDepth == 0)
+        track.getAudio().bitDepth = 16;
+      format = new AudioFormat(AudioFormat.MPEGLAYER3, track.getAudio().getSamplingFrequency(), track.getAudio().bitDepth, track.getAudio().channels);
 
       setEnabled(true);
     }
-    else if (track.CodecID.compareTo("A_MPEG/L2") == 0)
+    else if (track.getCodecID().compareTo("A_MPEG/L2") == 0)
     {
-      if (track.audio.BitDepth == 0)
-        track.audio.BitDepth = 16;
-      format = new AudioFormat("mpegaudio", track.audio.SamplingFrequency, track.audio.BitDepth, track.audio.Channels);
+      if (track.getAudio().bitDepth == 0)
+        track.getAudio().bitDepth = 16;
+      format = new AudioFormat("mpegaudio", track.getAudio().getSamplingFrequency(), track.getAudio().bitDepth, track.getAudio().channels);
 
       setEnabled(true);
     }

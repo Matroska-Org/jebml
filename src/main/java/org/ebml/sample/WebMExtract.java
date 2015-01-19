@@ -47,13 +47,13 @@ public class WebMExtract {
 
 		MatroskaFileTrack track=null;
 		for(MatroskaFileTrack t : mF.getTrackList() ) {
-			if(t.CodecID.compareTo("V_VP8")==0)
+			if(t.getCodecID().compareTo("V_VP8")==0)
 				track = t;
 		}
 		
 		if (track!=null)
 		{
-			MatroskaFileFrame frame = mF.getNextFrame(track.TrackNo);
+			MatroskaFileFrame frame = mF.getNextFrame(track.getTrackNo());
 			int count=0;
 			while (frame != null)
 			{
@@ -72,7 +72,7 @@ public class WebMExtract {
 	
 					oFS.write(frame.getData());
 				}
-				frame = mF.getNextFrame(track.TrackNo);
+				frame = mF.getNextFrame(track.getTrackNo());
 				count++;
 			}
 		}
