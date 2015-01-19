@@ -64,13 +64,13 @@ public class WebMExtract {
 	
 					oFS.write("RIFF".getBytes());
 	
-					writeIntLE(oFS, frame.Data.length+20-8);
+					writeIntLE(oFS, frame.getData().length+20-8);
 	
 					oFS.write("WEBPVP8".getBytes());
 					oFS.write(0x20);
-					writeIntLE(oFS, (frame.Data.length+20-8)-0xc);
+					writeIntLE(oFS, (frame.getData().length+20-8)-0xc);
 	
-					oFS.write(frame.Data);
+					oFS.write(frame.getData());
 				}
 				frame = mF.getNextFrame(track.TrackNo);
 				count++;

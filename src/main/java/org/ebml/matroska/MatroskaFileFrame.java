@@ -19,17 +19,19 @@
  */
 package org.ebml.matroska;
 
+import java.util.ArrayList;
+
 import org.ebml.util.*;
 
 /**
-  * Matroska Frame, holds a Matroska frame timecode, duration, and data
-  */
-public class MatroskaFileFrame 
+ * Matroska Frame, holds a Matroska frame timecode, duration, and data
+ */
+public class MatroskaFileFrame
 {
   /**
    * Matroska Frame Puller interface
    */
-  public interface MatroskaFramePuller 
+  public interface MatroskaFramePuller
   {
     public void PushNewMatroskaFrame(MatroskaFileFrame frame);
   };
@@ -37,62 +39,118 @@ public class MatroskaFileFrame
   /**
    * The track this frame belongs to
    */
-  public int TrackNo;
+  private int trackNo;
   /**
    * A timecode, it should be in ms
    */
-  public long Timecode;
+  private long timecode;
   /**
    * The duration of this frame, it should also be in ms
    */
-  public long Duration;
+  private long duration;
+
   /**
-   * The first reference this frame has, set to 0 for no reference
+   * List of references
    */
-  public long Reference;
-  /**
-   * More references, can be null if there are no more references
-   */
-  public long [] References;
+  private ArrayList<Long> references;
   /**
    * The frame data
    */
-  public byte [] Data;
-  public boolean KeyFrame;
+  private byte[] data;
+  private boolean keyFrame;
 
-/**
+  /**
    * MatroskaFrame Default constructor
    */
-  public MatroskaFileFrame() 
+  public MatroskaFileFrame()
   {
-    //System.out.println("new " + this);
+    references = new ArrayList<Long>();
+    // System.out.println("new " + this);
   }
 
   /**
    * MatroskaFrame Copy constructor
+   * 
    * @param copy MatroskaFrame to copy
    */
-  public MatroskaFileFrame(MatroskaFileFrame copy) 
+  public MatroskaFileFrame(final MatroskaFileFrame copy)
   {
-    //System.out.println("MatroskaFrame copy " + this);
-    this.TrackNo = copy.TrackNo;
-    this.Timecode = copy.Timecode;
-    this.Duration = copy.Duration;
-    this.Reference = copy.Reference;
-    this.KeyFrame = copy.KeyFrame;
-    if (copy.References != null) 
+    // System.out.println("MatroskaFrame copy " + this);
+    this.trackNo = copy.trackNo;
+    this.setTimecode(copy.getTimecode());
+    this.setDuration(copy.getDuration());
+    this.setKeyFrame(copy.isKeyFrame());
+    if (copy.getReferences() != null)
     {
-      this.References = new long[copy.References.length];
-      ArrayCopy.arraycopy(copy.References, 0, this.References, 0, copy.References.length);
+      this.references.addAll(copy.getReferences());
     }
-    if (copy.Data != null) 
+    if (copy.getData() != null)
     {
-      this.Data = new byte[copy.Data.length];
-      ArrayCopy.arraycopy(copy.Data, 0, this.Data, 0, copy.Data.length);
+      this.setData(new byte[copy.getData().length]);
+      ArrayCopy.arraycopy(copy.getData(), 0, this.getData(), 0, copy.getData().length);
     }
   }
-  
-  public boolean isKeyFrame() {
-    return KeyFrame;
+
+  public boolean isKeyFrame()
+  {
+    return keyFrame;
+  }
+
+  public int getTrackNo()
+  {
+    return trackNo;
+  }
+
+  public void setTrackNo(final int trackNo)
+  {
+    this.trackNo = trackNo;
+  }
+
+  public ArrayList<Long> getReferences()
+  {
+    return references;
+  }
+
+  public void addReferences(final long... references)
+  {
+    for (final Long ref: references)
+    {
+      this.references.add(ref);
+    }
+  }
+
+  public long getTimecode()
+  {
+    return timecode;
+  }
+
+  public void setTimecode(long timecode)
+  {
+    this.timecode = timecode;
+  }
+
+  public long getDuration()
+  {
+    return duration;
+  }
+
+  public void setDuration(long duration)
+  {
+    this.duration = duration;
+  }
+
+  public byte[] getData()
+  {
+    return data;
+  }
+
+  public void setData(byte[] data)
+  {
+    this.data = data;
+  }
+
+  public void setKeyFrame(boolean keyFrame)
+  {
+    this.keyFrame = keyFrame;
   }
 }

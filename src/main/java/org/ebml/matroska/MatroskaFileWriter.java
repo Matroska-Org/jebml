@@ -22,8 +22,8 @@ package org.ebml.matroska;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.ebml.BinaryElement;
 import org.ebml.DateElement;
+import org.ebml.Element;
 import org.ebml.FloatElement;
 import org.ebml.MasterElement;
 import org.ebml.StringElement;
@@ -38,175 +38,179 @@ public class MatroskaFileWriter
   protected DataWriter ioDW;
   protected MatroskaDocType doc = new MatroskaDocType();
 
-  public long TimecodeScale = 1000000;
-  public double Duration = 60.0;
-  public Date SegmentDate = new Date();
-  public ArrayList<MatroskaFileTrack> TrackList = new ArrayList<MatroskaFileTrack>();
+  private long timecodeScale = 1000000;
+  private Double duration;
+  private final Date segmentDate = new Date();
+  private final ArrayList<MatroskaFileTrack> trackList = new ArrayList<MatroskaFileTrack>();
+  private final MatroskaFileMetaSeek metaSeek;
+  private final MatroskaFileCues cueData;
+  private final MatroskaCluster cluster;
+  private boolean inited = false;
 
-	public MatroskaFileWriter(DataWriter outputDataWriter)
-	{
-		ioDW = outputDataWriter;
-	}
-
-  public void writeEBMLHeader() 
+  public MatroskaFileWriter(final DataWriter outputDataWriter)
   {
-    MasterElement ebmlHeaderElem = (MasterElement)doc.createElement(MatroskaDocType.EBMLHeader_Id);
-    
-    StringElement docTypeElem = (StringElement)doc.createElement(MatroskaDocType.DocType_Id);
+    ioDW = outputDataWriter;
+    writeEBMLHeader();
+    writeSegmentHeader();
+    metaSeek = new MatroskaFileMetaSeek(doc, ioDW.getFilePointer());
+    cueData = new MatroskaFileCues(doc, ioDW.getFilePointer());
+    metaSeek.write(ioDW);
+    cluster = (MatroskaCluster) doc.createElement(MatroskaDocType.Cluster_Id);
+  }
+
+  void writeEBMLHeader()
+  {
+    final MasterElement ebmlHeaderElem = (MasterElement) doc.createElement(MatroskaDocType.EBMLHeader_Id);
+
+    final StringElement docTypeElem = (StringElement) doc.createElement(MatroskaDocType.DocType_Id);
     docTypeElem.setValue("matroska");
-    
-    UnsignedIntegerElement docTypeVersionElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.DocTypeVersion_Id);
+
+    final UnsignedIntegerElement docTypeVersionElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.DocTypeVersion_Id);
     docTypeVersionElem.setValue(1);
-    
-    UnsignedIntegerElement docTypeReadVersionElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.DocTypeReadVersion_Id);
+
+    final UnsignedIntegerElement docTypeReadVersionElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.DocTypeReadVersion_Id);
     docTypeReadVersionElem.setValue(1);
-    
-    ebmlHeaderElem.addChildElement(docTypeElem);    
-    ebmlHeaderElem.addChildElement(docTypeVersionElem);    
-    ebmlHeaderElem.addChildElement(docTypeReadVersionElem); 
+
+    ebmlHeaderElem.addChildElement(docTypeElem);
+    ebmlHeaderElem.addChildElement(docTypeVersionElem);
+    ebmlHeaderElem.addChildElement(docTypeReadVersionElem);
     ebmlHeaderElem.writeElement(ioDW);
   }
 
-  public void writeSegmentHeader() 
+  void writeSegmentHeader()
   {
-    MatroskaSegment segmentElem = (MatroskaSegment)doc.createElement(MatroskaDocType.Segment_Id);
-    //segmentElem.setSize(-1);
+    final MatroskaSegment segmentElem = (MatroskaSegment) doc.createElement(MatroskaDocType.Segment_Id);
     segmentElem.setUnknownSize(true);
     segmentElem.writeHeaderData(ioDW);
   }
 
-  public void writeSegmentInfo()
+  void writeSegmentInfo()
   {
-    MasterElement segmentInfoElem = (MasterElement)doc.createElement(MatroskaDocType.SegmentInfo_Id);
-    
-    StringElement writingAppElem = (StringElement)doc.createElement(MatroskaDocType.WritingApp_Id);
+    final MasterElement segmentInfoElem = (MasterElement) doc.createElement(MatroskaDocType.SegmentInfo_Id);
+
+    final StringElement writingAppElem = (StringElement) doc.createElement(MatroskaDocType.WritingApp_Id);
     writingAppElem.setValue("Matroska File Writer v1.0");
 
-    StringElement muxingAppElem = (StringElement)doc.createElement(MatroskaDocType.MuxingApp_Id);
+    final StringElement muxingAppElem = (StringElement) doc.createElement(MatroskaDocType.MuxingApp_Id);
     muxingAppElem.setValue("JEBML v1.0");
 
-    DateElement dateElem = (DateElement)doc.createElement(MatroskaDocType.DateUTC_Id);
-    dateElem.setDate(SegmentDate);
-		
-    //Add timecode scale
-    UnsignedIntegerElement timecodescaleElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.TimecodeScale_Id);
-    timecodescaleElem.setValue(TimecodeScale);
-										
-    FloatElement durationElem = (FloatElement)doc.createElement(MatroskaDocType.Duration_Id);
-    durationElem.setValue(Duration * 1000.0);
-	 
+    final DateElement dateElem = (DateElement) doc.createElement(MatroskaDocType.DateUTC_Id);
+    dateElem.setDate(segmentDate);
+
+    // Add timecode scale
+    final UnsignedIntegerElement timecodescaleElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TimecodeScale_Id);
+    timecodescaleElem.setValue(timecodeScale);
+
     segmentInfoElem.addChildElement(dateElem);
     segmentInfoElem.addChildElement(timecodescaleElem);
-    segmentInfoElem.addChildElement(durationElem);
+
+    if (duration != null)
+    {
+      final FloatElement durationElem = (FloatElement) doc.createElement(MatroskaDocType.Duration_Id);
+      durationElem.setValue(duration * 1000.0);
+      segmentInfoElem.addChildElement(durationElem);
+    }
+
     segmentInfoElem.addChildElement(writingAppElem);
     segmentInfoElem.addChildElement(muxingAppElem);
 
+    metaSeek.addIndexedElement(segmentInfoElem, ioDW.getFilePointer());
     segmentInfoElem.writeElement(ioDW);
   }
 
-  public void writeTracks()
+  void writeTracks()
   {
-    MasterElement tracksElem = (MasterElement)doc.createElement(MatroskaDocType.Tracks_Id);
+    final long pos = MatroskaFileTrack.writeTracks(trackList, ioDW);
+    metaSeek.addIndexedElement(MatroskaDocType.Tracks_Id, pos);
+    metaSeek.update(ioDW);
+  }
 
-    for (int i = 0; i < TrackList.size(); i++) 
-    {
-      MatroskaFileTrack track = (MatroskaFileTrack)TrackList.get(i);
-      MasterElement trackEntryElem = (MasterElement)doc.createElement(MatroskaDocType.TrackEntry_Id);
+  public long getTimecodeScale()
+  {
+    return timecodeScale;
+  }
 
-      UnsignedIntegerElement trackNoElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.TrackNumber_Id);
-      trackNoElem.setValue(track.TrackNo);
+  /**
+   * Sets the time scale used in this file. This is the number of nanoseconds represented by the timecode unit in frames. Defaults to 1,000,000. Must
+   * be set before init() is called.
+   * 
+   * @param timecodeScale
+   */
+  public void setTimecodeScale(final long timecodeScale)
+  {
+    assert !inited;
+    this.timecodeScale = timecodeScale;
+  }
 
-      UnsignedIntegerElement trackUIDElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.TrackUID_Id);
-      trackUIDElem.setValue(track.TrackUID);
+  public double getDuration()
+  {
+    return duration;
+  }
 
-      UnsignedIntegerElement trackTypeElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.TrackType_Id);
-      trackTypeElem.setValue(track.TrackType);
+  /**
+   * Sets the duration of the file. Note that this may only be set with any effect prior to the init() method being called. Optional.
+   * 
+   * @param duration
+   */
+  public void setDuration(final double duration)
+  {
+    assert !inited;
+    this.duration = duration;
+  }
 
-      StringElement trackNameElem = (StringElement)doc.createElement(MatroskaDocType.TrackName_Id);
-      trackNameElem.setValue(track.Name);
+  /**
+   * Adds a track to the file. Note that this is required for every track to be included, and must be done prior to the init() method being called.
+   * 
+   * @param track
+   */
+  public void addTrack(final MatroskaFileTrack track)
+  {
+    assert !inited;
+    trackList.add(track);
+  }
 
-      StringElement trackLangElem = (StringElement)doc.createElement(MatroskaDocType.TrackLanguage_Id);
-      trackLangElem.setValue(track.Language);
-
-      StringElement trackCodecIDElem = (StringElement)doc.createElement(MatroskaDocType.TrackCodecID_Id);
-      trackCodecIDElem.setValue(track.CodecID);
-
-      BinaryElement trackCodecPrivateElem = (BinaryElement)doc.createElement(MatroskaDocType.TrackCodecPrivate_Id);
-      trackCodecPrivateElem.setData(track.CodecPrivate);
-
-      UnsignedIntegerElement trackDefaultDurationElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.TrackDefaultDuration_Id);
-      trackDefaultDurationElem.setValue(track.DefaultDuration);
-
-      trackEntryElem.addChildElement(trackNoElem);
-      trackEntryElem.addChildElement(trackUIDElem);
-      trackEntryElem.addChildElement(trackTypeElem);
-      trackEntryElem.addChildElement(trackNameElem);
-      trackEntryElem.addChildElement(trackLangElem);
-      trackEntryElem.addChildElement(trackCodecIDElem);
-      trackEntryElem.addChildElement(trackCodecPrivateElem);
-      trackEntryElem.addChildElement(trackDefaultDurationElem);
-
-      // Now we add the audio/video dependant sub-elements
-      if (track.TrackType == MatroskaDocType.track_video) 
-      {
-        MasterElement trackVideoElem = (MasterElement)doc.createElement(MatroskaDocType.TrackVideo_Id);
-
-        UnsignedIntegerElement trackVideoPixelWidthElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.PixelWidth_Id);
-        trackVideoPixelWidthElem.setValue(track.Video_PixelWidth);
-
-        UnsignedIntegerElement trackVideoPixelHeightElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.PixelHeight_Id);
-        trackVideoPixelHeightElem.setValue(track.Video_PixelHeight);
-
-        UnsignedIntegerElement trackVideoDisplayWidthElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.DisplayWidth_Id);
-        trackVideoDisplayWidthElem.setValue(track.Video_DisplayWidth);
-
-        UnsignedIntegerElement trackVideoDisplayHeightElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.DisplayHeight_Id);
-        trackVideoDisplayHeightElem.setValue(track.Video_DisplayHeight);
-
-        trackVideoElem.addChildElement(trackVideoPixelWidthElem);
-        trackVideoElem.addChildElement(trackVideoPixelHeightElem);
-        trackVideoElem.addChildElement(trackVideoDisplayWidthElem);
-        trackVideoElem.addChildElement(trackVideoDisplayHeightElem);
-        
-        trackEntryElem.addChildElement(trackVideoElem);
-      } 
-      else if (track.TrackType == MatroskaDocType.track_audio) 
-      {
-        MasterElement trackAudioElem = (MasterElement)doc.createElement(MatroskaDocType.TrackVideo_Id);
-
-        UnsignedIntegerElement trackAudioChannelsElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.Channels_Id);
-        trackAudioChannelsElem.setValue(track.Audio_Channels);
-
-        UnsignedIntegerElement trackAudioBitDepthElem = (UnsignedIntegerElement)doc.createElement(MatroskaDocType.BitDepth_Id);
-        trackAudioBitDepthElem.setValue(track.Audio_BitDepth);
-
-        FloatElement trackAudioSamplingRateElem = (FloatElement)doc.createElement(MatroskaDocType.SamplingFrequency_Id);
-        trackAudioSamplingRateElem.setValue(track.Audio_SamplingFrequency);
-
-        FloatElement trackAudioOutputSamplingFrequencyElem = (FloatElement)doc.createElement(MatroskaDocType.OutputSamplingFrequency_Id);
-        trackAudioOutputSamplingFrequencyElem.setValue(track.Audio_OutputSamplingFrequency);
-
-        trackAudioElem.addChildElement(trackAudioChannelsElem);
-        trackAudioElem.addChildElement(trackAudioBitDepthElem);
-        trackAudioElem.addChildElement(trackAudioSamplingRateElem);
-        trackAudioElem.addChildElement(trackAudioOutputSamplingFrequencyElem);
-        
-        trackEntryElem.addChildElement(trackAudioElem);
-      }
-
-      tracksElem.addChildElement(trackEntryElem);
-    }
-
-    tracksElem.writeElement(ioDW);
+  /**
+   * Sets up the inital file-start headers. Must be called prior to adding any frames and after all tracks have been added.
+   *
+   */
+  public void init()
+  {
+    assert !inited;
+    inited = true;
+    writeSegmentInfo();
+    writeTracks();
   }
 
   /**
    * Add a frame
    * 
    * @param frame The frame to add
-  */
-  public void AddFrame(MatroskaFileFrame frame) 
+   */
+  public void addFrame(final MatroskaFileFrame frame)
   {
+    assert inited;
+    if (cluster.AddFrame(frame))
+    {
+      final long clusterPos = ioDW.getFilePointer();
+      cueData.addCue(clusterPos, cluster.getClusterTimecode(), cluster.getTracks());
+      cluster.flush(ioDW);
+    }
+  }
 
+  /**
+   * Finalizes the file by writing the final headers, index, and last few frames.
+   *
+   */
+  public void close()
+  {
+    assert inited;
+    final long clusterPos = ioDW.getFilePointer();
+    cueData.addCue(clusterPos, cluster.getClusterTimecode(), cluster.getTracks());
+    cluster.flush(ioDW);
+
+    final Element cues = cueData.toElement();
+    metaSeek.addIndexedElement(cues, ioDW.getFilePointer());
+    cues.writeElement(ioDW);
+    metaSeek.update(ioDW);
   }
 }

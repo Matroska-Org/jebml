@@ -19,86 +19,103 @@
  */
 package org.ebml.matroska;
 
-import org.ebml.*;
-import org.ebml.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.ebml.MasterElement;
+import org.ebml.io.DataWriter;
 
 /**
- * Summary description for MatroskaCluster.
+ * A cluster of frames in a file. Used internally during muxing.
  */
-public class MatroskaCluster extends MasterElement
+class MatroskaCluster extends MasterElement
 {
-  static public int NO_LACING = 0;
-  static public int XIPH_LACING = 1;
-  static public int EBML_LACING = 2;
+  private final Queue<MatroskaFileFrame> frames = new ConcurrentLinkedQueue<>();
+  private final Set<Integer> tracks = new HashSet<>();
+  public long clusterTimecode = Long.MAX_VALUE;
+  private int sizeLimit;
+  private int totalSize = 0;
+  private long durationLimit;
 
-  protected int [] laceMode = null;
-  protected TLinkedList frames = new TLinkedList();
-  protected long clusterTimecode = 0;
-
-  public MatroskaCluster(byte[] type) 
+  public MatroskaCluster(final byte[] type)
   {
     super(type);
   }
 
-  /**
-   * Set the current lacing mode.
-   * 
-   * @param trackNo Track Number for the track to enable lacing for. 1-based index
-   * @param laceMode The lacing moe to use. See NO_LACING, XIPH_LACING, and EBML_LACING.
-   */
-  void setLaceMode(short trackNo, int laceMode)
+  void setLimitParameters(final long duration, final int size)
   {
-    if (this.laceMode == null) 
-    {
-      this.laceMode = new int[trackNo];
-    }
-    if (this.laceMode.length < trackNo) 
-    {
-      int [] oldLaceMode = this.laceMode;
-      this.laceMode = new int[trackNo];;
-      ArrayCopy.arraycopy(this.laceMode, 0, oldLaceMode, 0, oldLaceMode.length);
-    }
-    this.laceMode[trackNo-1] = laceMode;
+    this.sizeLimit = size;
+    this.durationLimit = duration;
   }
 
   /**
-   * Get the current lacing mode.
+   * Add a frame to the cluster
    * 
-   * @param trackNo Track Number for the track to enable lacing for. 1-based index
-   * @return -1 if the track no is invalid
+   * @param frame
+   * @return false if you should begin another cluster.
    */
-  int getLaceMode(short trackNo)
-  {
-    if (this.laceMode == null) 
-    {
-      return -1;
-    }
-    if (this.laceMode.length < trackNo) 
-    {
-      return -1;
-    }
-    
-    return this.laceMode[trackNo-1];
-  }
-
-  public void AddFrame(MatroskaFileFrame frame) 
+  public boolean AddFrame(final MatroskaFileFrame frame)
   {
     // Is this the earliest timecode?
-    if (frame.Timecode < clusterTimecode) 
+    if (frame.getTimecode() < clusterTimecode)
     {
-      clusterTimecode = frame.Timecode;
+      clusterTimecode = frame.getTimecode();
     }
     frames.add(frame);
+    totalSize += frame.getData().length;
+    tracks.add(frame.getTrackNo());
+    return clusterTimecode - frame.getTimecode() < durationLimit && totalSize < sizeLimit;
   }
 
-  public void FlushFrames()
+  public long flush(final DataWriter ioDW)
   {
-    TLinkedList.IteratorImpl iter = frames.first();
-    while (iter.hasNext()) 
+    try
     {
-      //MatroskaFileFrame frame = (MatroskaFileFrame)
-    	iter.next();
+      final MasterElement clusterElem = (MasterElement) MatroskaDocType.obj.createElement(MatroskaDocType.TrackVideo_Id);
+      MatroskaSimpleBlock block = null;
+      boolean forceNew = true;
+      long lastTimecode = 0;
+      int lastTrackNumber = 0;
+      for (final MatroskaFileFrame frame: frames)
+      {
+        frame.setTimecode(frame.getTimecode() - clusterTimecode);
+        if (forceNew || lastTimecode != frame.getTimecode() || lastTrackNumber != frame.getTrackNo())
+        {
+          if (block != null)
+          {
+            clusterElem.addChildElement(block.toElement());
+          }
+          block = new MatroskaSimpleBlock();
+        }
+        lastTimecode = frame.getTimecode();
+        lastTrackNumber = frame.getTrackNo();
+        forceNew = !block.addFrame(frame);
+      }
+      if (block != null)
+      {
+        clusterElem.addChildElement(block.toElement());
+      }
+      return clusterElem.writeElement(ioDW);
     }
-    
+    finally
+    {
+      frames.clear();
+      tracks.clear();
+      totalSize = 0;
+      clusterTimecode = Long.MAX_VALUE;
+    }
+  }
+
+  public long getClusterTimecode()
+  {
+    return clusterTimecode;
+  }
+
+  public Collection<Integer> getTracks()
+  {
+    return tracks;
   }
 }
