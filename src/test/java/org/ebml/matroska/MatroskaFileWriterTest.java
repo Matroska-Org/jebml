@@ -16,9 +16,12 @@ import org.ebml.io.FileDataWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MatroskaFileWriterTest
 {
+  private static final Logger LOG = LoggerFactory.getLogger(MatroskaFileWriterTest.class);
   private File destination;
   private FileDataWriter ioDW;
   private MatroskaFileTrack testTrack;
@@ -57,7 +60,7 @@ public class MatroskaFileWriterTest
     reader.readFile();
     assertEquals(MatroskaDocType.track_subtitle, reader.getTrackList()[0].getTrackType());
     assertEquals(42, reader.getTrackList()[0].getTrackNo());
-    System.out.println(reader.getReport());
+    LOG.info(reader.getReport());
   }
 
   @Test
@@ -87,7 +90,7 @@ public class MatroskaFileWriterTest
     {
       return;
     }
-    System.out.println(levelN.getElementType().name);
+    LOG.info("Found element {} at level {}", levelN.getElementType().name, level);
     if (!(levelN.equals(MatroskaDocType.Void_Id)))
     {
       assertEquals(level, levelN.getElementType().level);

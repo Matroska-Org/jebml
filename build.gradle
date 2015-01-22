@@ -7,6 +7,9 @@ repositories {
 
 dependencies {
     compile 'javax.media:jmf:2.1.1e'
+    compile 'org.slf4j:slf4j-api:1.7.5'
+    testCompile 'junit:junit:4.11'
+    testRuntime 'ch.qos.logback:logback-classic:1.1.2'
 }
 
 project.version = '1.1'
