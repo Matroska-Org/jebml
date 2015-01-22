@@ -96,6 +96,8 @@ public class CommandLineSample
         }
         // writer.Close();
       }
+      System.out.println(track.getCodecID());
+      System.out.println(track.getTrackType());
     }
 
     final long endTime = System.currentTimeMillis();

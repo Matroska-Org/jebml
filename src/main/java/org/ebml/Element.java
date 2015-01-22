@@ -25,311 +25,386 @@ package org.ebml;
  * Created on November 19, 2002, 9:11 PM
  */
 
+import java.util.Arrays;
+
 import org.ebml.io.*;
 import org.ebml.util.*;
 
 /**
-     * Defines the basic EBML element.  Subclasses may provide child element access.
- * @author  John Cannon
+ * Defines the basic EBML element. Subclasses may provide child element access.
+ * 
+ * @author John Cannon
  */
-public class Element {
+public class Element
+{
 
   protected Element parent;
   protected ElementType typeInfo;
   protected byte[] type = {
-      0x00};
+      0x00 };
   private static int MIN_SIZE_LENGTH = 0;
   protected long size = 0;
-  protected byte[] data;
+  protected byte[] data = null;
   protected boolean dataRead = false;
   private int headerSize;
 
   /** Creates a new instance of Element */
-  public Element(byte[] type) {
+  public Element(final byte[] type)
+  {
     this.type = type;
   }
 
-  /** Read the element data 
+  /**
+   * Read the element data
    */
-  public void readData(DataSource source) {
-    //Setup a buffer for it's data
-    this.data = new byte[(int)size];
-    //Read the data
+  public void readData(final DataSource source)
+  {
+    // Setup a buffer for it's data
+    this.data = new byte[(int) size];
+    // Read the data
     source.read(this.data, 0, this.data.length);
     dataRead = true;
+    // System.out.printf("Read %d bytes from %s", size, typeInfo.name);
   }
 
-  /** Skip the element data 
+  /**
+   * Skip the element data
    */
-  public void skipData(DataSource source) {
-    if (!dataRead) {
+  public void skipData(final DataSource source)
+  {
+    if (!dataRead)
+    {
       // Skip the data
       source.skip(size);
       dataRead = true;
     }
   }
 
-  public long writeElement(DataWriter writer) 
+  public long writeElement(final DataWriter writer)
   {
     return writeHeaderData(writer) + writeData(writer);
   }
 
-  /** Write the element header data.
-   *  Override this in sub-classes for more specialized writing.
+  /**
+   * Write the element header data. Override this in sub-classes for more specialized writing.
    */
-  public long writeHeaderData(DataWriter writer) 
+  public long writeHeaderData(final DataWriter writer)
   {
     long len = 0;
 
-    byte [] type = getType();
+    final byte[] type = getType();
     len += type.length;
     writer.write(type);
-    
-    byte [] size = Element.makeEbmlCodedSize(getSize());
+
+    final byte[] size = Element.makeEbmlCodedSize(getSize());
+    // System.out.printf("Writing header for element %s with size %d (%s)\n", typeInfo.name, getTotalSize(), EBMLReader.bytesToHex(size));
+
     len += size.length;
     writer.write(size);
 
     return len;
   }
 
-  /** Write the element data.
-   *  Override this in sub-classes for more specialized writing.
+  /**
+   * Write the element data. Override this in sub-classes for more specialized writing.
    */
-  public long writeData(DataWriter writer) 
+  public long writeData(final DataWriter writer)
   {
-    return writer.write(this.data, 0, this.data.length);
+    if (data == null)
+    {
+      throw new NullPointerException(String.format("No data to write: %s : %s", typeInfo.name, Arrays.toString(this.type)));
+    }
+    return writer.write(this.data);
   }
 
-  /** Getter for property data.
+  /**
+   * Getter for property data.
+   * 
    * @return Value of property data.
    *
    */
-  public byte[] getData() {
+  public byte[] getData()
+  {
     return this.data;
   }
 
-  /** Setter for property data.
+  /**
+   * Setter for property data.
+   * 
    * @param data New value of property data.
    *
    */
-  public void setData(byte[] data) {
+  public void setData(final byte[] data)
+  {
     this.data = data;
     this.size = data.length;
   }
 
-  /** Clears the data of this element, useful if you just want 
-   * this element to be a placeholder
+  /**
+   * Clears the data of this element, useful if you just want this element to be a placeholder
    */
-  public void clearData() 
+  public void clearData()
   {
     this.data = null;
   }
 
-  /** Getter for property size.
+  /**
+   * Getter for property size.
+   * 
    * @return Value of property size.
    *
    */
-  public long getSize() {
+  public long getSize()
+  {
     return size;
   }
 
-  /** Setter for property size.
+  /**
+   * Setter for property size.
+   * 
    * @param size New value of property size.
    *
    */
-  public void setSize(long size) {
+  public void setSize(final long size)
+  {
     this.size = size;
   }
 
-  /** Get the total size of this element
+  /**
+   * Get the total size of this element
    */
-  public long getTotalSize() 
+  public long getTotalSize()
   {
     long totalSize = 0;
     totalSize += getType().length;
-    //totalSize += Element.codedSizeLength(getSize());
-    totalSize += this.headerSize;
-    totalSize += getSize();    
+    totalSize += Element.codedSizeLength(getSize());
+    // totalSize += this.headerSize;
+    totalSize += getSize();
     return totalSize;
   }
 
-  /** Getter for property type.
+  /**
+   * Getter for property type.
+   * 
    * @return Value of property type.
    *
    */
-  public byte[] getType() {
+  public byte[] getType()
+  {
     return type;
   }
 
-  /** Setter for property type.
+  /**
+   * Setter for property type.
+   * 
    * @param type New value of property type.
    *
    */
-  public void setType(byte[] type) {
+  public void setType(final byte[] type)
+  {
     this.type = type;
   }
 
-  public void setElementType(ElementType typeInfo) {
+  public void setElementType(final ElementType typeInfo)
+  {
     this.typeInfo = typeInfo;
   }
 
-  public ElementType getElementType() {
+  public ElementType getElementType()
+  {
     return typeInfo;
   }
 
-  /** Getter for property parent.
+  /**
+   * Getter for property parent.
+   * 
    * @return Value of property parent.
    *
    */
-  public Element getParent() {
+  public Element getParent()
+  {
     return this.parent;
   }
 
-  /** Setter for property parent.
+  /**
+   * Setter for property parent.
+   * 
    * @param parent New value of property parent.
    *
    */
-  public void setParent(Element parent) {
+  public void setParent(final Element parent)
+  {
     this.parent = parent;
   }
 
-  public byte[] toByteArray() {
-    byte[] head = makeEbmlCode(type, size);
-    byte[] ret = new byte[head.length + data.length];
+  public byte[] toByteArray()
+  {
+    final byte[] head = makeEbmlCode(type, size);
+    final byte[] ret = new byte[head.length + data.length];
     org.ebml.util.ArrayCopy.arraycopy(head, 0, ret, 0, head.length);
     org.ebml.util.ArrayCopy.arraycopy(data, 0, ret, head.length, data.length);
     return ret;
   }
 
-  public boolean equals(byte [] typeId) {
+  public boolean equals(final byte[] typeId)
+  {
     return ElementType.compareIDs(this.type, typeId);
   }
 
-  public boolean equals(ElementType elemType) {
+  public boolean equals(final ElementType elemType)
+  {
     return this.equals(elemType.id);
   }
 
-  public static void setMinSizeLength(int minSize) {
+  public static void setMinSizeLength(final int minSize)
+  {
     MIN_SIZE_LENGTH = minSize;
   }
 
-  public static int getMinSizeLength() {
+  public static int getMinSizeLength()
+  {
     return MIN_SIZE_LENGTH;
   }
 
-  public static byte[] makeEbmlCode(byte[] typeID, long size) {
-    int codedLen = codedSizeLength(size);
-    byte[] ret = new byte[typeID.length + codedLen];
+  public static byte[] makeEbmlCode(final byte[] typeID, final long size)
+  {
+    final int codedLen = codedSizeLength(size);
+    final byte[] ret = new byte[typeID.length + codedLen];
     ArrayCopy.arraycopy(typeID, 0, ret, 0, typeID.length);
-    byte[] codedSize = makeEbmlCodedSize(size);
+    final byte[] codedSize = makeEbmlCodedSize(size);
     ArrayCopy.arraycopy(codedSize, 0, ret, typeID.length, codedSize.length);
     return ret;
   }
 
-  public static byte[] makeEbmlCodedSize(long size) {
-    int len = codedSizeLength(size);
-    byte[] ret = new byte[len];
-    //byte[] packedSize = packIntUnsigned(size);
+  public static byte[] makeEbmlCodedSize(final long size)
+  {
+    final int len = codedSizeLength(size);
+    final byte[] ret = new byte[len];
+    // byte[] packedSize = packIntUnsigned(size);
     long mask = 0x00000000000000FFL;
-    for (int i = 0; i < len; i++) {
-      ret[len - 1 - i] = (byte)((size & mask) >>> (i * 8));
+    for (int i = 0; i < len; i++)
+    {
+      ret[len - 1 - i] = (byte) ((size & mask) >>> (i * 8));
       mask <<= 8;
     }
-    //The first size bits should be clear, otherwise we have an error in the size determination.
+    // The first size bits should be clear, otherwise we have an error in the size determination.
     ret[0] |= 0x80 >> (len - 1);
     return ret;
   }
 
-  public static int getMinByteSize(long value) {
-    if (value <= 0x7F && value >= 0x80) {
+  public static int getMinByteSize(final long value)
+  {
+    if (value <= 0x7F && value >= 0x80)
+    {
       return 1;
     }
-    else if (value <= 0x7FFF && value >= 0x8000) {
+    else if (value <= 0x7FFF && value >= 0x8000)
+    {
       return 2;
     }
-    else if (value <= 0x7FFFFF && value >= 0x800000) {
+    else if (value <= 0x7FFFFF && value >= 0x800000)
+    {
       return 3;
     }
-    else if (value <= 0x7FFFFFFF && value >= 0x80000000) {
+    else if (value <= 0x7FFFFFFF && value >= 0x80000000)
+    {
       return 4;
     }
-    else if (value <= 0x7FFFFFFFFFL && value >= 0x8000000000L) {
+    else if (value <= 0x7FFFFFFFFFL && value >= 0x8000000000L)
+    {
       return 5;
     }
-    else if (value <= 0x7FFFFFFFFFFFL && value >= 0x800000000000L) {
+    else if (value <= 0x7FFFFFFFFFFFL && value >= 0x800000000000L)
+    {
       return 6;
     }
-    else if (value <= 0x7FFFFFFFFFFFFFL && value >= 0x80000000000000L) {
+    else if (value <= 0x7FFFFFFFFFFFFFL && value >= 0x80000000000000L)
+    {
       return 7;
     }
-    else {
+    else
+    {
       return 8;
     }
   }
 
-  public static int getMinByteSizeUnsigned(long value) {
+  public static int getMinByteSizeUnsigned(final long value)
+  {
     int size = 8;
     long mask = 0xFF00000000000000L;
-    for (int i = 0; i < 8; i++) {
-      if ((value & mask) == 0) {
+    for (int i = 0; i < 8; i++)
+    {
+      if ((value & mask) == 0)
+      {
         mask = mask >>> 8;
         size--;
       }
-      else {
+      else
+      {
         return size;
       }
     }
     return 8;
   }
 
-  public static int codedSizeLength(long value) {
+  public static int codedSizeLength(final long value)
+  {
     int codedSize = 0;
-    if (value < 127) {
+    if (value < 127)
+    {
       codedSize = 1;
     }
-    else if (value < 16383) {
+    else if (value < 16383)
+    {
       codedSize = 2;
     }
-    else if (value < 2097151) {
+    else if (value < 2097151)
+    {
       codedSize = 3;
     }
-    else if (value < 268435455) {
+    else if (value < 268435455)
+    {
       codedSize = 4;
     }
-    if ((MIN_SIZE_LENGTH > 0) && (codedSize <= MIN_SIZE_LENGTH)) {
+    if ((MIN_SIZE_LENGTH > 0) && (codedSize <= MIN_SIZE_LENGTH))
+    {
       codedSize = MIN_SIZE_LENGTH;
     }
-    else {
-      //codedSize = 8;
+    else
+    {
+      // codedSize = 8;
     }
     return codedSize;
   }
 
-  public static byte[] packIntUnsigned(long value) {
-    int size = getMinByteSizeUnsigned(value);
+  public static byte[] packIntUnsigned(final long value)
+  {
+    final int size = getMinByteSizeUnsigned(value);
     return packInt(value, size);
   }
 
-  public static byte[] packInt(long value) {
-    int size = getMinByteSize(value);
+  public static byte[] packInt(final long value)
+  {
+    final int size = getMinByteSize(value);
     return packInt(value, size);
   }
 
-  public static byte[] packInt(long value, int size) 
-  {    
-    byte[] ret = new byte[size];
-    long mask = 0x00000000000000FFL;
+  public static byte[] packInt(final long value, final int size)
+  {
+    final byte[] ret = new byte[size];
+    final long mask = 0x00000000000000FFL;
     int b = size - 1;
-    for (int i = 0; i < size; i++) 
+    for (int i = 0; i < size; i++)
     {
-      ret[b] = (byte)(((value >>> (8 * i)) & mask));
+      ret[b] = (byte) (((value >>> (8 * i)) & mask));
       b--;
     }
     return ret;
   }
 
-public void setHeaderSize(int headerSize) {
-	this.headerSize = headerSize;
-	
-}
+  public void setHeaderSize(final int headerSize)
+  {
+    this.headerSize = headerSize;
+
+  }
 }

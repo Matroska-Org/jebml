@@ -52,7 +52,7 @@ public class MatroskaFileFrame
   /**
    * List of references
    */
-  private ArrayList<Long> references;
+  private ArrayList<Long> references = new ArrayList<>();
   /**
    * The frame data
    */
@@ -124,7 +124,7 @@ public class MatroskaFileFrame
     return timecode;
   }
 
-  public void setTimecode(long timecode)
+  public void setTimecode(final long timecode)
   {
     this.timecode = timecode;
   }
@@ -134,7 +134,7 @@ public class MatroskaFileFrame
     return duration;
   }
 
-  public void setDuration(long duration)
+  public void setDuration(final long duration)
   {
     this.duration = duration;
   }
@@ -144,12 +144,12 @@ public class MatroskaFileFrame
     return data;
   }
 
-  public void setData(byte[] data)
+  public void setData(final byte[] data)
   {
     this.data = data;
   }
 
-  public void setKeyFrame(boolean keyFrame)
+  public void setKeyFrame(final boolean keyFrame)
   {
     this.keyFrame = keyFrame;
   }

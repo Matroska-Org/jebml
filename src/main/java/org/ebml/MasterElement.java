@@ -22,20 +22,23 @@ package org.ebml;
 import org.ebml.io.*;
 import java.util.*;
 
-public class MasterElement extends Element {
+public class MasterElement extends Element
+{
   protected long usedSize;
   protected ArrayList<Element> children = new ArrayList<Element>();
 
-  public MasterElement(byte[] type) {
+  public MasterElement(final byte[] type)
+  {
     super(type);
     usedSize = 0;
   }
 
-  public Element readNextChild(EBMLReader reader) {
+  public Element readNextChild(final EBMLReader reader)
+  {
     if (usedSize >= this.getSize())
       return null;
 
-    Element elem = reader.readNextElement();
+    final Element elem = reader.readNextElement();
     if (elem == null)
       return null;
 
@@ -43,27 +46,31 @@ public class MasterElement extends Element {
 
     usedSize += elem.getTotalSize();
 
+    // System.out.printf("Read element %s of size %d: %d remaining\n", elem.typeInfo.name, elem.getTotalSize(), size - usedSize);
     return elem;
   }
 
   /* Skip the element data */
-  public void skipData(DataSource source) {
+  @Override
+  public void skipData(final DataSource source)
+  {
     // Skip the child elements
-    source.skip(size-usedSize);
+    source.skip(size - usedSize);
   }
 
-  public long writeData(DataWriter writer) 
+  @Override
+  public long writeData(final DataWriter writer)
   {
     long len = 0;
-    for (int i = 0; i < children.size(); i++) 
+    for (int i = 0; i < children.size(); i++)
     {
-      Element elem = (Element)children.get(i);
+      final Element elem = children.get(i);
       len += elem.writeElement(writer);
     }
     return len;
   }
 
-  public void addChildElement(Element elem) 
+  public void addChildElement(final Element elem)
   {
     children.add(elem);
     size += elem.getTotalSize();

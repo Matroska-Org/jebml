@@ -29,35 +29,36 @@ public class MatroskaSegment extends MasterElement
 {
   protected boolean bUnknownSize = false;
 
-  public MatroskaSegment(byte[] type) 
+  public MatroskaSegment(final byte[] type)
   {
     super(type);
   }
 
-  /** Write the element header data.
-   *  The override will write the size as unknown if the flag is set.
+  /**
+   * Write the element header data. The override will write the size as unknown if the flag is set.
    */
-  public long writeHeaderData(DataWriter writer) 
+  @Override
+  public long writeHeaderData(final DataWriter writer)
   {
     long len = 0;
 
-    byte [] type = getType();
+    final byte[] type = getType();
     len += type.length;
     writer.write(type);
-    
-    byte [] size;
-    if (bUnknownSize) 
+
+    byte[] size;
+    if (bUnknownSize)
     {
       size = new byte[5];
-      size[0] = (byte)(0xFF >>> (size.length-1));
+      size[0] = (byte) (0xFF >>> (size.length - 1));
       for (int i = 1; i < size.length; i++)
-        size[i] = (byte)0xFF;
-    } 
-    else 
+        size[i] = (byte) 0xFF;
+    }
+    else
     {
       size = Element.makeEbmlCodedSize(getSize());
-    }    
-    
+    }
+
     len += size.length;
     writer.write(size);
 
@@ -65,10 +66,9 @@ public class MatroskaSegment extends MasterElement
   }
 
   /**
-   * Setter for Unknown Size flag.
-   * This is a special case for ebml. The size value is filled with 1's.
+   * Setter for Unknown Size flag. This is a special case for ebml. The size value is filled with 1's.
    */
-  public void setUnknownSize(boolean bUnknownSize) 
+  public void setUnknownSize(final boolean bUnknownSize)
   {
     this.bUnknownSize = bUnknownSize;
   }
@@ -76,7 +76,7 @@ public class MatroskaSegment extends MasterElement
   /**
    * Getter for Unknown Size flag.
    */
-  public boolean getUnknownSize() 
+  public boolean getUnknownSize()
   {
     return bUnknownSize;
   }

@@ -4,14 +4,16 @@ import org.ebml.BinaryElement;
 import org.ebml.Element;
 import org.ebml.MasterElement;
 import org.ebml.UnsignedIntegerElement;
+import org.ebml.VoidElement;
 import org.ebml.io.DataWriter;
 
 public class MatroskaFileMetaSeek
 {
-  private static final long BLOCK_RESERVE_SIZE = 4096;
-  private long myPosition = 0;
+  private static final long BLOCK_RESERVE_SIZE = 256;
+  private final long myPosition;
   private final MatroskaDocType doc;
   private final MasterElement seekHeadElem;
+  private final VoidElement placeHolderElem;
   private final long referencePosition;
 
   /**
@@ -24,7 +26,11 @@ public class MatroskaFileMetaSeek
   {
     this.doc = doc;
     this.referencePosition = referencePosition;
-    seekHeadElem = (MasterElement) doc.createElement(MatroskaDocType.TrackVideo_Id);
+    myPosition = referencePosition;
+    seekHeadElem = (MasterElement) doc.createElement(MatroskaDocType.SeekHead_Id);
+    placeHolderElem = new VoidElement();
+    placeHolderElem.setSize(BLOCK_RESERVE_SIZE - 6);
+    seekHeadElem.addChildElement(placeHolderElem);
   }
 
   /**
@@ -32,19 +38,20 @@ public class MatroskaFileMetaSeek
    * if the stream is seekable. Following subsequent additions to the object, the update() method can be used to update the originally written object.
    * 
    * @param ioDW data stream to write to
-   * @return ending position of the data stream.
+   * @return length of data written
    */
   public long write(final DataWriter ioDW)
   {
-    myPosition = ioDW.getFilePointer();
-    final long end = seekHeadElem.writeElement(ioDW);
-    return ioDW.isSeekable() ? ioDW.seek(myPosition + BLOCK_RESERVE_SIZE) : end;
+    final long elemLen = seekHeadElem.writeElement(ioDW);
+    assert elemLen == BLOCK_RESERVE_SIZE;
+    assert (ioDW.getFilePointer() - myPosition) == elemLen;
+    return BLOCK_RESERVE_SIZE;
   }
 
   /**
    * Updates the representation of the object in the datastream to account for added indexed elements
    * 
-   * @param ioDW a seekable data stream
+   * @param ioDW the data stream containing this object
    */
   public void update(final DataWriter ioDW)
   {
@@ -64,6 +71,7 @@ public class MatroskaFileMetaSeek
    */
   public void addIndexedElement(final Element element, final long filePosition)
   {
+    // System.out.printf("Adding indexed element %s @ %d (%d)\n", element.getElementType().name, filePosition, filePosition - referencePosition);
     addIndexedElement(element.getType(), filePosition);
   }
 
@@ -73,6 +81,7 @@ public class MatroskaFileMetaSeek
    * 
    * @param element The element itself
    * @param filePosition Position in the data stream where the element has been written.
+   * @return
    */
   public void addIndexedElement(final byte[] elementType, final long filePosition)
   {
@@ -80,12 +89,15 @@ public class MatroskaFileMetaSeek
     final BinaryElement seekEntryIdElem = (BinaryElement) doc.createElement(MatroskaDocType.SeekID_Id);
     seekEntryIdElem.setData(elementType);
 
-    final UnsignedIntegerElement seekEntryPosElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.SeekID_Id);
+    final UnsignedIntegerElement seekEntryPosElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.SeekPosition_Id);
     seekEntryPosElem.setValue(filePosition - referencePosition);
 
-    seekEntryElem.addChildElement(seekEntryPosElem);
     seekEntryElem.addChildElement(seekEntryIdElem);
+    seekEntryElem.addChildElement(seekEntryPosElem);
 
     seekHeadElem.addChildElement(seekEntryElem);
+    placeHolderElem.reduceSize(seekEntryElem.getTotalSize());
+    seekHeadElem.setSize(BLOCK_RESERVE_SIZE - 6);
+    // System.out.printf("Adding indexed element @ %d (%d)\n", filePosition, filePosition - referencePosition);
   }
 }

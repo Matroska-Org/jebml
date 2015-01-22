@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.ebml.MasterElement;
+import org.ebml.UnsignedIntegerElement;
 import org.ebml.io.DataWriter;
 
 /**
@@ -36,9 +37,9 @@ class MatroskaCluster extends MasterElement
   private final Queue<MatroskaFileFrame> frames = new ConcurrentLinkedQueue<>();
   private final Set<Integer> tracks = new HashSet<>();
   public long clusterTimecode = Long.MAX_VALUE;
-  private int sizeLimit;
+  private int sizeLimit = Integer.MAX_VALUE;
   private int totalSize = 0;
-  private long durationLimit;
+  private long durationLimit = Long.MAX_VALUE;
 
   public MatroskaCluster(final byte[] type)
   {
@@ -67,14 +68,20 @@ class MatroskaCluster extends MasterElement
     frames.add(frame);
     totalSize += frame.getData().length;
     tracks.add(frame.getTrackNo());
-    return clusterTimecode - frame.getTimecode() < durationLimit && totalSize < sizeLimit;
+    return ((frame.getTimecode() - clusterTimecode) < durationLimit) && (totalSize < sizeLimit);
   }
 
   public long flush(final DataWriter ioDW)
   {
+    if (frames.size() == 0)
+      return 0;
     try
     {
-      final MasterElement clusterElem = (MasterElement) MatroskaDocType.obj.createElement(MatroskaDocType.TrackVideo_Id);
+      final MasterElement clusterElem = (MasterElement) MatroskaDocType.obj.createElement(MatroskaDocType.Cluster_Id);
+      final UnsignedIntegerElement timecodeElem = (UnsignedIntegerElement) MatroskaDocType.obj.createElement(MatroskaDocType.ClusterTimecode_Id);
+      timecodeElem.setValue(clusterTimecode);
+      clusterElem.addChildElement(timecodeElem);
+
       MatroskaSimpleBlock block = null;
       boolean forceNew = true;
       long lastTimecode = 0;

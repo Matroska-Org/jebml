@@ -21,6 +21,7 @@ class MatroskaSimpleBlock
   private boolean invisible = false;
   private boolean discardable = false;
   private final List<MatroskaFileFrame> frames = new ArrayList<>();
+  private int totalSize = 18;
 
   static MatroskaSimpleBlock fromElement(final Element level3, final DataSource ioDS, final EBMLReader reader)
   {
@@ -37,7 +38,7 @@ class MatroskaSimpleBlock
 
   private byte[] createInnerData()
   {
-    final ByteBuffer buf = ByteBuffer.allocate(0);
+    final ByteBuffer buf = ByteBuffer.allocate(totalSize);
 
     assert trackNumber < 0x4000;
     if (trackNumber < 0x80)
@@ -53,7 +54,9 @@ class MatroskaSimpleBlock
     final BitSet bs = new BitSet(8);
     bs.set(0, keyFrame);
     bs.set(4, invisible);
-    byte[] sizes = null;
+    ByteBuffer sizes = null;
+    laceMode = pickBestLaceMode();
+    // TODO: correctly calculate resultant buffer size for different lace modes
     switch (laceMode)
     {
       case EBML:
@@ -87,12 +90,21 @@ class MatroskaSimpleBlock
     return buf.array();
   }
 
-  private byte[] fixedEncodeLaceSizes()
+  private MatroskaLaceMode pickBestLaceMode()
   {
-    return ByteBuffer.allocate(1).put((byte) (frames.size() - 1)).array();
+    if (frames.size() == 1)
+    {
+      return MatroskaLaceMode.NONE;
+    }
+    return laceMode;
   }
 
-  private byte[] xiphEncodeLaceSizes()
+  private ByteBuffer fixedEncodeLaceSizes()
+  {
+    return ByteBuffer.allocate(1).put((byte) (frames.size() - 1));
+  }
+
+  private ByteBuffer xiphEncodeLaceSizes()
   {
     final ByteBuffer buf = ByteBuffer.allocate(30);
     buf.put((byte) (frames.size() - 1));
@@ -106,10 +118,10 @@ class MatroskaSimpleBlock
       }
       buf.put((byte) tmpSize);
     }
-    return buf.array();
+    return buf;
   }
 
-  private byte[] ebmlEncodeLaceSizes()
+  private ByteBuffer ebmlEncodeLaceSizes()
   {
     final ByteBuffer buf = ByteBuffer.allocate(30);
     buf.put((byte) (frames.size() - 1));
@@ -118,7 +130,7 @@ class MatroskaSimpleBlock
       final int tmpSize = frames.get(i).getData().length;
       buf.put(Element.makeEbmlCodedSize(tmpSize));
     }
-    return buf.array();
+    return buf;
   }
 
   public long getTimecode()
@@ -163,12 +175,14 @@ class MatroskaSimpleBlock
 
   public boolean addFrame(final MatroskaFileFrame frame)
   {
+    totalSize += frame.getData().length;
     frames.add(frame);
     if (frame.getData().length > MAX_LACE_SIZE)
     {
       laceMode = MatroskaLaceMode.NONE;
       return false;
     }
+    totalSize += 4;
     return !(laceMode.equals(MatroskaLaceMode.NONE) || frames.size() > 8);
   }
 

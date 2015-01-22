@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.ebml.DateElement;
-import org.ebml.Element;
 import org.ebml.FloatElement;
 import org.ebml.MasterElement;
 import org.ebml.StringElement;
@@ -62,6 +61,18 @@ public class MatroskaFileWriter
   {
     final MasterElement ebmlHeaderElem = (MasterElement) doc.createElement(MatroskaDocType.EBMLHeader_Id);
 
+    final UnsignedIntegerElement ebmlVersionElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.EBMLVersion_Id);
+    ebmlVersionElem.setValue(1);
+
+    final UnsignedIntegerElement ebmlReadVersionElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.EBMLReadVersion_Id);
+    ebmlReadVersionElem.setValue(1);
+
+    final UnsignedIntegerElement ebmlMaxIdLenElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.EBMLMaxIDLength_Id);
+    ebmlMaxIdLenElem.setValue(4);
+
+    final UnsignedIntegerElement ebmlMaxSizeLenElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.EBMLMaxSizeLength_Id);
+    ebmlMaxSizeLenElem.setValue(8);
+
     final StringElement docTypeElem = (StringElement) doc.createElement(MatroskaDocType.DocType_Id);
     docTypeElem.setValue("matroska");
 
@@ -71,6 +82,10 @@ public class MatroskaFileWriter
     final UnsignedIntegerElement docTypeReadVersionElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.DocTypeReadVersion_Id);
     docTypeReadVersionElem.setValue(1);
 
+    ebmlHeaderElem.addChildElement(ebmlVersionElem);
+    ebmlHeaderElem.addChildElement(ebmlReadVersionElem);
+    ebmlHeaderElem.addChildElement(ebmlMaxIdLenElem);
+    ebmlHeaderElem.addChildElement(ebmlMaxSizeLenElem);
     ebmlHeaderElem.addChildElement(docTypeElem);
     ebmlHeaderElem.addChildElement(docTypeVersionElem);
     ebmlHeaderElem.addChildElement(docTypeReadVersionElem);
@@ -179,6 +194,8 @@ public class MatroskaFileWriter
     inited = true;
     writeSegmentInfo();
     writeTracks();
+    cluster.setLimitParameters(5000, 1024 * 1024);
+    metaSeek.addIndexedElement(cluster, ioDW.getFilePointer());
   }
 
   /**
@@ -189,11 +206,12 @@ public class MatroskaFileWriter
   public void addFrame(final MatroskaFileFrame frame)
   {
     assert inited;
-    if (cluster.AddFrame(frame))
+    if (!cluster.AddFrame(frame))
     {
       final long clusterPos = ioDW.getFilePointer();
       cueData.addCue(clusterPos, cluster.getClusterTimecode(), cluster.getTracks());
       cluster.flush(ioDW);
+      System.out.println("Cluster-flush!");
     }
   }
 
@@ -208,9 +226,9 @@ public class MatroskaFileWriter
     cueData.addCue(clusterPos, cluster.getClusterTimecode(), cluster.getTracks());
     cluster.flush(ioDW);
 
-    final Element cues = cueData.toElement();
-    metaSeek.addIndexedElement(cues, ioDW.getFilePointer());
-    cues.writeElement(ioDW);
+    // final Element cues = cueData.toElement();
+    // metaSeek.addIndexedElement(cues, ioDW.getFilePointer());
+    // cues.writeElement(ioDW);
     metaSeek.update(ioDW);
   }
 }

@@ -81,6 +81,7 @@ public class MatroskaFile
 
       while (level1 != null)
       {
+        // System.out.printf("Found element %s\n", level1.getElementType().name);
         level1.readData(ioDS);
         if (level1.equals(MatroskaDocType.DocType_Id))
         {
@@ -102,9 +103,10 @@ public class MatroskaFile
     if (level0.equals(MatroskaDocType.Segment_Id))
     {
       level1 = ((MasterElement) level0).readNextChild(reader);
-
+      System.out.println("Got segment element");
       while (level1 != null)
       {
+        System.out.printf("Got %s element in segment\n", level1.getElementType().name);
         if (level1.equals(MatroskaDocType.SegmentInfo_Id))
         {
           _parseSegmentInfo(level1, level2);
@@ -137,7 +139,8 @@ public class MatroskaFile
     }
     else
     {
-      throw new java.lang.RuntimeException("Error: Segment not the second element in the file");
+      throw new java.lang.RuntimeException(String.format("Error: Segment not the second element in the file: was %s instead",
+                                                         level0.getElementType().name));
     }
   }
 
@@ -328,7 +331,6 @@ public class MatroskaFile
       {
         MatroskaBlock block = null;
         final long BlockDuration = 0;
-        final long BlockReference = 0;
         block = (MatroskaBlock) level2;
         block.readData(ioDS);
         block.parseBlock();
@@ -336,7 +338,6 @@ public class MatroskaFile
         frame.setTrackNo(block.getTrackNo());
         frame.setTimecode(block.getAdjustedBlockTimecode(ClusterTimecode, this.TimecodeScale));
         frame.setDuration(BlockDuration);
-        frame.addReferences(BlockReference);
         frame.setData(block.getFrame(0));
         frame.setKeyFrame(block.isKeyFrame());
         synchronized (FrameQueue)

@@ -36,8 +36,8 @@ import org.ebml.io.DataWriter;
  */
 public class MatroskaFileTrack
 {
-  private short trackNo;
-  private long trackUID;
+  private int trackNo = 1;
+  private long trackUID = 1337;
   private byte trackType;
   private boolean flagEnabled = true;
   private boolean flagDefault = true;
@@ -45,7 +45,7 @@ public class MatroskaFileTrack
   private boolean flagLacing = true;
   private int minCache = 0;
   private int maxBlockAdditionalId = 0;
-  private String name;
+  private String name = "unnamed";
   private String language = "eng";
   private String codecID;
   private byte[] codecPrivate;
@@ -176,18 +176,17 @@ public class MatroskaFileTrack
 
   static MatroskaFileTrack fromElement(final Element level2, final DataSource ioDS, final EBMLReader reader)
   {
+    // TODO: read all possible elements
     Element level3 = ((MasterElement) level2).readNextChild(reader);
     Element level4 = null;
     final MatroskaFileTrack track = new MatroskaFileTrack();
-    level3 = ((MasterElement) level2).readNextChild(reader);
-
+    System.out.println("Reading track from doc!");
     while (level3 != null)
     {
       if (level3.equals(MatroskaDocType.TrackNumber_Id))
       {
         level3.readData(ioDS);
-        track.setTrackNo((short) ((UnsignedIntegerElement) level3).getValue());
-
+        track.setTrackNo((int) ((UnsignedIntegerElement) level3).getValue());
       }
       else if (level3.equals(MatroskaDocType.TrackUID_Id))
       {
@@ -304,6 +303,7 @@ public class MatroskaFileTrack
       level3.skipData(ioDS);
       level3 = ((MasterElement) level2).readNextChild(reader);
     }
+    System.out.println("Read track from doc!");
     return track;
   }
 
@@ -321,22 +321,22 @@ public class MatroskaFileTrack
     final UnsignedIntegerElement trackTypeElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackType_Id);
     trackTypeElem.setValue(this.getTrackType());
 
-    final UnsignedIntegerElement trackFlagEnabledElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackType_Id);
+    final UnsignedIntegerElement trackFlagEnabledElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackFlagEnabled_Id);
     trackFlagEnabledElem.setValue(this.isFlagEnabled() ? 1 : 0);
 
-    final UnsignedIntegerElement trackFlagDefaultElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackType_Id);
+    final UnsignedIntegerElement trackFlagDefaultElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackFlagDefault_Id);
     trackFlagDefaultElem.setValue(this.isFlagDefault() ? 1 : 0);
 
-    final UnsignedIntegerElement trackFlagForcedElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackType_Id);
+    final UnsignedIntegerElement trackFlagForcedElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackFlagForced_Id);
     trackFlagForcedElem.setValue(this.isFlagForced() ? 1 : 0);
 
-    final UnsignedIntegerElement trackFlagLacingElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackType_Id);
+    final UnsignedIntegerElement trackFlagLacingElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackFlagLacing_Id);
     trackFlagLacingElem.setValue(this.isFlagLacing() ? 1 : 0);
 
-    final UnsignedIntegerElement trackMinCacheElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackType_Id);
+    final UnsignedIntegerElement trackMinCacheElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackMinCache_Id);
     trackMinCacheElem.setValue(this.getMinCache());
 
-    final UnsignedIntegerElement trackMaxBlockAddIdElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackType_Id);
+    final UnsignedIntegerElement trackMaxBlockAddIdElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackMaxBlockAdditionID_Id);
     trackMaxBlockAddIdElem.setValue(this.getMaxBlockAdditionalId());
 
     final StringElement trackNameElem = (StringElement) doc.createElement(MatroskaDocType.TrackName_Id);
@@ -348,34 +348,41 @@ public class MatroskaFileTrack
     final StringElement trackCodecIDElem = (StringElement) doc.createElement(MatroskaDocType.TrackCodecID_Id);
     trackCodecIDElem.setValue(this.getCodecID());
 
-    final BinaryElement trackCodecPrivateElem = (BinaryElement) doc.createElement(MatroskaDocType.TrackCodecPrivate_Id);
-    trackCodecPrivateElem.setData(this.getCodecPrivate());
-
-    final UnsignedIntegerElement trackDefaultDurationElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackDefaultDuration_Id);
-    trackDefaultDurationElem.setValue(this.getDefaultDuration());
-
-    final UnsignedIntegerElement trackCodecDecodeAllElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackType_Id);
-    trackCodecDecodeAllElem.setValue(this.codecDecodeAll ? 1 : 0);
-
-    final UnsignedIntegerElement trackSeekPrerollElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackType_Id);
-    trackSeekPrerollElem.setValue(this.seekPreroll);
-
     trackEntryElem.addChildElement(trackNoElem);
     trackEntryElem.addChildElement(trackUIDElem);
     trackEntryElem.addChildElement(trackTypeElem);
+
     trackEntryElem.addChildElement(trackFlagEnabledElem);
     trackEntryElem.addChildElement(trackFlagDefaultElem);
     trackEntryElem.addChildElement(trackFlagForcedElem);
     trackEntryElem.addChildElement(trackFlagLacingElem);
     trackEntryElem.addChildElement(trackMinCacheElem);
     trackEntryElem.addChildElement(trackMaxBlockAddIdElem);
-    trackEntryElem.addChildElement(trackNameElem);
+
+    // trackEntryElem.addChildElement(trackNameElem); This element is broken. TODO: Add UTF-8 element support.
     trackEntryElem.addChildElement(trackLangElem);
     trackEntryElem.addChildElement(trackCodecIDElem);
-    trackEntryElem.addChildElement(trackCodecPrivateElem);
+
+    if (codecPrivate != null)
+    {
+      final BinaryElement trackCodecPrivateElem = (BinaryElement) doc.createElement(MatroskaDocType.TrackCodecPrivate_Id);
+      trackCodecPrivateElem.setData(this.getCodecPrivate());
+      trackEntryElem.addChildElement(trackCodecPrivateElem);
+
+    }
+
+    final UnsignedIntegerElement trackDefaultDurationElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackDefaultDuration_Id);
+    trackDefaultDurationElem.setValue(this.getDefaultDuration());
+
+    final UnsignedIntegerElement trackCodecDecodeAllElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackCodecDecodeAll_Id);
+    trackCodecDecodeAllElem.setValue(this.codecDecodeAll ? 1 : 0);
+
+    // final UnsignedIntegerElement trackSeekPrerollElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.TrackSeekPreroll_Id);
+    // trackSeekPrerollElem.setValue(this.seekPreroll);
+
     trackEntryElem.addChildElement(trackDefaultDurationElem);
     trackEntryElem.addChildElement(trackCodecDecodeAllElem);
-    trackEntryElem.addChildElement(trackSeekPrerollElem);
+    // trackEntryElem.addChildElement(trackSeekPrerollElem);
 
     // Now we add the audio/video dependant sub-elements
     if (this.getTrackType() == MatroskaDocType.track_video)
@@ -403,7 +410,7 @@ public class MatroskaFileTrack
     }
     else if (this.getTrackType() == MatroskaDocType.track_audio)
     {
-      final MasterElement trackAudioElem = (MasterElement) doc.createElement(MatroskaDocType.TrackVideo_Id);
+      final MasterElement trackAudioElem = (MasterElement) doc.createElement(MatroskaDocType.TrackAudio_Id);
 
       final UnsignedIntegerElement trackAudioChannelsElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.Channels_Id);
       trackAudioChannelsElem.setValue(this.audio.channels);
@@ -439,12 +446,12 @@ public class MatroskaFileTrack
     return tracksElem.writeElement(ioDW);
   }
 
-  public short getTrackNo()
+  public int getTrackNo()
   {
     return trackNo;
   }
 
-  public void setTrackNo(final short trackNo)
+  public void setTrackNo(final int trackNo)
   {
     this.trackNo = trackNo;
   }
