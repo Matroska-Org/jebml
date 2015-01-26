@@ -19,8 +19,10 @@
  */
 package org.ebml;
 
-import org.ebml.io.*;
-import java.util.*;
+import java.util.ArrayList;
+
+import org.ebml.io.DataSource;
+import org.ebml.io.DataWriter;
 
 public class MasterElement extends Element
 {
@@ -42,11 +44,15 @@ public class MasterElement extends Element
   public Element readNextChild(final EBMLReader reader)
   {
     if (usedSize >= this.getSize())
+    {
       return null;
+    }
 
     final Element elem = reader.readNextElement();
     if (elem == null)
+    {
       return null;
+    }
 
     elem.setParent(this);
 

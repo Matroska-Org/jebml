@@ -32,51 +32,51 @@ public class ArrayCopy
 
   }
 
-  public static void arraycopy(byte [] src, int src_offset, byte [] dest, int dest_offset, int count) 
+  public static void arraycopy(final byte[] src, final int srcOffset, final byte[] dest, final int destOffset, final int count)
   {
-    for (int i = 0; i < count; i++) 
+    for (int i = 0; i < count; i++)
     {
-      dest[dest_offset + i] = src[src_offset + i];
+      dest[destOffset + i] = src[srcOffset + i];
     }
   }
 
-  public static void arraycopy(char [] src, int src_offset, char [] dest, int dest_offset, int count) 
+  public static void arraycopy(final char[] src, final int srcOffset, final char[] dest, final int destOffset, final int count)
   {
-    for (int i = 0; i < count; i++) 
+    for (int i = 0; i < count; i++)
     {
-      dest[dest_offset + i] = src[src_offset + i];
+      dest[destOffset + i] = src[srcOffset + i];
     }
   }
 
-  public static void arraycopy(short [] src, int src_offset, short [] dest, int dest_offset, int count) 
+  public static void arraycopy(final short[] src, final int srcOffset, final short[] dest, final int destOffset, final int count)
   {
-    for (int i = 0; i < count; i++) 
+    for (int i = 0; i < count; i++)
     {
-      dest[dest_offset + i] = src[src_offset + i];
+      dest[destOffset + i] = src[srcOffset + i];
     }
   }
 
-  public static void arraycopy(int [] src, int src_offset, int [] dest, int dest_offset, int count) 
+  public static void arraycopy(final int[] src, final int srcOffset, final int[] dest, final int destOffset, final int count)
   {
-    for (int i = 0; i < count; i++) 
+    for (int i = 0; i < count; i++)
     {
-      dest[dest_offset + i] = src[src_offset + i];
+      dest[destOffset + i] = src[srcOffset + i];
     }
   }
 
-  public static void arraycopy(long [] src, int src_offset, long [] dest, int dest_offset, int count) 
+  public static void arraycopy(final long[] src, final int srcOffset, final long[] dest, final int destOffset, final int count)
   {
-    for (int i = 0; i < count; i++) 
+    for (int i = 0; i < count; i++)
     {
-      dest[dest_offset + i] = src[src_offset + i];
+      dest[destOffset + i] = src[srcOffset + i];
     }
   }
 
-  public static void arraycopy(Object [] src, int src_offset, Object [] dest, int dest_offset, int count) 
+  public static void arraycopy(final Object[] src, final int srcOffset, final Object[] dest, final int destOffset, final int count)
   {
-    for (int i = 0; i < count; i++) 
+    for (int i = 0; i < count; i++)
     {
-      dest[dest_offset + i] = src[src_offset + i];
+      dest[destOffset + i] = src[srcOffset + i];
     }
   }
 }

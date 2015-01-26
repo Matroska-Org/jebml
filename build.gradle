@@ -1,5 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
+apply plugin: 'findbugs'
+apply plugin: 'checkstyle'
 
 repositories {
     mavenCentral()
@@ -10,6 +12,30 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.5'
     testCompile 'junit:junit:4.11'
     testRuntime 'ch.qos.logback:logback-classic:1.1.2'
+}
+
+checkstyleMain {
+    configFile = file("tools/csMain.xml")
+}
+checkstyleTest {
+    configFile = file("tools/csTest.xml")
+}
+findbugs {
+    toolVersion = "3.+"
+    effort = "max"
+    reportLevel = "high"
+}
+findbugsMain {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+findbugsTest {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
 }
 
 project.version = '1.1'

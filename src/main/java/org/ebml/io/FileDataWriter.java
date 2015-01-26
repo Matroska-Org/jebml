@@ -19,7 +19,9 @@
  */
 package org.ebml.io;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 public class FileDataWriter implements DataWriter
 {

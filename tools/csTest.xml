@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN" "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+
+<!--
+    This configuration file was written by the eclipse-cs plugin configuration editor
+-->
+<!--
+    Checkstyle-Configuration: Jebml Test
+    Description: none
+-->
+<module name="Checker">
+  <property name="severity" value="warning"/>
+  <property name="charset" value="UTF-8"/>
+  <module name="TreeWalker">
+    <module name="FileContentsHolder"/>
+    <module name="JavadocMethod">
+      <property name="severity" value="ignore"/>
+      <property name="scope" value="package"/>
+      <property name="suppressLoadErrors" value="true"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="JavadocStyle">
+      <property name="severity" value="ignore"/>
+      <property name="scope" value="public"/>
+      <property name="checkFirstSentence" value="false"/>
+      <property name="checkHtml" value="false"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="JavadocType">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="JavadocVariable">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="LocalFinalVariableName">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="LocalVariableName">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="MemberName">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="MethodName">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="PackageName">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="ParameterName">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="StaticVariableName">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="TypeName">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="IllegalImport">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="RedundantImport">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="UnusedImports">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="MethodLength">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="ParameterNumber">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="warning"/>
+    </module>
+    <module name="LineLength">
+      <property name="severity" value="ignore"/>
+      <property name="max" value="300"/>
+      <property name="tabWidth" value="2"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="EmptyForIteratorPad">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="MethodParamPad">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="NoWhitespaceAfter">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="NoWhitespaceBefore">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="ParenPad">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="TypecastParenPad">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="WhitespaceAfter">
+      <property name="severity" value="error"/>
+      <property name="tokens" value="COMMA, SEMI"/>
+    </module>
+    <module name="WhitespaceAround">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="ModifierOrder">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="RedundantModifier">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="LeftCurly">
+      <property name="severity" value="error"/>
+      <property name="option" value="nl"/>
+    </module>
+    <module name="NeedBraces">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="RightCurly">
+      <property name="severity" value="error"/>
+      <property name="option" value="alone"/>
+    </module>
+    <module name="AvoidInlineConditionals">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="EmptyStatement">
+      <metadata name="net.sf.eclipsecs.core.comment" value="We can be a little lenient here since we can assume the developer is getting started and might start out with code stubs."/>
+      <property name="severity" value="warning"/>
+      <message key="empty.statement" value="Found an empty statement block here.  Assuming initial development  phase.  Please remove the block if not required!"/>
+    </module>
+    <module name="EqualsHashCode">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="IllegalInstantiation">
+      <property name="severity" value="error"/>
+      <message key="instantiation.avoid" value="Instantiation of {0} should be avoided. A factory method might be a better solution."/>
+    </module>
+    <module name="InnerAssignment">
+      <property name="severity" value="error"/>
+      <message key="assignment.inner.avoid" value="Inner assignments should be avoided.  This makes future debugging and maintenance complicated."/>
+    </module>
+    <module name="MagicNumber">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="MissingSwitchDefault">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="RedundantThrows">
+      <property name="severity" value="ignore"/>
+      <property name="suppressLoadErrors" value="true"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="warning"/>
+    </module>
+    <module name="SimplifyBooleanReturn">
+      <property name="severity" value="error"/>
+      <message key="simplify.boolreturn" value="Suggestion - Conditional logic can be removed to simplify the return statement."/>
+    </module>
+    <module name="DesignForExtension">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="FinalClass">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="HideUtilityClassConstructor">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="InterfaceIsType">
+      <property name="severity" value="warning"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="VisibilityModifier">
+      <property name="severity" value="error"/>
+      <property name="protectedAllowed" value="true"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="ArrayTypeStyle">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="TodoComment">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="UpperEll">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="AnnotationUseStyle">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="MissingDeprecated">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="MissingOverride">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="SuppressWarnings">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="AbstractClassName">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="PackageAnnotation">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="AvoidStarImport">
+      <property name="severity" value="error"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="error"/>
+    </module>
+    <module name="AvoidStaticImport">
+      <property name="severity" value="ignore"/>
+      <message key="import.avoidStatic" value="Be careful when using static import.  If your class defines a method or variable of the same import name, it will use yours.   Probably not what you want.  It can be annoying for a developer to lose track where the method or variable is defined. - {0}."/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="info"/>
+    </module>
+    <module name="AnonInnerLength">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="ImportOrder">
+      <property name="severity" value="ignore"/>
+      <property name="option" value="bottom"/>
+      <property name="caseSensitive" value="false"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="warning"/>
+    </module>
+    <module name="DefaultComesLast">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="DeclarationOrder">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="CovariantEquals">
+      <property name="severity" value="warning"/>
+      <message key="covariant.equals" value="Found an equals() method that has a different signature than Object.equals().  This is known as covariant &quot;equals()&quot; and requires overriding equals(java.lang.Object)."/>
+    </module>
+    <module name="FallThrough">
+      <property name="severity" value="warning"/>
+    </module>
+    <module name="MissingCtor">
+      <property name="severity" value="ignore"/>
+      <message key="missing.ctor" value="Class should define a constructor.  Do not rely on the implicit, default constructor."/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="MultipleVariableDeclarations">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="OneStatementPerLine">
+      <property name="severity" value="error"/>
+    </module>
+    <module name="TrailingComment">
+      <property name="severity" value="ignore"/>
+      <message key="trailing.comments" value="Avoid the use of trailing comments.  Instead, place the comment on its own line.  The reasons are described in the checkstyle rule."/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="HiddenField">
+      <property name="severity" value="error"/>
+      <property name="tokens" value="VARIABLE_DEF"/>
+    </module>
+    <module name="MagicNumber">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+  </module>
+  <module name="JavadocPackage">
+    <property name="severity" value="ignore"/>
+    <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+  </module>
+  <module name="NewlineAtEndOfFile">
+    <property name="severity" value="ignore"/>
+    <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+  </module>
+  <module name="Translation">
+    <property name="severity" value="ignore"/>
+    <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+  </module>
+  <module name="FileTabCharacter">
+    <property name="severity" value="error"/>
+  </module>
+  <module name="SuppressionCommentFilter">
+    <property name="offCommentFormat" value="CSOFF\: ([\w\|]+)"/>
+    <property name="onCommentFormat" value="CSON\: ([\w\|]+)"/>
+    <property name="checkFormat" value="$1"/>
+  </module>
+</module>

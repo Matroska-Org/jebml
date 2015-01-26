@@ -20,9 +20,7 @@
 package org.ebml.io;
 
 /**
- * Interface for seeking operations.
- * Not designed to be used alone but as a super interface for a more
- * specialied reading or writing interfaces.
+ * Interface for seeking operations. Not designed to be used alone but as a super interface for a more specialied reading or writing interfaces.
  */
 public interface DataSeekable
 {
@@ -32,9 +30,9 @@ public interface DataSeekable
    * @return <code>-1</code> if the length is unknown
    * @return <code> >0</code> length of the <code>DataSeekable</code>
    */
-  public long length();
+  long length();
 
-  public long getFilePointer();
+  long getFilePointer();
 
   /**
    * Check if the <code>DataSeekable</code> object is seekable
@@ -42,7 +40,7 @@ public interface DataSeekable
    * @return <code>true</code> if seeking is supported.
    * @return <code>false</code> if seeking is not supported.
    */
-  public boolean isSeekable();
+  boolean isSeekable();
 
   /**
    * Seeks in the <code>DataSeekable</code>
@@ -50,5 +48,5 @@ public interface DataSeekable
    * @param pos Absolute position to seek to
    * @return The new file position
    */
-  public long seek(long pos);
+  long seek(long pos);
 }

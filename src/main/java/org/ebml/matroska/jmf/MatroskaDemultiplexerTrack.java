@@ -1,5 +1,6 @@
 package org.ebml.matroska.jmf;
 
+// CSOFF: AvoidStarImport
 import org.ebml.matroska.*;
 import javax.media.Track;
 import javax.media.Format;
@@ -7,6 +8,8 @@ import javax.media.Time;
 import javax.media.Buffer;
 import javax.media.TrackListener;
 import javax.media.format.*;
+
+//CSON: AvoidStarImport
 
 /**
  * <p>
@@ -29,39 +32,43 @@ import javax.media.format.*;
 public class MatroskaDemultiplexerTrack implements Track
 {
   protected MatroskaFile file = null;
-  protected int TrackNo = -1;
-  protected boolean Valid = false;
+  protected int trackNo = -1;
+  protected boolean valid = false;
   protected Format format = null;
-  protected boolean Enabled = false;
-  protected long StartTimecode = -1;
+  protected boolean enabled = false;
+  protected long startTimecode = -1;
 
-  public MatroskaDemultiplexerTrack(final MatroskaFile file, final int TrackNo)
+  public MatroskaDemultiplexerTrack(final MatroskaFile file, final int trackNo)
   {
     this.file = file;
-    this.TrackNo = TrackNo;
+    this.trackNo = trackNo;
     init();
   }
 
   public void init()
   {
-    final MatroskaFileTrack track = file.getTrack(TrackNo);
+    final MatroskaFileTrack track = file.getTrack(trackNo);
     if (track.getCodecID().compareTo("V_MS/VFW/FOURCC") == 0)
     {
-
+      System.out.println("Got fourcc");
     }
     else if (track.getCodecID().compareTo("A_MPEG/L3") == 0)
     {
-      if (track.getAudio().bitDepth == 0)
-        track.getAudio().bitDepth = 16;
-      format = new AudioFormat(AudioFormat.MPEGLAYER3, track.getAudio().getSamplingFrequency(), track.getAudio().bitDepth, track.getAudio().channels);
+      if (track.getAudio().getBitDepth() == 0)
+      {
+        track.getAudio().setBitDepth(16);
+      }
+      format = new AudioFormat(AudioFormat.MPEGLAYER3, track.getAudio().getSamplingFrequency(), track.getAudio().getBitDepth(), track.getAudio().getChannels());
 
       setEnabled(true);
     }
     else if (track.getCodecID().compareTo("A_MPEG/L2") == 0)
     {
-      if (track.getAudio().bitDepth == 0)
-        track.getAudio().bitDepth = 16;
-      format = new AudioFormat("mpegaudio", track.getAudio().getSamplingFrequency(), track.getAudio().bitDepth, track.getAudio().channels);
+      if (track.getAudio().getBitDepth() == 0)
+      {
+        track.getAudio().setBitDepth(16);
+      }
+      format = new AudioFormat("mpegaudio", track.getAudio().getSamplingFrequency(), track.getAudio().getBitDepth(), track.getAudio().getChannels());
 
       setEnabled(true);
     }
@@ -74,37 +81,37 @@ public class MatroskaDemultiplexerTrack implements Track
   }
 
   @Override
-  public void setEnabled(final boolean Enabled)
+  public void setEnabled(final boolean enabled)
   {
-    this.Enabled = Enabled;
+    this.enabled = enabled;
   }
 
   @Override
   public boolean isEnabled()
   {
-    return Enabled;
+    return enabled;
   }
 
   @Override
   public Time getStartTime()
   {
-    return new Time(StartTimecode);
+    return new Time(startTimecode);
   }
 
   @Override
   public void readFrame(final Buffer buffer)
   {
     // System.out.println("MatroskaDemultiplexerTrack.readFrame(buffer = " + buffer + ")");
-    final MatroskaFileFrame frame = file.getNextFrame(TrackNo);
+    final MatroskaFileFrame frame = file.getNextFrame(trackNo);
     if (frame == null)
     {
       buffer.setDiscard(true);
       buffer.setEOM(true);
       return;
     }
-    if (StartTimecode == -1)
+    if (startTimecode == -1)
     {
-      StartTimecode = frame.getTimecode();
+      startTimecode = frame.getTimecode();
     }
     buffer.setTimeStamp(frame.getTimecode() * 1000000);
     if (frame.getDuration() != 0)

@@ -20,18 +20,16 @@
 package org.ebml.io;
 
 /**
- * Defines the interface used for custom <code>DataWriter</code>'s.  A
- * <code>DataWriter</code> provides methods of writing bytes individually or
- * in arrays.  These basic functions must be defined in any <code>DataWriter</code>
- * objects to be used with the <code>EBMLWriter</code>.
+ * Defines the interface used for custom <code>DataWriter</code>'s. A <code>DataWriter</code> provides methods of writing bytes individually or in
+ * arrays. These basic functions must be defined in any <code>DataWriter</code> objects to be used with the <code>EBMLWriter</code>.
  *
  * @author Jory Stone
  */
-public interface DataWriter extends DataSeekable 
+public interface DataWriter extends DataSeekable
 {
-  public int write(byte b);
+  int write(byte b);
 
-  public int write(byte[] buff);
+  int write(byte[] buff);
 
-  public int write(byte[] buff, int offset, int length);
+  int write(byte[] buff, int offset, int length);
 }

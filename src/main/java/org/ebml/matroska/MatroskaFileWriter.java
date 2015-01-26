@@ -166,7 +166,7 @@ public class MatroskaFileWriter
    */
   public void addFrame(final MatroskaFileFrame frame)
   {
-    if (!cluster.AddFrame(frame))
+    if (!cluster.addFrame(frame))
     {
       flush();
     }

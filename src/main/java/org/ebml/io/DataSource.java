@@ -26,22 +26,21 @@ package org.ebml.io;
  */
 
 /**
- * Defines the interface used for custom <code>DataSource</code>'s.  A
- * <code>DataSource</code> provides methods of reading bytes individually or
- * in arrays.  These basic functions must be defined in any <code>DataSource</code>
- * objects to be used with the <code>EBMLReader</code>.
+ * Defines the interface used for custom <code>DataSource</code>'s. A <code>DataSource</code> provides methods of reading bytes individually or in
+ * arrays. These basic functions must be defined in any <code>DataSource</code> objects to be used with the <code>EBMLReader</code>.
  *
  * @author John Cannon
  * @author Jory Stone
  */
 
-public interface DataSource extends DataSeekable {
+public interface DataSource extends DataSeekable
+{
 
-  public byte readByte();
+  byte readByte();
 
-  public int read(byte[] buff);
+  int read(byte[] buff);
 
-  public int read(byte[] buff, int offset, int length);
+  int read(byte[] buff, int offset, int length);
 
   /**
    * Skip a number of bytes in the <code>DataSeekable</code>
@@ -49,5 +48,5 @@ public interface DataSource extends DataSeekable {
    * @param offset The number of bytes to skip
    * @return The number of bytes skipped
    */
-  public long skip(long offset);
+  long skip(long offset);
 }

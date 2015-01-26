@@ -19,15 +19,16 @@
  */
 package org.ebml.matroska;
 
-import org.ebml.*;
-import org.ebml.util.*;
+import org.ebml.EBMLReader;
+import org.ebml.Element;
+import org.ebml.util.ArrayCopy;
 
 public class MatroskaBlock
 {
-  protected int[] Sizes = null;
-  protected int HeaderSize = 0;
-  protected int BlockTimecode = 0;
-  protected int TrackNo = 0;
+  protected int[] sizes = null;
+  protected int headerSize = 0;
+  protected int blockTimecode = 0;
+  protected int trackNo = 0;
   private boolean keyFrame;
   private final byte[] data;
 
@@ -43,48 +44,54 @@ public class MatroskaBlock
   public void parseBlock()
   {
     int index = 0;
-    TrackNo = (int) EBMLReader.readEBMLCode(data);
-    index = Element.codedSizeLength(TrackNo);
-    HeaderSize += index;
+    trackNo = (int) EBMLReader.readEBMLCode(data);
+    index = Element.codedSizeLength(trackNo);
+    headerSize += index;
 
-    final short BlockTimecode1 = (short) (data[index++] & 0xFF);
-    final short BlockTimecode2 = (short) (data[index++] & 0xFF);
-    if (BlockTimecode1 != 0 || BlockTimecode2 != 0)
+    final short blockTimecode1 = (short) (data[index++] & 0xFF);
+    final short blockTimecode2 = (short) (data[index++] & 0xFF);
+    if (blockTimecode1 != 0 || blockTimecode2 != 0)
     {
-      BlockTimecode = (BlockTimecode1 << 8) | BlockTimecode2;
+      blockTimecode = (blockTimecode1 << 8) | blockTimecode2;
     }
 
     final int keyFlag = data[index] & 0x80;
     if (keyFlag > 0)
+    {
       this.keyFrame = true;
+    }
     else
+    {
       this.keyFrame = false;
+    }
 
-    final int LaceFlag = data[index] & 0x06;
+    final int laceFlag = data[index] & 0x06;
     index++;
     // Increase the HeaderSize by the number of bytes we have read
-    HeaderSize += 3;
-    if (LaceFlag != 0x00)
+    headerSize += 3;
+    if (laceFlag != 0x00)
     {
       // We have lacing
-      final byte LaceCount = data[index++];
-      HeaderSize += 1;
-      if (LaceFlag == 0x02)
+      final byte laceCount = data[index++];
+      headerSize += 1;
+      if (laceFlag == 0x02)
       { // Xiph Lacing
-        Sizes = readXiphLaceSizes(index, LaceCount);
+        sizes = readXiphLaceSizes(index, laceCount);
 
       }
-      else if (LaceFlag == 0x06)
+      else if (laceFlag == 0x06)
       { // EBML Lacing
-        Sizes = readEBMLLaceSizes(index, LaceCount);
+        sizes = readEBMLLaceSizes(index, laceCount);
 
       }
-      else if (LaceFlag == 0x04)
+      else if (laceFlag == 0x04)
       { // Fixed Size Lacing
-        Sizes = new int[LaceCount + 1];
-        Sizes[0] = (data.length - HeaderSize) / (LaceCount + 1);
-        for (int s = 0; s < LaceCount; s++)
-          Sizes[s + 1] = Sizes[0];
+        sizes = new int[laceCount + 1];
+        sizes[0] = (data.length - headerSize) / (laceCount + 1);
+        for (int s = 0; s < laceCount; s++)
+        {
+          sizes[s + 1] = sizes[0];
+        }
       }
       else
       {
@@ -96,118 +103,118 @@ public class MatroskaBlock
     // this.dataRead = true;
   }
 
-  private int[] readEBMLLaceSizes(int index, final short LaceCount)
+  private int[] readEBMLLaceSizes(int index, final short laceCount)
   {
-    final int[] LaceSizes = new int[LaceCount + 1];
-    LaceSizes[LaceCount] = data.length;
+    final int[] laceSizes = new int[laceCount + 1];
+    laceSizes[laceCount] = data.length;
 
     // This uses the DataSource.getBytePosition() for finding the header size
     // because of the trouble of finding the byte size of sized ebml coded integers
     // long ByteStartPos = source.getFilePointer();
     final int startIndex = index;
 
-    LaceSizes[0] = (int) EBMLReader.readEBMLCode(data, index);
-    index += Element.codedSizeLength(LaceSizes[0]);
-    LaceSizes[LaceCount] -= LaceSizes[0];
+    laceSizes[0] = (int) EBMLReader.readEBMLCode(data, index);
+    index += Element.codedSizeLength(laceSizes[0]);
+    laceSizes[laceCount] -= laceSizes[0];
 
-    long FirstEBMLSize = LaceSizes[0];
-    long LastEBMLSize = 0;
-    for (int l = 0; l < LaceCount - 1; l++)
+    long firstEBMLSize = laceSizes[0];
+    long lastEBMLSize = 0;
+    for (int l = 0; l < laceCount - 1; l++)
     {
-      LastEBMLSize = EBMLReader.readSignedEBMLCode(data, index);
-      index += Element.codedSizeLength(LastEBMLSize);
+      lastEBMLSize = EBMLReader.readSignedEBMLCode(data, index);
+      index += Element.codedSizeLength(lastEBMLSize);
 
-      FirstEBMLSize += LastEBMLSize;
-      LaceSizes[l + 1] = (int) FirstEBMLSize;
+      firstEBMLSize += lastEBMLSize;
+      laceSizes[l + 1] = (int) firstEBMLSize;
 
       // Update the size of the last block
-      LaceSizes[LaceCount] -= LaceSizes[l + 1];
+      laceSizes[laceCount] -= laceSizes[l + 1];
     }
     // long ByteEndPos = source.getFilePointer();
 
     // HeaderSize = HeaderSize + (int)(ByteEndPos - ByteStartPos);
-    HeaderSize = HeaderSize + index - startIndex;
-    LaceSizes[LaceCount] -= HeaderSize;
+    headerSize = headerSize + index - startIndex;
+    laceSizes[laceCount] -= headerSize;
 
-    return LaceSizes;
+    return laceSizes;
   }
 
-  private int[] readXiphLaceSizes(int index, final short LaceCount)
+  private int[] readXiphLaceSizes(int index, final short laceCount)
   {
-    final int[] LaceSizes = new int[LaceCount + 1];
-    LaceSizes[LaceCount] = data.length;
+    final int[] laceSizes = new int[laceCount + 1];
+    laceSizes[laceCount] = data.length;
 
     // long ByteStartPos = source.getFilePointer();
 
-    for (int l = 0; l < LaceCount; l++)
+    for (int l = 0; l < laceCount; l++)
     {
-      short LaceSizeByte = 255;
-      while (LaceSizeByte == 255)
+      short laceSizeByte = 255;
+      while (laceSizeByte == 255)
       {
-        LaceSizeByte = (short) (data[index++] & 0xFF);
-        HeaderSize += 1;
-        LaceSizes[l] += LaceSizeByte;
+        laceSizeByte = (short) (data[index++] & 0xFF);
+        headerSize += 1;
+        laceSizes[l] += laceSizeByte;
       }
       // Update the size of the last block
-      LaceSizes[LaceCount] -= LaceSizes[l];
+      laceSizes[laceCount] -= laceSizes[l];
     }
     // long ByteEndPos = source.getFilePointer();
 
-    LaceSizes[LaceCount] -= HeaderSize;
+    laceSizes[laceCount] -= headerSize;
 
-    return LaceSizes;
+    return laceSizes;
   }
 
   public int getFrameCount()
   {
-    if (Sizes == null)
+    if (sizes == null)
     {
       return 1;
     }
-    return Sizes.length;
+    return sizes.length;
   }
 
   public byte[] getFrame(final int frame)
   {
-    if (Sizes == null)
+    if (sizes == null)
     {
       if (frame != 0)
       {
         throw new IllegalArgumentException("Tried to read laced frame on non-laced Block. MatroskaBlock.getFrame(frame > 0)");
       }
-      final byte[] FrameData = new byte[data.length - HeaderSize];
-      ArrayCopy.arraycopy(data, HeaderSize, FrameData, 0, FrameData.length);
+      final byte[] frameData = new byte[data.length - headerSize];
+      ArrayCopy.arraycopy(data, headerSize, frameData, 0, frameData.length);
 
-      return FrameData;
+      return frameData;
     }
-    final byte[] FrameData = new byte[Sizes[frame]];
+    final byte[] frameData = new byte[sizes[frame]];
 
     // Calc the frame data offset
-    int StartOffset = HeaderSize;
+    int startOffset = headerSize;
     for (int s = 0; s < frame; s++)
     {
-      StartOffset += Sizes[s];
+      startOffset += sizes[s];
     }
 
     // Copy the frame data
-    ArrayCopy.arraycopy(data, StartOffset, FrameData, 0, FrameData.length);
+    ArrayCopy.arraycopy(data, startOffset, frameData, 0, frameData.length);
 
-    return FrameData;
+    return frameData;
   }
 
-  public long getAdjustedBlockTimecode(final long ClusterTimecode, final long TimecodeScale)
+  public long getAdjustedBlockTimecode(final long clusterTimecode, final long timecodeScale)
   {
-    return ClusterTimecode + (BlockTimecode);// * TimecodeScale);
+    return clusterTimecode + (blockTimecode); // * timecodeScale);
   }
 
   public int getTrackNo()
   {
-    return TrackNo;
+    return trackNo;
   }
 
   public int getBlockTimecode()
   {
-    return BlockTimecode;
+    return blockTimecode;
   }
 
   public void setFrameData(final short trackNo, final int timecode, final byte[] data)

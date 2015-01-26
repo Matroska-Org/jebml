@@ -21,7 +21,7 @@ package org.ebml.matroska;
 
 import java.util.ArrayList;
 
-import org.ebml.util.*;
+import org.ebml.util.ArrayCopy;
 
 /**
  * Matroska Frame, holds a Matroska frame timecode, duration, and data
@@ -33,7 +33,7 @@ public class MatroskaFileFrame
    */
   public interface MatroskaFramePuller
   {
-    public void PushNewMatroskaFrame(MatroskaFileFrame frame);
+    void pushNewMatroskaFrame(MatroskaFileFrame frame);
   };
 
   /**

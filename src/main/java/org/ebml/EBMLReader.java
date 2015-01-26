@@ -19,8 +19,8 @@
  */
 package org.ebml;
 
-import org.ebml.io.*;
-import org.ebml.util.*;
+import org.ebml.io.DataSource;
+import org.ebml.util.ArrayCopy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,9 +67,10 @@ import org.slf4j.LoggerFactory;
  */
 public class EBMLReader
 {
-  protected DataSource source;
-
   private static final Logger LOG = LoggerFactory.getLogger(EBMLReader.class);
+  private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
+
+  protected DataSource source;
 
   /**
    * Creates a new <code>EBMLReader</code> reading from the <code>DataSource
@@ -83,16 +84,14 @@ public class EBMLReader
     this.source = source;
   }
 
-  final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
-
   public static String bytesToHex(final byte[] bytes)
   {
     final char[] hexChars = new char[bytes.length * 2];
     for (int j = 0; j < bytes.length; j++)
     {
       final int v = bytes[j] & 0xFF;
-      hexChars[j * 2] = hexArray[v >>> 4];
-      hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
     }
     return new String(hexChars);
   }
@@ -103,8 +102,10 @@ public class EBMLReader
     final byte[] elementType = readEBMLCodeAsBytes(source);
 
     if (elementType == null)
+    {
       // Failed to read type id
       return null;
+    }
 
     final Element elem = ProtoType.getInstance(elementType);
 
@@ -118,8 +119,10 @@ public class EBMLReader
     final byte[] data = getEBMLCodeAsBytes(source);
     final long elementSize = parseEBMLCode(data);
     if (elementSize == 0)
+    {
       // Zero sized element is valid
       LOG.error("Invalid element size for {}", elem.typeInfo.getName());
+    }
 
     // Set it's size
     elem.setSize(elementSize);
@@ -139,7 +142,7 @@ public class EBMLReader
     return elem;
   }
 
-  static public byte[] getEBMLCodeAsBytes(final DataSource source)
+  public static byte[] getEBMLCodeAsBytes(final DataSource source)
   {
     // Begin loop with byte set to newly read byte.
     final byte firstByte = source.readByte();
@@ -194,14 +197,16 @@ public class EBMLReader
    *
    * @return ebml size
    */
-  static public long readEBMLCode(final DataSource source)
+  public static long readEBMLCode(final DataSource source)
   {
     // Begin loop with byte set to newly read byte.
     final byte firstByte = source.readByte();
     final int numBytes = readEBMLCodeSize(firstByte);
     if (numBytes == 0)
+    {
       // Invalid size
       return 0;
+    }
 
     // Setup space to store the bits
     final byte[] data = new byte[numBytes];
@@ -229,7 +234,9 @@ public class EBMLReader
   public static long parseEBMLCode(final byte[] data)
   {
     if (data == null)
+    {
       return 0;
+    }
     // Put this into a long
     long size = 0;
     long n = 0;
@@ -247,7 +254,7 @@ public class EBMLReader
    *
    * @return ebml size
    */
-  static public long readEBMLCode(final byte[] source)
+  public static long readEBMLCode(final byte[] source)
   {
     return readEBMLCode(source, 0);
   }
@@ -258,14 +265,16 @@ public class EBMLReader
    *
    * @return ebml size
    */
-  static public long readEBMLCode(final byte[] source, final int offset)
+  public static long readEBMLCode(final byte[] source, final int offset)
   {
     // Begin loop with byte set to newly read byte.
     final byte firstByte = source[offset];
     final int numBytes = readEBMLCodeSize(firstByte);
     if (numBytes == 0)
+    {
       // Invalid size
       return 0;
+    }
 
     // Setup space to store the bits
     final byte[] data = new byte[numBytes];
@@ -296,7 +305,7 @@ public class EBMLReader
    *
    * @return ebml size
    */
-  static public long readSignedEBMLCode(final byte[] source)
+  public static long readSignedEBMLCode(final byte[] source)
   {
     return readSignedEBMLCode(source, 0);
   }
@@ -307,14 +316,16 @@ public class EBMLReader
    *
    * @return ebml size
    */
-  static public long readSignedEBMLCode(final byte[] source, final int offset)
+  public static long readSignedEBMLCode(final byte[] source, final int offset)
   {
     // Begin loop with byte set to newly read byte.
     final byte firstByte = source[offset];
     final int numBytes = readEBMLCodeSize(firstByte);
     if (numBytes == 0)
+    {
       // Invalid size
       return 0;
+    }
 
     // Setup space to store the bits
     final byte[] data = new byte[numBytes];
@@ -367,7 +378,7 @@ public class EBMLReader
    *
    * @return ebml size
    */
-  static public long readSignedEBMLCode(final DataSource source)
+  public static long readSignedEBMLCode(final DataSource source)
   {
 
     // Begin loop with byte set to newly read byte.
@@ -389,8 +400,10 @@ public class EBMLReader
       mask >>>= 1;
     }
     if (numBytes == 0)
+    {
       // Invalid size
       return 0;
+    }
 
     // Setup space to store the bits
     final byte[] data = new byte[numBytes];
@@ -442,19 +455,21 @@ public class EBMLReader
    *
    * @return byte array filled with the ebml size, (size bits included)
    */
-  static public byte[] readEBMLCodeAsBytes(final DataSource source)
+  public static byte[] readEBMLCodeAsBytes(final DataSource source)
   {
     // Begin loop with byte set to newly read byte.
     final byte firstByte = source.readByte();
     final int numBytes = readEBMLCodeSize(firstByte);
     if (numBytes == 0)
+    {
       // Invalid element
       return null;
+    }
     // Setup space to store the bits
     final byte[] data = new byte[numBytes];
 
     // Clear the 1 at the front of this byte, all the way to the beginning of the size
-    data[0] = ((firstByte));// & ((0xFF >>> (numBytes))));
+    data[0] = ((firstByte));
 
     if (numBytes > 1)
     {

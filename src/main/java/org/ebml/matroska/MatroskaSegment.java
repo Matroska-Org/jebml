@@ -19,8 +19,9 @@
  */
 package org.ebml.matroska;
 
-import org.ebml.*;
-import org.ebml.io.*;
+import org.ebml.Element;
+import org.ebml.MasterElement;
+import org.ebml.io.DataWriter;
 
 /**
  * Summary description for MatroskaSegment.
@@ -52,7 +53,9 @@ public class MatroskaSegment extends MasterElement
       size = new byte[5];
       size[0] = (byte) (0xFF >>> (size.length - 1));
       for (int i = 1; i < size.length; i++)
+      {
         size[i] = (byte) 0xFF;
+      }
     }
     else
     {

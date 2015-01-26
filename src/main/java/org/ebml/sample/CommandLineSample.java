@@ -2,7 +2,6 @@ package org.ebml.sample;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import org.ebml.io.FileDataSource;
 import org.ebml.io.FileDataWriter;
 import org.ebml.matroska.MatroskaFile;
@@ -29,8 +28,13 @@ import org.ebml.matroska.MatroskaFileTrack.TrackType;
  * @version 1.0
  */
 
-public class CommandLineSample
+public final class CommandLineSample
 {
+  private CommandLineSample()
+  {
+
+  }
+
   public static void main(final String[] args)
   {
     System.out.println("JEBML CommandLineSample - (c) 2004 Jory 'jcsston' Stone <jcsston@toughguy.net>");
@@ -77,7 +81,7 @@ public class CommandLineSample
     if (track.getCodecID().compareTo("A_MPEG/L3") == 0)
     {
       System.out.println("Extracting mp3 track");
-      final String outputFilename = filename + ".mp3";// + ".wav";
+      final String outputFilename = filename + ".mp3"; // + ".wav";
       try (FileOutputStream oFS = new FileOutputStream(outputFilename))
       {
         /*
@@ -115,7 +119,7 @@ public class CommandLineSample
     {
       final MatroskaFileTrack track = new MatroskaFileTrack();
       track.setTrackNo((short) i);
-      track.setTrackUID(new java.util.Random().nextLong());
+      track.setTrackUID(1);
       track.setTrackType(TrackType.VIDEO);
       track.setName("Track " + Integer.toString(i));
       track.getVideo().setPixelWidth((short) 320);

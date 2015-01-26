@@ -19,67 +19,118 @@
  */
 package org.ebml.io;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
-public class FileDataSource implements DataSource {
+public class FileDataSource implements DataSource
+{
   RandomAccessFile file = null;
 
-  public FileDataSource(String filename) throws FileNotFoundException, IOException {
+  public FileDataSource(final String filename) throws FileNotFoundException, IOException
+  {
     file = new RandomAccessFile(filename, "r");
   }
-  public FileDataSource(String filename, String mode) throws FileNotFoundException, IOException {
+
+  public FileDataSource(final String filename, final String mode) throws FileNotFoundException, IOException
+  {
     file = new RandomAccessFile(filename, mode);
   }
-  public byte readByte() {
-    try {
+
+  @Override
+  public byte readByte()
+  {
+    try
+    {
       return file.readByte();
-    } catch (IOException ex) {
+    }
+    catch (final IOException ex)
+    {
       return 0;
     }
   }
-  public int read(byte[] buff) {
-    try {
+
+  @Override
+  public int read(final byte[] buff)
+  {
+    try
+    {
       return file.read(buff);
-    } catch (IOException ex) {
+    }
+    catch (final IOException ex)
+    {
       return 0;
     }
   }
-  public int read(byte[] buff, int offset, int length) {
-    try {
+
+  @Override
+  public int read(final byte[] buff, final int offset, final int length)
+  {
+    try
+    {
       return file.read(buff, offset, length);
-    } catch (IOException ex) {
+    }
+    catch (final IOException ex)
+    {
       return 0;
     }
   }
-  public long skip(long offset) {
-    try {
-      return file.skipBytes((int)offset);
-    } catch (IOException ex) {
+
+  @Override
+  public long skip(final long offset)
+  {
+    try
+    {
+      return file.skipBytes((int) offset);
+    }
+    catch (final IOException ex)
+    {
       return 0;
     }
   }
-  public long length() {
-    try {
+
+  @Override
+  public long length()
+  {
+    try
+    {
       return file.length();
-    } catch (IOException ex) {
+    }
+    catch (final IOException ex)
+    {
       return -1;
     }
   }
-  public long getFilePointer() {
-    try {
+
+  @Override
+  public long getFilePointer()
+  {
+    try
+    {
       return file.getFilePointer();
-    } catch (IOException ex) {
+    }
+    catch (final IOException ex)
+    {
       return -1;
     }
   }
-  public boolean isSeekable() {
+
+  @Override
+  public boolean isSeekable()
+  {
     return true;
   }
-  public long seek(long pos) {
-    try {
+
+  @Override
+  public long seek(final long pos)
+  {
+    try
+    {
       file.seek(pos);
       return file.getFilePointer();
-    } catch (IOException ex) {
+    }
+    catch (final IOException ex)
+    {
       return -1;
     }
   }

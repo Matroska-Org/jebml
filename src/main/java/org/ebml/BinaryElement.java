@@ -37,7 +37,7 @@ public class BinaryElement extends Element
   /*
    * private byte[] type = { 0x00};
    */
-  private static int MIN_SIZE_LENGTH = 4;
+  private static int minSizeLength = 4;
 
   // private long size = 0;
   // protected byte[] data;
@@ -142,11 +142,11 @@ public class BinaryElement extends Element
 
   public static void setMinSizeLength(final int minSize)
   {
-    MIN_SIZE_LENGTH = minSize;
+    minSizeLength = minSize;
   }
 
   public static int getMinSizeLength()
   {
-    return MIN_SIZE_LENGTH;
+    return minSizeLength;
   }
 }

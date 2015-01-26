@@ -43,7 +43,7 @@ class MatroskaCluster
   private final Set<Integer> tracks = new HashSet<>();
   private final List<Long> sliencedTracks = new ArrayList<>();
 
-  public long clusterTimecode = Long.MAX_VALUE;
+  private long clusterTimecode = Long.MAX_VALUE;
   private int sizeLimit = Integer.MAX_VALUE;
   private int totalSize = 0;
   private long durationLimit = Long.MAX_VALUE;
@@ -64,7 +64,7 @@ class MatroskaCluster
    * @param frame
    * @return false if you should begin another cluster.
    */
-  public boolean AddFrame(final MatroskaFileFrame frame)
+  public boolean addFrame(final MatroskaFileFrame frame)
   {
     // Is this the earliest timecode?
     if (frame.getTimecode() < clusterTimecode)
@@ -80,7 +80,9 @@ class MatroskaCluster
   public long flush(final DataWriter ioDW)
   {
     if (frames.size() == 0)
+    {
       return 0;
+    }
     try
     {
       final MasterElement clusterElem = MatroskaDocTypes.Cluster.getInstance();

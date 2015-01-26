@@ -30,7 +30,7 @@ import org.ebml.io.DataWriter;
  */
 public class VoidElement extends Element
 {
-  private final static byte[] VOID_TYPE = new byte[] {(byte) 0xEC };
+  private static final byte[] VOID_TYPE = new byte[] {(byte) 0xEC };
 
   /*
    * Creates a new instance of Element

@@ -21,27 +21,29 @@ package org.ebml.matroska;
 
 import java.util.ArrayList;
 
-public class MatroskaFileSimpleTag 
+public class MatroskaFileSimpleTag
 {
-  public String Name;
-  public String Value;
-  public ArrayList<MatroskaFileSimpleTag> Children = new ArrayList<MatroskaFileSimpleTag>();
+  public String name;
+  public String value;
+  public ArrayList<MatroskaFileSimpleTag> children = new ArrayList<MatroskaFileSimpleTag>();
 
-  public String toString(int depth) 
+  public String toString(int depth)
   {
     String s = new String();
     String depthIndent = new String();
     for (int d = 0; d < depth; d++)
+    {
       depthIndent += "\t";
+    }
 
     s += depthIndent + "SimpleTag\n";
-    s += depthIndent + "\tName: " + Name + "\n";
-    s += depthIndent + "\tValue: " + Value + "\n";
+    s += depthIndent + "\tName: " + name + "\n";
+    s += depthIndent + "\tValue: " + value + "\n";
 
     depth++;
-    for (int t = 0; t < Children.size(); t++) 
+    for (int t = 0; t < children.size(); t++)
     {
-      s += ((MatroskaFileSimpleTag)Children.get(t)).toString(depth);
+      s += children.get(t).toString(depth);
     }
 
     return s;

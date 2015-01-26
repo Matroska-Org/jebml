@@ -27,8 +27,9 @@ package org.ebml;
 
 import java.util.Arrays;
 
-import org.ebml.io.*;
-import org.ebml.util.*;
+import org.ebml.io.DataSource;
+import org.ebml.io.DataWriter;
+import org.ebml.util.ArrayCopy;
 
 /**
  * Defines the basic EBML element. Subclasses may provide child element access.
@@ -37,12 +38,12 @@ import org.ebml.util.*;
  */
 public class Element
 {
+  private static int minSizeLength = 0;
 
   protected Element parent;
   protected ProtoType<?> typeInfo;
   protected byte[] type = {
       0x00 };
-  private static int MIN_SIZE_LENGTH = 0;
   protected long size = 0;
   protected byte[] data = null;
   protected boolean dataRead = false;
@@ -95,15 +96,14 @@ public class Element
   {
     long len = 0;
 
-    final byte[] type = getType();
     len += type.length;
     writer.write(type);
 
-    final byte[] size = Element.makeEbmlCodedSize(getSize());
+    final byte[] encodedSize = Element.makeEbmlCodedSize(getSize());
     // System.out.printf("Writing header for element %s with size %d (%s)\n", typeInfo.name, getTotalSize(), EBMLReader.bytesToHex(size));
 
-    len += size.length;
-    writer.write(size);
+    len += encodedSize.length;
+    writer.write(encodedSize);
 
     return len;
   }
@@ -249,24 +249,19 @@ public class Element
     return ret;
   }
 
-  public boolean equals(final byte[] typeId)
+  public boolean isType(final byte[] typeId)
   {
-    return ElementType.compareIDs(this.type, typeId);
-  }
-
-  public boolean equals(final ElementType elemType)
-  {
-    return this.equals(elemType.id);
+    return Arrays.equals(this.type, typeId);
   }
 
   public static void setMinSizeLength(final int minSize)
   {
-    MIN_SIZE_LENGTH = minSize;
+    minSizeLength = minSize;
   }
 
   public static int getMinSizeLength()
   {
-    return MIN_SIZE_LENGTH;
+    return minSizeLength;
   }
 
   public static byte[] makeEbmlCode(final byte[] typeID, final long size)
@@ -369,13 +364,13 @@ public class Element
     {
       codedSize = 4;
     }
-    if ((MIN_SIZE_LENGTH > 0) && (codedSize <= MIN_SIZE_LENGTH))
+    if ((minSizeLength > 0) && (codedSize <= minSizeLength))
     {
-      codedSize = MIN_SIZE_LENGTH;
+      codedSize = minSizeLength;
     }
     else
     {
-      // codedSize = 8;
+      codedSize = 8;
     }
     return codedSize;
   }

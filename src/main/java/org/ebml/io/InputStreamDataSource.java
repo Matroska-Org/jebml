@@ -19,7 +19,8 @@
  */
 package org.ebml.io;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 
 /*
  * InputStreamDataSource
@@ -28,87 +29,116 @@ import java.io.*;
  *
  * @author  John Cannon
  */
-public class InputStreamDataSource
-    implements DataSource {
+public class InputStreamDataSource implements DataSource
+{
   protected InputStream in = null;
   protected long pos = 0;
   protected byte[] buffer = new byte[1];
 
-  public InputStream getInputStream() {
-    return in;
-  }
   /** Creates a new instance of InputStreamDataSource */
-  public InputStreamDataSource(InputStream in) {
+  public InputStreamDataSource(final InputStream in)
+  {
     this.in = in;
   }
 
-  public byte readByte() {
-    try {
-      int l = in.read(buffer);
+  public InputStream getInputStream()
+  {
+    return in;
+  }
+
+  @Override
+  public byte readByte()
+  {
+    try
+    {
+      final int l = in.read(buffer);
       pos += l;
       return buffer[0];
     }
-    catch (IOException e) {
+    catch (final IOException e)
+    {
       e.printStackTrace();
       return -1;
     }
   }
 
-  public int read(byte[] buff) {
-    try {
-      int l = in.read(buff);
+  @Override
+  public int read(final byte[] buff)
+  {
+    try
+    {
+      final int l = in.read(buff);
       pos += l;
       return l;
     }
-    catch (IOException e) {
+    catch (final IOException e)
+    {
       e.printStackTrace();
       return -1;
     }
   }
 
-  public int read(byte[] buff, int offset, int length) {
-    try {
-      int l = in.read(buff, offset, length);
+  @Override
+  public int read(final byte[] buff, final int offset, final int length)
+  {
+    try
+    {
+      final int l = in.read(buff, offset, length);
       pos += l;
       return l;
     }
-    catch (IOException e) {
+    catch (final IOException e)
+    {
       e.printStackTrace();
       return -1;
     }
   }
 
-  public long skip(long offset) {
-    try {
-      long l = in.skip(offset);
+  @Override
+  public long skip(final long offset)
+  {
+    try
+    {
+      final long l = in.skip(offset);
       pos += l;
       return l;
     }
-    catch (IOException e) {
+    catch (final IOException e)
+    {
       e.printStackTrace();
       return -1;
     }
   }
 
-  public long length() {
-    try {
+  @Override
+  public long length()
+  {
+    try
+    {
       return pos + in.available();
     }
-    catch (IOException e) {
+    catch (final IOException e)
+    {
       e.printStackTrace();
       return -1;
     }
   }
 
-  public long getFilePointer() {
+  @Override
+  public long getFilePointer()
+  {
     return pos;
   }
 
-  public boolean isSeekable() {
+  @Override
+  public boolean isSeekable()
+  {
     return false;
   }
 
-  public long seek(long pos) {
+  @Override
+  public long seek(final long pos)
+  {
     return pos;
   }
 

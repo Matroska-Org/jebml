@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public class ProtoType<T extends Element>
 {
   private static final Logger LOG = LoggerFactory.getLogger(ProtoType.class);
-  private static HashMap<Long, ProtoType<? extends Element>> CLASS_MAP = new HashMap<>();
+  private static final HashMap<Long, ProtoType<? extends Element>> CLASS_MAP = new HashMap<>();
   Class<T> clazz;
   private final byte[] type;
 

@@ -1,6 +1,6 @@
 package org.ebml.matroska;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.ebml.EBMLReader;
 import org.ebml.Element;

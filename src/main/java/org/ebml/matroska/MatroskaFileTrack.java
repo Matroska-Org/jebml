@@ -59,13 +59,12 @@ public class MatroskaFileTrack
     SUBTITLE(0x11),
     BUTTONS(0x12),
     CONTROL(0x20);
+    final byte type;
 
     private TrackType(final int type)
     {
       this.type = (byte) type;
     }
-
-    byte type;
 
     public static TrackType fromOrdinal(final long l)
     {
@@ -145,8 +144,8 @@ public class MatroskaFileTrack
   {
     private float samplingFrequency;
     private float outputSamplingFrequency;
-    public short channels;
-    public byte bitDepth;
+    private short channels;
+    private byte bitDepth;
 
     public float getSamplingFrequency()
     {
@@ -166,6 +165,26 @@ public class MatroskaFileTrack
     public void setOutputSamplingFrequency(final float outputSamplingFrequency)
     {
       this.outputSamplingFrequency = outputSamplingFrequency;
+    }
+
+    public short getChannels()
+    {
+      return channels;
+    }
+
+    public void setChannels(final short channels)
+    {
+      this.channels = channels;
+    }
+
+    public byte getBitDepth()
+    {
+      return bitDepth;
+    }
+
+    public void setBitDepth(final int bitDepth)
+    {
+      this.bitDepth = (byte) bitDepth;
     }
   }
 
@@ -204,7 +223,9 @@ public class MatroskaFileTrack
     s += "\t\t" + "Language: " + getLanguage() + "\n";
     s += "\t\t" + "CodecID: " + getCodecID() + "\n";
     if (getCodecPrivate() != null)
+    {
       s += "\t\t" + "CodecPrivate: " + getCodecPrivate().length + " byte(s)" + "\n";
+    }
 
     if (getTrackType() == TrackType.VIDEO)
     {
@@ -218,10 +239,14 @@ public class MatroskaFileTrack
     {
       s += "\t\t" + "SamplingFrequency: " + audio.getSamplingFrequency() + "\n";
       if (audio.getOutputSamplingFrequency() != 0)
+      {
         s += "\t\t" + "OutputSamplingFrequency: " + audio.getOutputSamplingFrequency() + "\n";
-      s += "\t\t" + "Channels: " + audio.channels + "\n";
-      if (audio.bitDepth != 0)
-        s += "\t\t" + "BitDepth: " + audio.bitDepth + "\n";
+      }
+      s += "\t\t" + "Channels: " + audio.getChannels() + "\n";
+      if (audio.getBitDepth() != 0)
+      {
+        s += "\t\t" + "BitDepth: " + audio.getBitDepth() + "\n";
+      }
     }
 
     return s;
@@ -236,78 +261,78 @@ public class MatroskaFileTrack
     System.out.println("Reading track from doc!");
     while (level3 != null)
     {
-      if (level3.equals(MatroskaDocTypes.TrackNumber.getType()))
+      if (level3.isType(MatroskaDocTypes.TrackNumber.getType()))
       {
         level3.readData(ioDS);
         track.setTrackNo((int) ((UnsignedIntegerElement) level3).getValue());
       }
-      else if (level3.equals(MatroskaDocTypes.TrackUID.getType()))
+      else if (level3.isType(MatroskaDocTypes.TrackUID.getType()))
       {
         level3.readData(ioDS);
         track.setTrackUID(((UnsignedIntegerElement) level3).getValue());
 
       }
-      else if (level3.equals(MatroskaDocTypes.TrackType.getType()))
+      else if (level3.isType(MatroskaDocTypes.TrackType.getType()))
       {
         level3.readData(ioDS);
         track.setTrackType(TrackType.fromOrdinal(((UnsignedIntegerElement) level3).getValue()));
 
       }
-      else if (level3.equals(MatroskaDocTypes.DefaultDuration.getType()))
+      else if (level3.isType(MatroskaDocTypes.DefaultDuration.getType()))
       {
         level3.readData(ioDS);
         track.setDefaultDuration(((UnsignedIntegerElement) level3).getValue());
 
       }
-      else if (level3.equals(MatroskaDocTypes.Name.getType()))
+      else if (level3.isType(MatroskaDocTypes.Name.getType()))
       {
         level3.readData(ioDS);
         track.setName(((StringElement) level3).getValue());
 
       }
-      else if (level3.equals(MatroskaDocTypes.Language.getType()))
+      else if (level3.isType(MatroskaDocTypes.Language.getType()))
       {
         level3.readData(ioDS);
         track.setLanguage(((StringElement) level3).getValue());
 
       }
-      else if (level3.equals(MatroskaDocTypes.CodecID.getType()))
+      else if (level3.isType(MatroskaDocTypes.CodecID.getType()))
       {
         level3.readData(ioDS);
         track.setCodecID(((StringElement) level3).getValue());
 
       }
-      else if (level3.equals(MatroskaDocTypes.CodecPrivate.getType()))
+      else if (level3.isType(MatroskaDocTypes.CodecPrivate.getType()))
       {
         level3.readData(ioDS);
         track.setCodecPrivate(((BinaryElement) level3).getData());
 
       }
-      else if (level3.equals(MatroskaDocTypes.Video.getType()))
+      else if (level3.isType(MatroskaDocTypes.Video.getType()))
       {
         level4 = ((MasterElement) level3).readNextChild(reader);
         track.video = new MatroskaVideoTrack();
         while (level4 != null)
         {
-          if (level4.equals(MatroskaDocTypes.PixelWidth.getType()))
+          if (level4.isType(MatroskaDocTypes.PixelWidth.getType()))
           {
             level4.readData(ioDS);
             track.video.setPixelWidth((short) ((UnsignedIntegerElement) level4).getValue());
 
           }
-          else if (level4.equals(MatroskaDocTypes.PixelHeight.getType()))
+          else if (level4.isType(MatroskaDocTypes.PixelHeight.getType()))
           {
             level4.readData(ioDS);
             track.video.setPixelHeight((short) ((UnsignedIntegerElement) level4).getValue());
 
           }
-          else if (level4.equals(MatroskaDocTypes.DisplayWidth.getType()))
+          else if (level4.isType(MatroskaDocTypes.DisplayWidth.getType()))
           {
             level4.readData(ioDS);
             track.video.setDisplayWidth((short) ((UnsignedIntegerElement) level4).getValue());
 
           }
-          else if (level4.equals(MatroskaDocTypes.DisplayHeight.getType()))
+          else if (level4.isType(MatroskaDocTypes.DisplayHeight.getType()))
           {
             level4.readData(ioDS);
             track.video.setDisplayHeight((short) ((UnsignedIntegerElement) level4).getValue());
@@ -318,34 +343,34 @@ public class MatroskaFileTrack
         }
 
       }
-      else if (level3.equals(MatroskaDocTypes.Audio.getType()))
+      else if (level3.isType(MatroskaDocTypes.Audio.getType()))
       {
         level4 = ((MasterElement) level3).readNextChild(reader);
         track.audio = new MatroskaAudioTrack();
         while (level4 != null)
         {
-          if (level4.equals(MatroskaDocTypes.SamplingFrequency.getType()))
+          if (level4.isType(MatroskaDocTypes.SamplingFrequency.getType()))
           {
             level4.readData(ioDS);
             track.audio.setSamplingFrequency((float) ((FloatElement) level4).getValue());
 
           }
-          else if (level4.equals(MatroskaDocTypes.OutputSamplingFrequency.getType()))
+          else if (level4.isType(MatroskaDocTypes.OutputSamplingFrequency.getType()))
           {
             level4.readData(ioDS);
             track.audio.setOutputSamplingFrequency((float) ((FloatElement) level4).getValue());
 
           }
-          else if (level4.equals(MatroskaDocTypes.Channels.getType()))
+          else if (level4.isType(MatroskaDocTypes.Channels.getType()))
           {
             level4.readData(ioDS);
-            track.audio.channels = (short) ((UnsignedIntegerElement) level4).getValue();
+            track.audio.setChannels((short) ((UnsignedIntegerElement) level4).getValue());
 
           }
-          else if (level4.equals(MatroskaDocTypes.BitDepth.getType()))
+          else if (level4.isType(MatroskaDocTypes.BitDepth.getType()))
           {
             level4.readData(ioDS);
-            track.audio.bitDepth = (byte) ((UnsignedIntegerElement) level4).getValue();
+            track.audio.setBitDepth((byte) ((UnsignedIntegerElement) level4).getValue());
           }
 
           level4.skipData(ioDS);
@@ -392,11 +417,9 @@ public class MatroskaFileTrack
     trackMaxBlockAddIdElem.setValue(this.getMaxBlockAdditionalId());
 
     final StringElement trackNameElem = MatroskaDocTypes.Name.getInstance();
-    ;
     trackNameElem.setValue(this.getName());
 
     final StringElement trackLangElem = MatroskaDocTypes.Language.getInstance();
-    ;
     trackLangElem.setValue(this.getLanguage());
 
     final StringElement trackCodecIDElem = MatroskaDocTypes.CodecID.getInstance();
@@ -413,7 +436,7 @@ public class MatroskaFileTrack
     trackEntryElem.addChildElement(trackMinCacheElem);
     trackEntryElem.addChildElement(trackMaxBlockAddIdElem);
 
-    // trackEntryElem.addChildElement(trackNameElem); This element is broken. TODO: Add UTF-8 element support.
+    trackEntryElem.addChildElement(trackNameElem);
     trackEntryElem.addChildElement(trackLangElem);
     trackEntryElem.addChildElement(trackCodecIDElem);
 
@@ -477,10 +500,10 @@ public class MatroskaFileTrack
       final MasterElement trackAudioElem = MatroskaDocTypes.Audio.getInstance();
 
       final UnsignedIntegerElement trackAudioChannelsElem = MatroskaDocTypes.Channels.getInstance();
-      trackAudioChannelsElem.setValue(this.audio.channels);
+      trackAudioChannelsElem.setValue(this.audio.getChannels());
 
       final UnsignedIntegerElement trackAudioBitDepthElem = MatroskaDocTypes.BitDepth.getInstance();
-      trackAudioBitDepthElem.setValue(this.audio.bitDepth);
+      trackAudioBitDepthElem.setValue(this.audio.getBitDepth());
 
       final FloatElement trackAudioSamplingRateElem = MatroskaDocTypes.SamplingFrequency.getInstance();
       trackAudioSamplingRateElem.setValue(this.audio.getSamplingFrequency());

@@ -19,7 +19,7 @@
  */
 package org.ebml;
 
-import org.ebml.io.*;
+import org.ebml.io.DataWriter;
 
 /**
  * Summary description for EBMLWriter.
@@ -28,19 +28,19 @@ public class EBMLWriter
 {
   protected DataWriter writer;
 
-  /** Creates a new <code>EBMLReader</code> reading from the <code>DataSource
-   * source</code>. The <code>DocType doc</code> is used to validate the
-   * document.
+  /**
+   * Creates a new <code>EBMLReader</code> reading from the <code>DataSource
+   * source</code>. The <code>DocType doc</code> is used to validate the document.
    *
    * @param source DataSource to read from
    * @param doc DocType to use to validate the docment
    */
-  public EBMLWriter(DataWriter writer) 
+  public EBMLWriter(final DataWriter writer)
   {
     this.writer = writer;
   }
 
-  public long writeElement(Element elem) 
+  public long writeElement(final Element elem)
   {
     return elem.writeHeaderData(writer) + elem.writeData(writer);
   }

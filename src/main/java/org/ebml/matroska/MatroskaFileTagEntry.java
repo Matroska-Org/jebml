@@ -21,33 +21,34 @@ package org.ebml.matroska;
 
 import java.util.ArrayList;
 
-public class MatroskaFileTagEntry 
+public class MatroskaFileTagEntry
 {
-  public ArrayList<Long> TrackUID = new ArrayList<Long>();
-  public ArrayList<Long> ChapterUID = new ArrayList<Long>();
-  public ArrayList<Long> AttachmentUID = new ArrayList<Long>();
-  public ArrayList<MatroskaFileSimpleTag> SimpleTags = new ArrayList<MatroskaFileSimpleTag>();
+  public ArrayList<Long> trackUID = new ArrayList<Long>();
+  public ArrayList<Long> chapterUID = new ArrayList<Long>();
+  public ArrayList<Long> attachmentUID = new ArrayList<Long>();
+  public ArrayList<MatroskaFileSimpleTag> simpleTags = new ArrayList<MatroskaFileSimpleTag>();
 
-  public String toString() 
+  @Override
+  public String toString()
   {
     String s = new String();
 
-    if (TrackUID.size() > 0) 
+    if (trackUID.size() > 0)
     {
-      s += "\t\t" + "TrackUID: " + TrackUID.toArray().toString() + "\n";
+      s += "\t\t" + "TrackUID: " + trackUID.toString() + "\n";
     }
-    if (ChapterUID.size() > 0) 
+    if (chapterUID.size() > 0)
     {
-      s += "\t\t" + "ChapterUID: " + ChapterUID.toArray().toString() + "\n";
+      s += "\t\t" + "ChapterUID: " + chapterUID.toString() + "\n";
     }
-    if (AttachmentUID.size() > 0) 
+    if (attachmentUID.size() > 0)
     {
-      s += "\t\t" + "AttachmentUID: " + AttachmentUID.toArray().toString() + "\n";
+      s += "\t\t" + "AttachmentUID: " + attachmentUID.toString() + "\n";
     }
 
-    for (int t = 0; t < SimpleTags.size(); t++) 
+    for (int t = 0; t < simpleTags.size(); t++)
     {
-      s += ((MatroskaFileSimpleTag)SimpleTags.get(t)).toString(2);
+      s += simpleTags.get(t).toString(2);
     }
 
     return s;
