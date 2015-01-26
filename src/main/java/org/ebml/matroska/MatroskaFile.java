@@ -54,7 +54,7 @@ public class MatroskaFile
   public MatroskaFile(final DataSource inputDataSource)
   {
     ioDS = inputDataSource;
-    reader = new EBMLReader(ioDS, MatroskaDocType.obj);
+    reader = new EBMLReader(ioDS);
   }
 
   /**
@@ -75,7 +75,7 @@ public class MatroskaFile
       throw new java.lang.RuntimeException("Error: Unable to scan for EBML elements");
     }
 
-    if (level0.equals(MatroskaDocType.EBMLHeader_Id))
+    if (level0.equals(MatroskaDocTypes.EBML.getType()))
     {
       level1 = ((MasterElement) level0).readNextChild(reader);
 
@@ -83,7 +83,7 @@ public class MatroskaFile
       {
         // System.out.printf("Found element %s\n", level1.getElementType().name);
         level1.readData(ioDS);
-        if (level1.equals(MatroskaDocType.DocType_Id))
+        if (level1.equals(MatroskaDocTypes.DocType.getType()))
         {
           final String DocType = ((StringElement) level1).getValue();
           if (DocType.compareTo("matroska") != 0 && DocType.compareTo("webm") != 0)
@@ -100,24 +100,24 @@ public class MatroskaFile
     }
 
     level0 = reader.readNextElement();
-    if (level0.equals(MatroskaDocType.Segment_Id))
+    if (level0.equals(MatroskaDocTypes.Segment.getType()))
     {
       level1 = ((MasterElement) level0).readNextChild(reader);
       System.out.println("Got segment element");
       while (level1 != null)
       {
-        System.out.printf("Got %s element in segment\n", level1.getElementType().name);
-        if (level1.equals(MatroskaDocType.SegmentInfo_Id))
+        System.out.printf("Got %s element in segment\n", level1.getElementType().getName());
+        if (level1.equals(MatroskaDocTypes.Info.getType()))
         {
           _parseSegmentInfo(level1, level2);
 
         }
-        else if (level1.equals(MatroskaDocType.Tracks_Id))
+        else if (level1.equals(MatroskaDocTypes.Tracks.getType()))
         {
           _parseTracks(level1, level2);
 
         }
-        else if (level1.equals(MatroskaDocType.Cluster_Id))
+        else if (level1.equals(MatroskaDocTypes.Cluster.getType()))
         {
           if (ScanFirstCluster)
           {
@@ -127,7 +127,7 @@ public class MatroskaFile
           break;
 
         }
-        else if (level1.equals(MatroskaDocType.Tags_Id))
+        else if (level1.equals(MatroskaDocTypes.Tag.getType()))
         {
           _parseTags(level1, level2);
 
@@ -140,7 +140,7 @@ public class MatroskaFile
     else
     {
       throw new java.lang.RuntimeException(String.format("Error: Segment not the second element in the file: was %s instead",
-                                                         level0.getElementType().name));
+                                                         level0.getElementType().getName()));
     }
   }
 
@@ -301,7 +301,7 @@ public class MatroskaFile
       Element level1 = ((MasterElement) level0).readNextChild(reader);
       while (level1 != null)
       {
-        if (level1.equals(MatroskaDocType.Cluster_Id))
+        if (level1.equals(MatroskaDocTypes.Cluster.getType()))
         {
           _parseNextCluster(level1);
         }
@@ -321,18 +321,19 @@ public class MatroskaFile
 
     while (level2 != null)
     {
-      if (level2.equals(MatroskaDocType.ClusterTimecode_Id))
+      if (level2.equals(MatroskaDocTypes.Timecode.getType()))
       {
         level2.readData(ioDS);
         ClusterTimecode = ((UnsignedIntegerElement) level2).getValue();
 
       }
-      else if (level2.equals(MatroskaDocType.ClusterSimpleBlock_Id))
+      else if (level2.equals(MatroskaDocTypes.SimpleBlock.getType()))
       {
+        level2.readData(ioDS);
         MatroskaBlock block = null;
         final long BlockDuration = 0;
-        block = (MatroskaBlock) level2;
-        block.readData(ioDS);
+        block = new MatroskaBlock(level2.getData());
+
         block.parseBlock();
         final MatroskaFileFrame frame = new MatroskaFileFrame();
         frame.setTrackNo(block.getTrackNo());
@@ -356,29 +357,29 @@ public class MatroskaFile
         level2.skipData(ioDS);
 
       }
-      else if (level2.equals(MatroskaDocType.ClusterBlockGroup_Id))
+      else if (level2.equals(MatroskaDocTypes.BlockGroup.getType()))
       {
-        MatroskaBlock block = null;
+        final BinaryElement blockElem = MatroskaDocTypes.Block.getInstance();
         long BlockDuration = 0;
         long BlockReference = 0;
         level3 = ((MasterElement) level2).readNextChild(reader);
-
+        MatroskaBlock block = null;
         while (level3 != null)
         {
-          if (level3.equals(MatroskaDocType.ClusterBlock_Id))
+          if (level3.equals(MatroskaDocTypes.Block.getType()))
           {
-            block = (MatroskaBlock) level3;
-            block.readData(ioDS);
+            blockElem.readData(ioDS);
+            block = new MatroskaBlock(blockElem.getData());
             block.parseBlock();
 
           }
-          else if (level3.equals(MatroskaDocType.ClusterBlockDuration_Id))
+          else if (level3.equals(MatroskaDocTypes.BlockDuration.getType()))
           {
             level3.readData(ioDS);
             BlockDuration = ((UnsignedIntegerElement) level3).getValue();
 
           }
-          else if (level3.equals(MatroskaDocType.ClusterReferenceBlock_Id))
+          else if (level3.equals(MatroskaDocTypes.ReferenceBlock.getType()))
           {
             level3.readData(ioDS);
             BlockReference = ((SignedIntegerElement) level3).getValue();
@@ -442,37 +443,37 @@ public class MatroskaFile
 
     while (level2 != null)
     {
-      if (level2.equals(MatroskaDocType.Title_Id))
+      if (level2.equals(MatroskaDocTypes.Title.getType()))
       {
         level2.readData(ioDS);
         SegmentTitle = ((StringElement) level2).getValue();
 
       }
-      else if (level2.equals(MatroskaDocType.DateUTC_Id))
+      else if (level2.equals(MatroskaDocTypes.DateUTC.getType()))
       {
         level2.readData(ioDS);
         SegmentDate = ((DateElement) level2).getDate();
 
       }
-      else if (level2.equals(MatroskaDocType.MuxingApp_Id))
+      else if (level2.equals(MatroskaDocTypes.MuxingApp.getType()))
       {
         level2.readData(ioDS);
         MuxingApp = ((StringElement) level2).getValue();
 
       }
-      else if (level2.equals(MatroskaDocType.WritingApp_Id))
+      else if (level2.equals(MatroskaDocTypes.WritingApp.getType()))
       {
         level2.readData(ioDS);
         WritingApp = ((StringElement) level2).getValue();
 
       }
-      else if (level2.equals(MatroskaDocType.Duration_Id))
+      else if (level2.equals(MatroskaDocTypes.Duration.getType()))
       {
         level2.readData(ioDS);
         Duration = ((FloatElement) level2).getValue();
 
       }
-      else if (level2.equals(MatroskaDocType.TimecodeScale_Id))
+      else if (level2.equals(MatroskaDocTypes.TimecodeScale.getType()))
       {
         level2.readData(ioDS);
         TimecodeScale = ((UnsignedIntegerElement) level2).getValue();
@@ -489,7 +490,7 @@ public class MatroskaFile
 
     while (level2 != null)
     {
-      if (level2.equals(MatroskaDocType.TrackEntry_Id))
+      if (level2.equals(MatroskaDocTypes.TrackEntry.getType()))
       {
         TrackList.add(MatroskaFileTrack.fromElement(level2, ioDS, reader));
       }
@@ -506,32 +507,32 @@ public class MatroskaFile
 
     while (level2 != null)
     {
-      if (level2.equals(MatroskaDocType.Tag_Id))
+      if (level2.equals(MatroskaDocTypes.Tag.getType()))
       {
         final MatroskaFileTagEntry tag = new MatroskaFileTagEntry();
         level3 = ((MasterElement) level2).readNextChild(reader);
 
         while (level3 != null)
         {
-          if (level3.equals(MatroskaDocType.TagTargets_Id))
+          if (level3.equals(MatroskaDocTypes.Targets.getType()))
           {
             level4 = ((MasterElement) level3).readNextChild(reader);
 
             while (level4 != null)
             {
-              if (level4.equals(MatroskaDocType.TagTargetTrackUID_Id))
+              if (level4.equals(MatroskaDocTypes.TagTrackUID.getType()))
               {
                 level4.readData(ioDS);
                 tag.TrackUID.add(new Long(((UnsignedIntegerElement) level4).getValue()));
 
               }
-              else if (level4.equals(MatroskaDocType.TagTargetChapterUID_Id))
+              else if (level4.equals(MatroskaDocTypes.TagChapterUID.getType()))
               {
                 level4.readData(ioDS);
                 tag.ChapterUID.add(new Long(((UnsignedIntegerElement) level4).getValue()));
 
               }
-              else if (level4.equals(MatroskaDocType.TagTargetAttachmentUID_Id))
+              else if (level4.equals(MatroskaDocTypes.TagAttachmentUID.getType()))
               {
                 level4.readData(ioDS);
                 tag.AttachmentUID.add(new Long(((UnsignedIntegerElement) level4).getValue()));
@@ -542,7 +543,7 @@ public class MatroskaFile
             }
 
           }
-          else if (level3.equals(MatroskaDocType.TagSimpleTag_Id))
+          else if (level3.equals(MatroskaDocTypes.SimpleTag.getType()))
           {
             tag.SimpleTags.add(_parseTagsSimpleTag(level3, level4));
           }
@@ -564,21 +565,17 @@ public class MatroskaFile
 
     while (level4 != null)
     {
-      if (level4.equals(MatroskaDocType.TagSimpleTagName_Id))
+      if (level4.equals(MatroskaDocTypes.TagName.getType()))
       {
         level4.readData(ioDS);
         SimpleTag.Name = ((StringElement) level4).getValue();
 
       }
-      else if (level4.equals(MatroskaDocType.TagSimpleTagString_Id))
+      else if (level4.equals(MatroskaDocTypes.TagString.getType()))
       {
         level4.readData(ioDS);
         SimpleTag.Value = ((StringElement) level4).getValue();
 
-      }
-      else if (level4.equals(MatroskaDocType.TagSimpleTag_Id))
-      {
-        SimpleTag.Children.add(_parseTagsSimpleTag(level3, level4));
       }
 
       level4.skipData(ioDS);

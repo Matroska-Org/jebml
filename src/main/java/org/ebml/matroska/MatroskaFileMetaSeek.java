@@ -4,7 +4,6 @@ import org.ebml.BinaryElement;
 import org.ebml.Element;
 import org.ebml.MasterElement;
 import org.ebml.UnsignedIntegerElement;
-import org.ebml.VoidElement;
 import org.ebml.io.DataWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ public class MatroskaFileMetaSeek
   private static final Logger LOG = LoggerFactory.getLogger(MatroskaFileMetaSeek.class);
   private static final long BLOCK_RESERVE_SIZE = 256;
   private final long myPosition;
-  private final MatroskaDocType doc;
   private final MasterElement seekHeadElem;
   private final VoidElement placeHolderElem;
   private final long referencePosition;
@@ -25,15 +23,12 @@ public class MatroskaFileMetaSeek
    * @param doc
    * @param referencePosition The first byte after the first Segment element in the file
    */
-  public MatroskaFileMetaSeek(final MatroskaDocType doc, final long referencePosition)
+  public MatroskaFileMetaSeek(final long referencePosition)
   {
-    this.doc = doc;
     this.referencePosition = referencePosition;
     myPosition = referencePosition;
-    seekHeadElem = (MasterElement) doc.createElement(MatroskaDocType.SeekHead_Id);
-    placeHolderElem = new VoidElement();
-    placeHolderElem.setSize(BLOCK_RESERVE_SIZE - 6);
-    seekHeadElem.addChildElement(placeHolderElem);
+    seekHeadElem = MatroskaDocTypes.SeekHead.getInstance();
+    placeHolderElem = new VoidElement(BLOCK_RESERVE_SIZE - seekHeadElem.getTotalSize());
   }
 
   /**
@@ -46,8 +41,8 @@ public class MatroskaFileMetaSeek
   public long write(final DataWriter ioDW)
   {
     final long elemLen = seekHeadElem.writeElement(ioDW);
-    assert elemLen == BLOCK_RESERVE_SIZE;
-    assert (ioDW.getFilePointer() - myPosition) == elemLen;
+    final long voidLen = placeHolderElem.writeElement(ioDW);
+    assert elemLen + voidLen == BLOCK_RESERVE_SIZE;
     return BLOCK_RESERVE_SIZE;
   }
 
@@ -75,7 +70,7 @@ public class MatroskaFileMetaSeek
    */
   public void addIndexedElement(final Element element, final long filePosition)
   {
-    LOG.debug("Adding indexed element {} @ {}", element.getElementType().name, filePosition - referencePosition);
+    LOG.debug("Adding indexed element {} @ {}", element.getElementType().getName(), filePosition - referencePosition);
     addIndexedElement(element.getType(), filePosition);
   }
 
@@ -90,18 +85,17 @@ public class MatroskaFileMetaSeek
   public void addIndexedElement(final byte[] elementType, final long filePosition)
   {
     LOG.debug("Adding indexed element @ {}", filePosition - referencePosition);
-    final MasterElement seekEntryElem = (MasterElement) doc.createElement(MatroskaDocType.SeekEntry_Id);
-    final BinaryElement seekEntryIdElem = (BinaryElement) doc.createElement(MatroskaDocType.SeekID_Id);
+    final MasterElement seekEntryElem = MatroskaDocTypes.Seek.getInstance();
+    final BinaryElement seekEntryIdElem = MatroskaDocTypes.SeekID.getInstance();
     seekEntryIdElem.setData(elementType);
 
-    final UnsignedIntegerElement seekEntryPosElem = (UnsignedIntegerElement) doc.createElement(MatroskaDocType.SeekPosition_Id);
+    final UnsignedIntegerElement seekEntryPosElem = MatroskaDocTypes.SeekPosition.getInstance();
     seekEntryPosElem.setValue(filePosition - referencePosition);
 
     seekEntryElem.addChildElement(seekEntryIdElem);
     seekEntryElem.addChildElement(seekEntryPosElem);
 
     seekHeadElem.addChildElement(seekEntryElem);
-    placeHolderElem.reduceSize(seekEntryElem.getTotalSize());
-    seekHeadElem.setSize(BLOCK_RESERVE_SIZE - 6);
+    placeHolderElem.setSize(BLOCK_RESERVE_SIZE - seekHeadElem.getTotalSize());
   }
 }

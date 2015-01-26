@@ -21,67 +21,94 @@ package org.ebml;
 
 import java.io.*;
 
-public class FloatElement extends BinaryElement {
-  public FloatElement(byte[] type) {
+public class FloatElement extends BinaryElement
+{
+  public FloatElement(final byte[] type)
+  {
     super(type);
+  }
+
+  public FloatElement()
+  {
+    super();
   }
 
   /**
    * Set the float value of this element
+   * 
    * @param value Float value to set
    * @throws ArithmeticException if the float value is larger than Double.MAX_VALUE
    */
-  public void setValue(double value) {
-    try {
-      if (value < Float.MAX_VALUE) {
-        ByteArrayOutputStream bIO = new ByteArrayOutputStream(4);
-        DataOutputStream dIO = new DataOutputStream(bIO);
-        dIO.writeFloat((float)value);
+  public void setValue(final double value)
+  {
+    try
+    {
+      if (value < Float.MAX_VALUE)
+      {
+        final ByteArrayOutputStream bIO = new ByteArrayOutputStream(4);
+        final DataOutputStream dIO = new DataOutputStream(bIO);
+        dIO.writeFloat((float) value);
 
         setData(bIO.toByteArray());
 
-      } else if (value < Double.MAX_VALUE) {
-        ByteArrayOutputStream bIO = new ByteArrayOutputStream(8);
-        DataOutputStream dIO = new DataOutputStream(bIO);
+      }
+      else if (value < Double.MAX_VALUE)
+      {
+        final ByteArrayOutputStream bIO = new ByteArrayOutputStream(8);
+        final DataOutputStream dIO = new DataOutputStream(bIO);
         dIO.writeDouble(value);
 
         setData(bIO.toByteArray());
 
-      } else {
-        throw new ArithmeticException(
-            "80-bit floats are not supported, BTW How did you create such a large float in Java?");
       }
-    } catch (IOException ex) {
+      else
+      {
+        throw new ArithmeticException(
+                                      "80-bit floats are not supported, BTW How did you create such a large float in Java?");
+      }
+    }
+    catch (final IOException ex)
+    {
       return;
     }
   }
 
   /**
    * Get the float value of this element
+   * 
    * @return Float value of this element
    * @throws ArithmeticException for 80-bit or 10-byte floats. AFAIK Java doesn't support them
    */
-  public double getValue() {
-    try {
-      if (size == 4) {
+  public double getValue()
+  {
+    try
+    {
+      if (size == 4)
+      {
         float value = 0;
-        ByteArrayInputStream bIS = new ByteArrayInputStream(data);
-        DataInputStream dIS = new DataInputStream(bIS);
+        final ByteArrayInputStream bIS = new ByteArrayInputStream(data);
+        final DataInputStream dIS = new DataInputStream(bIS);
         value = dIS.readFloat();
         return value;
 
-      } else if (size == 8) {
+      }
+      else if (size == 8)
+      {
         double value = 0;
-        ByteArrayInputStream bIS = new ByteArrayInputStream(data);
-        DataInputStream dIS = new DataInputStream(bIS);
+        final ByteArrayInputStream bIS = new ByteArrayInputStream(data);
+        final DataInputStream dIS = new DataInputStream(bIS);
         value = dIS.readDouble();
         return value;
 
-      } else {
-        throw new ArithmeticException(
-            "80-bit floats are not supported");
       }
-    } catch (IOException ex) {
+      else
+      {
+        throw new ArithmeticException(
+                                      "80-bit floats are not supported");
+      }
+    }
+    catch (final IOException ex)
+    {
       return 0;
     }
   }

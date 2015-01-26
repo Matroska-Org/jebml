@@ -9,6 +9,7 @@ import org.ebml.matroska.MatroskaFile;
 import org.ebml.matroska.MatroskaFileFrame;
 import org.ebml.matroska.MatroskaFileTrack;
 import org.ebml.matroska.MatroskaFileWriter;
+import org.ebml.matroska.MatroskaFileTrack.TrackType;
 
 /**
  * <p>
@@ -115,13 +116,13 @@ public class CommandLineSample
       final MatroskaFileTrack track = new MatroskaFileTrack();
       track.setTrackNo((short) i);
       track.setTrackUID(new java.util.Random().nextLong());
-      track.setTrackType((byte) 1);
+      track.setTrackType(TrackType.VIDEO);
       track.setName("Track " + Integer.toString(i));
       track.getVideo().setPixelWidth((short) 320);
       track.getVideo().setPixelHeight((short) 240);
       mFW.addTrack(track);
     }
-    mFW.init();
+    mFW.close();
     System.out.println("Write complete");
   }
 }

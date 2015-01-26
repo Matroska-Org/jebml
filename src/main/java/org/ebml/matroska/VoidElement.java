@@ -18,10 +18,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package org.ebml;
+package org.ebml.matroska;
 
 import java.util.Arrays;
 
+import org.ebml.Element;
 import org.ebml.io.DataWriter;
 
 /**
@@ -36,9 +37,10 @@ public class VoidElement extends Element
    * 
    * @param type The type ID of this element
    */
-  public VoidElement()
+  public VoidElement(final long size)
   {
     super(VOID_TYPE);
+    setSize(size);
   }
 
   @Override

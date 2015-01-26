@@ -21,8 +21,8 @@ package org.ebml;
 
 import java.util.*;
 
-
-public class ElementType {
+public class ElementType
+{
   public static short UNKNOWN_ELEMENT = 0;
   public static short MASTER_ELEMENT = 1;
   public static short BINARY_ELEMENT = 2;
@@ -36,15 +36,18 @@ public class ElementType {
 
   public String name;
   public short level;
-  public byte [] id;
+  public byte[] id;
   public short type;
-  //public HashMap child;
+  // public HashMap child;
   public ArrayList<ElementType> children;
 
-  public ElementType() {
+  public ElementType()
+  {
 
   }
-  public ElementType(String name, short level, byte [] id, short type, ArrayList<ElementType> children) {
+
+  public ElementType(final String name, final short level, final byte[] id, final short type, final ArrayList<ElementType> children)
+  {
     this.name = name;
     this.level = level;
     this.id = id;
@@ -52,13 +55,16 @@ public class ElementType {
     this.children = children;
   }
 
-  public ElementType findElement(byte [] id) {
+  public ElementType findElement(final byte[] id)
+  {
     if (this.isElement(id))
       return this;
 
-    if (children != null) {
-      for (int i = 0; i < children.size(); i++) {
-        ElementType entry = (ElementType)children.get(i);
+    if (children != null)
+    {
+      for (int i = 0; i < children.size(); i++)
+      {
+        ElementType entry = children.get(i);
         if (entry.isElement(id))
           return entry;
         entry = entry.findElement(id);
@@ -69,57 +75,80 @@ public class ElementType {
     return null;
   }
 
-  public boolean isElement(byte [] id) {
+  public boolean isElement(final byte[] id)
+  {
     return ElementType.compareIDs(this.id, id);
   }
 
-  public static boolean compareIDs(byte[] id1, byte[] id2) {
+  public static boolean compareIDs(final byte[] id1, final byte[] id2)
+  {
     if ((id1 == null)
         || (id2 == null)
         || (id1.length != id2.length))
       return false;
 
-    for (int i = 0; i < id1.length; i++) {
+    for (int i = 0; i < id1.length; i++)
+    {
       if (id1[i] != id2[i])
         return false;
     }
     return true;
   }
 
-  public Element createElement() {
+  public Element createElement()
+  {
     Element elem;
 
-    if (this.type == ElementType.MASTER_ELEMENT) {
+    if (this.type == ElementType.MASTER_ELEMENT)
+    {
       elem = new MasterElement(this.id);
 
-    } else if (this.type == ElementType.BINARY_ELEMENT) {
+    }
+    else if (this.type == ElementType.BINARY_ELEMENT)
+    {
       elem = new BinaryElement(this.id);
 
-    } else if (this.type == ElementType.STRING_ELEMENT) {
+    }
+    else if (this.type == ElementType.STRING_ELEMENT)
+    {
       elem = new StringElement(this.id);
 
-    } else if (this.type == ElementType.ASCII_STRING_ELEMENT) {
-      elem = new StringElement(this.id, "US-ASCII");
+    }
+    else if (this.type == ElementType.ASCII_STRING_ELEMENT)
+    {
+      elem = new StringElement(this.id);
 
-    } else if (this.type == ElementType.SINTEGER_ELEMENT) {
+    }
+    else if (this.type == ElementType.SINTEGER_ELEMENT)
+    {
       elem = new SignedIntegerElement(this.id);
 
-    } else if (this.type == ElementType.UINTEGER_ELEMENT) {
+    }
+    else if (this.type == ElementType.UINTEGER_ELEMENT)
+    {
       elem = new UnsignedIntegerElement(this.id);
 
-    } else if (this.type == ElementType.FLOAT_ELEMENT) {
+    }
+    else if (this.type == ElementType.FLOAT_ELEMENT)
+    {
       elem = new FloatElement(this.id);
 
-    } else if (this.type == ElementType.DATE_ELEMENT) {
+    }
+    else if (this.type == ElementType.DATE_ELEMENT)
+    {
       elem = new DateElement(this.id);
 
-    } else if (this.type == ElementType.UNKNOWN_ELEMENT) {
+    }
+    else if (this.type == ElementType.UNKNOWN_ELEMENT)
+    {
       elem = new BinaryElement(this.id);
 
-    } else {
+    }
+    else
+    {
       return null;
     }
-    elem.setElementType(this);
+    // elem.setElementType(this);
     return elem;
   }
 }

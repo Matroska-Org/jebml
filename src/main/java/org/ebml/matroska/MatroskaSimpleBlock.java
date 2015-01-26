@@ -15,13 +15,23 @@ class MatroskaSimpleBlock
   // Note: this max size based on libmatroska src
   private static final int MAX_LACE_SIZE = 6 * 0xFF;
   private int trackNumber = 0;
-  private long timecode = 0;
+  private short timecode = 0;
   private boolean keyFrame = true;
   private MatroskaLaceMode laceMode = MatroskaLaceMode.EBML;
   private boolean invisible = false;
   private boolean discardable = false;
   private final List<MatroskaFileFrame> frames = new ArrayList<>();
   private int totalSize = 18;
+
+  public MatroskaSimpleBlock()
+  {
+
+  }
+
+  public MatroskaSimpleBlock(final long duration)
+  {
+
+  }
 
   static MatroskaSimpleBlock fromElement(final Element level3, final DataSource ioDS, final EBMLReader reader)
   {
@@ -31,7 +41,7 @@ class MatroskaSimpleBlock
 
   Element toElement()
   {
-    final BinaryElement blockElem = (BinaryElement) MatroskaDocType.obj.createElement(MatroskaDocType.ClusterSimpleBlock_Id);
+    final BinaryElement blockElem = MatroskaDocTypes.SimpleBlock.getInstance();
     blockElem.setData(createInnerData());
     return blockElem;
   }
@@ -51,6 +61,7 @@ class MatroskaSimpleBlock
       buf.put((byte) (trackNumber & 0xFF));
     }
 
+    buf.putShort(timecode);
     final BitSet bs = new BitSet(8);
     bs.set(0, keyFrame);
     bs.set(4, invisible);
@@ -140,7 +151,8 @@ class MatroskaSimpleBlock
 
   public void setTimecode(final long timecode)
   {
-    this.timecode = timecode;
+    assert timecode < Short.MAX_VALUE;
+    this.timecode = (short) timecode;
   }
 
   public MatroskaLaceMode getLaceMode()
@@ -175,6 +187,8 @@ class MatroskaSimpleBlock
 
   public boolean addFrame(final MatroskaFileFrame frame)
   {
+    setTimecode(frame.getTimecode());
+    setTrackNumber(frame.getTrackNo());
     totalSize += frame.getData().length;
     frames.add(frame);
     if (frame.getData().length > MAX_LACE_SIZE)

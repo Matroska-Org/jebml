@@ -27,34 +27,43 @@ package org.ebml;
 
 /**
  * Basic class for the Signed Integer EBML data type.
- * @author  John Cannon
+ * 
+ * @author John Cannon
  */
-public class SignedIntegerElement
-    extends BinaryElement {
+public class SignedIntegerElement extends BinaryElement
+{
 
-  public SignedIntegerElement(byte[] typeID) {
+  public SignedIntegerElement(final byte[] typeID)
+  {
     super(typeID);
   }
 
-  public void setValue(long value) {
-    //System.out.println(Long.toHexString(value));
-    setData(packInt(value));
-    /*for (int i = 0; i < data.length; i++) {
-      System.out.print(Integer.toHexString(data[i]) + ", ");
-    }
-    System.out.print("\n");*/
+  public SignedIntegerElement()
+  {
+    super();
   }
 
-  public long getValue() {
+  public void setValue(final long value)
+  {
+    // System.out.println(Long.toHexString(value));
+    setData(packInt(value));
+    /*
+     * for (int i = 0; i < data.length; i++) { System.out.print(Integer.toHexString(data[i]) + ", "); } System.out.print("\n");
+     */
+  }
+
+  public long getValue()
+  {
     long l = 0;
     long tmp = 0;
-    l |= ((long)data[0] << (56 - ((8 - data.length) * 8)));
-    for (int i = 1; i < data.length; i++) {
-      tmp = ((long)data[data.length - i]) << 56;
+    l |= ((long) data[0] << (56 - ((8 - data.length) * 8)));
+    for (int i = 1; i < data.length; i++)
+    {
+      tmp = ((long) data[data.length - i]) << 56;
       tmp >>>= 56 - (8 * (i - 1));
       l |= tmp;
     }
-    //System.out.println(Long.toHexString(l));
+    // System.out.println(Long.toHexString(l));
     return l;
   }
 

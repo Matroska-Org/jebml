@@ -25,25 +25,35 @@ package org.ebml;
  * Created on February 15, 2003, 6:27 PM
  */
 /**
- *  Basic class for the Unsigned Integer data type in EBML.
- * @author  John Cannon
+ * Basic class for the Unsigned Integer data type in EBML.
+ * 
+ * @author John Cannon
  */
-public class UnsignedIntegerElement
-    extends org.ebml.BinaryElement {
+public class UnsignedIntegerElement extends BinaryElement
+{
 
-  public UnsignedIntegerElement(byte[] typeID) {
+  public UnsignedIntegerElement(final byte[] typeID)
+  {
     super(typeID);
   }
 
-  public void setValue(long value) {
+  public UnsignedIntegerElement()
+  {
+    super();
+  }
+
+  public void setValue(final long value)
+  {
     setData(packIntUnsigned(value));
   }
 
-  public long getValue() {
+  public long getValue()
+  {
     long l = 0;
     long tmp = 0;
-    for (int i = 0; i < data.length; i++) {
-      tmp = ((long)data[data.length - 1 - i]) << 56;
+    for (int i = 0; i < data.length; i++)
+    {
+      tmp = ((long) data[data.length - 1 - i]) << 56;
       tmp >>>= (56 - (i * 8));
       l |= tmp;
     }

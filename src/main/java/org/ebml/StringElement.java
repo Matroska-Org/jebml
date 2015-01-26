@@ -19,81 +19,55 @@
  */
 package org.ebml;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 /**
- * Baisc class for handling an EBML string data type.  This class encapsulates
- * both UTF and ASCII string types and can use any string type supported by
+ * Baisc class for handling an EBML string data type. This class encapsulates both UTF and ASCII string types and can use any string type supported by
  * the Java platform.
  *
- * @author  John Cannon
+ * @author John Cannon
  */
-public class StringElement
-    extends org.ebml.BinaryElement {
+public class StringElement extends BinaryElement
+{
 
-  private String charset = "UTF-8";
+  private Charset charset = StandardCharsets.US_ASCII;
 
   /** Creates a new instance of StringElement */
-  public StringElement(byte[] typeID) {
+  public StringElement(final byte[] typeID)
+  {
     super(typeID);
   }
 
-  public StringElement(byte[] typeID, String encoding) {
+  public StringElement()
+  {
+    super();
+  }
+
+  public StringElement(final byte[] typeID, final Charset encoding)
+  {
     super(typeID);
     charset = encoding;
   }
 
-  private boolean checkForCharsetHack() 
+  public StringElement(final Charset encoding)
   {
-    // Check if we are trying to read UTF-8, if so lets try UTF8.
-    // Microsofts Java supports "UTF8" but not "UTF-8"
-    if (charset.compareTo("UTF-8") == 0) 
-    {
-      charset = "UTF8";
-      // Let's try again
-      return true;
-    } 
-    else if (charset.compareTo("US-ASCII") == 0) 
-    {
-      // This is the same story as UTF-8, 
-      // If Microsoft is going to hijack Java they should at least support the orignal :>
-      charset = "ASCII";
-      // Let's try again
-      return true;            
-    }
-    return false;
+    super();
+    charset = encoding;
   }
 
-  public String getValue() {
-    try {
-      if (data == null)
-        throw new java.lang.IllegalStateException("Call readData() before trying to extract the string value.");
-
-      return new String(data, charset);
-    }
-    catch (java.io.UnsupportedEncodingException ex) {
-      if (checkForCharsetHack()) 
-      {
-        return getValue();
-      }
-      ex.printStackTrace();
-      return "";
-    }
+  public String getValue()
+  {
+    return new String(data, charset);
   }
 
-  public void setValue(String value) {
-    try {
-      setData(value.getBytes(charset));
-    }
-    catch (java.io.UnsupportedEncodingException ex) {
-      if (checkForCharsetHack()) 
-      {
-        setValue(value);
-        return;
-      }
-      ex.printStackTrace();
-    }
+  public void setValue(final String value)
+  {
+    setData(value.getBytes(charset));
   }
 
-  public String getEncoding() {
+  public Charset getEncoding()
+  {
     return charset;
   }
 }

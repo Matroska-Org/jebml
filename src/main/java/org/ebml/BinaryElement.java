@@ -27,89 +27,126 @@
 package org.ebml;
 
 /**
- * Defines the basic EBML element.  Subclasses may provide child element 
- * access.
- * Created on November 19, 2002, 9:11 PM
- * @author  John Cannon
+ * Defines the basic EBML element. Subclasses may provide child element access. Created on November 19, 2002, 9:11 PM
+ * 
+ * @author John Cannon
  */
-public class BinaryElement extends Element {
+public class BinaryElement extends Element
+{
 
-  /*private byte[] type = {
-      0x00};*/
+  /*
+   * private byte[] type = { 0x00};
+   */
   private static int MIN_SIZE_LENGTH = 4;
-  //private long size = 0;
-  //protected byte[] data;
+
+  // private long size = 0;
+  // protected byte[] data;
 
   /*
    * Creates a new instance of Element
-   @param type The type ID of this element
+   * 
+   * @param type The type ID of this element
    */
-  public BinaryElement(byte[] type) {
+  public BinaryElement(final byte[] type)
+  {
     super(type);
   }
 
-  /** Getter for property data.
+  public BinaryElement()
+  {
+    super();
+  }
+
+  /**
+   * Getter for property data.
+   * 
    * @return Value of property data.
    *
    */
-  public byte[] getData() {
+  @Override
+  public byte[] getData()
+  {
     return this.data;
   }
 
-  /** Setter for property data.
+  /**
+   * Setter for property data.
+   * 
    * @param data New value of property data.
    *
    */
-  public void setData(byte[] data) {
+  @Override
+  public void setData(final byte[] data)
+  {
     this.data = data;
     this.size = data.length;
   }
 
-  /** Getter for property size.
+  /**
+   * Getter for property size.
+   * 
    * @return Value of property size.
    *
    */
-  public long getSize() {
+  @Override
+  public long getSize()
+  {
     return size;
   }
 
-  /** Setter for property size.
+  /**
+   * Setter for property size.
+   * 
    * @param size New value of property size.
    *
    */
-  public void setSize(long size) {
+  @Override
+  public void setSize(final long size)
+  {
     this.size = size;
   }
 
-  /** Getter for property type.
+  /**
+   * Getter for property type.
+   * 
    * @return Value of property type.
    *
    */
-  public byte[] getType() {
+  @Override
+  public byte[] getType()
+  {
     return type;
   }
 
-  /** Setter for property type.
+  /**
+   * Setter for property type.
+   * 
    * @param type New value of property type.
    *
    */
-  public void setType(byte[] type) {
+  @Override
+  public void setType(final byte[] type)
+  {
     this.type = type;
   }
 
-  public byte[] toByteArray() {
-    byte[] head = makeEbmlCode(type, size);
-    byte[] ret = new byte[head.length + data.length];
+  @Override
+  public byte[] toByteArray()
+  {
+    final byte[] head = makeEbmlCode(type, size);
+    final byte[] ret = new byte[head.length + data.length];
     org.ebml.util.ArrayCopy.arraycopy(head, 0, ret, 0, head.length);
     org.ebml.util.ArrayCopy.arraycopy(data, 0, ret, head.length, data.length);
     return ret;
   }
 
-  public static void setMinSizeLength(int minSize) {
+  public static void setMinSizeLength(final int minSize)
+  {
     MIN_SIZE_LENGTH = minSize;
   }
 
-  public static int getMinSizeLength() {
+  public static int getMinSizeLength()
+  {
     return MIN_SIZE_LENGTH;
   }
 }

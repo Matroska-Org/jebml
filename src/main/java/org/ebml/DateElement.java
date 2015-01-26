@@ -21,48 +21,55 @@ package org.ebml;
 
 import java.util.*;
 
-public class DateElement extends SignedIntegerElement {
-  //const uint64 EbmlDate::UnixEpochDelay = 978307200; // 2001/01/01 00:00:00 UTC
+public class DateElement extends SignedIntegerElement
+{
+  // const uint64 EbmlDate::UnixEpochDelay = 978307200; // 2001/01/01 00:00:00 UTC
   public static long UnixEpochDelay = 978307200; // 2001/01/01 00:00:00 UTC
   private static int MIN_SIZE_LENGTH = 8;
 
-  public DateElement(byte[] type) {
+  public DateElement(final byte[] type)
+  {
     super(type);
+  }
+
+  public DateElement()
+  {
+    super();
   }
 
   /**
    * Set the Date of this element
+   * 
    * @param value Date to set
    */
-  public void setDate(Date value) {
-    long val = (value.getTime() - UnixEpochDelay) * 1000000000;
+  public void setDate(final Date value)
+  {
+    final long val = (value.getTime() - UnixEpochDelay) * 1000000000;
     setData(packInt(val, MIN_SIZE_LENGTH));
   }
 
   /**
    * Get the Date value of this element
+   * 
    * @return Date of this element
    */
-  public Date getDate() {
+  public Date getDate()
+  {
     /*
-    Date begin = new Date(0);
-    Date start = new Date(1970, 1, 1, 0, 0, 0);
-    Date end = new Date(2001, 1, 1, 0, 0, 0);
-    long diff0 = begin.getTime();
-    long diff1 = start.getTime();
-    long diff2 = end.getTime();
-    long diff3 = Date.UTC(2001, 1, 1, 0, 0, 0) - Date.UTC(1970, 1, 1, 0, 0, 0);
-    */
-    long val = getValue();;      
+     * Date begin = new Date(0); Date start = new Date(1970, 1, 1, 0, 0, 0); Date end = new Date(2001, 1, 1, 0, 0, 0); long diff0 = begin.getTime();
+     * long diff1 = start.getTime(); long diff2 = end.getTime(); long diff3 = Date.UTC(2001, 1, 1, 0, 0, 0) - Date.UTC(1970, 1, 1, 0, 0, 0);
+     */
+    long val = getValue();
+    ;
     val = val / 1000000000 + UnixEpochDelay;
     return new Date(val);
   }
 
   /**
-   * It's not recommended to use this method.
-   * Use the setDate(Date) method instead.
+   * It's not recommended to use this method. Use the setDate(Date) method instead.
    */
-  public void setValue(long value) 
+  @Override
+  public void setValue(final long value)
   {
     setData(packInt(value, MIN_SIZE_LENGTH));
   }

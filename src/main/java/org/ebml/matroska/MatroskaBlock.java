@@ -22,17 +22,18 @@ package org.ebml.matroska;
 import org.ebml.*;
 import org.ebml.util.*;
 
-public class MatroskaBlock extends BinaryElement
+public class MatroskaBlock
 {
   protected int[] Sizes = null;
   protected int HeaderSize = 0;
   protected int BlockTimecode = 0;
   protected int TrackNo = 0;
   private boolean keyFrame;
+  private final byte[] data;
 
-  public MatroskaBlock(final byte[] type)
+  public MatroskaBlock(final byte[] data)
   {
-    super(type);
+    this.data = data;
   }
 
   // public void readData(DataSource source) {
@@ -81,7 +82,7 @@ public class MatroskaBlock extends BinaryElement
       else if (LaceFlag == 0x04)
       { // Fixed Size Lacing
         Sizes = new int[LaceCount + 1];
-        Sizes[0] = (int) (this.getSize() - HeaderSize) / (LaceCount + 1);
+        Sizes[0] = (data.length - HeaderSize) / (LaceCount + 1);
         for (int s = 0; s < LaceCount; s++)
           Sizes[s + 1] = Sizes[0];
       }
@@ -98,7 +99,7 @@ public class MatroskaBlock extends BinaryElement
   private int[] readEBMLLaceSizes(int index, final short LaceCount)
   {
     final int[] LaceSizes = new int[LaceCount + 1];
-    LaceSizes[LaceCount] = (int) this.getSize();
+    LaceSizes[LaceCount] = data.length;
 
     // This uses the DataSource.getBytePosition() for finding the header size
     // because of the trouble of finding the byte size of sized ebml coded integers
@@ -134,7 +135,7 @@ public class MatroskaBlock extends BinaryElement
   private int[] readXiphLaceSizes(int index, final short LaceCount)
   {
     final int[] LaceSizes = new int[LaceCount + 1];
-    LaceSizes[LaceCount] = (int) this.getSize();
+    LaceSizes[LaceCount] = data.length;
 
     // long ByteStartPos = source.getFilePointer();
 

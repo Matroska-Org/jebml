@@ -39,19 +39,22 @@ public class Element
 {
 
   protected Element parent;
-  protected ElementType typeInfo;
+  protected ProtoType<?> typeInfo;
   protected byte[] type = {
       0x00 };
   private static int MIN_SIZE_LENGTH = 0;
   protected long size = 0;
   protected byte[] data = null;
   protected boolean dataRead = false;
-  private int headerSize;
 
   /** Creates a new instance of Element */
   public Element(final byte[] type)
   {
     this.type = type;
+  }
+
+  public Element()
+  {
   }
 
   /**
@@ -112,7 +115,7 @@ public class Element
   {
     if (data == null)
     {
-      throw new NullPointerException(String.format("No data to write: %s : %s", typeInfo.name, Arrays.toString(this.type)));
+      throw new NullPointerException(String.format("No data to write: %s : %s", typeInfo.getName(), Arrays.toString(this.type)));
     }
     return writer.write(this.data);
   }
@@ -205,12 +208,12 @@ public class Element
     this.type = type;
   }
 
-  public void setElementType(final ElementType typeInfo)
+  public void setElementType(final ProtoType<?> typeInfo)
   {
     this.typeInfo = typeInfo;
   }
 
-  public ElementType getElementType()
+  public ProtoType<?> getElementType()
   {
     return typeInfo;
   }
@@ -400,11 +403,5 @@ public class Element
       b--;
     }
     return ret;
-  }
-
-  public void setHeaderSize(final int headerSize)
-  {
-    this.headerSize = headerSize;
-
   }
 }

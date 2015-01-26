@@ -19,8 +19,10 @@
  */
 package org.ebml.matroska;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -28,22 +30,26 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.ebml.MasterElement;
 import org.ebml.UnsignedIntegerElement;
 import org.ebml.io.DataWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A cluster of frames in a file. Used internally during muxing.
  */
-class MatroskaCluster extends MasterElement
+class MatroskaCluster
 {
+  private static final Logger LOG = LoggerFactory.getLogger(MatroskaCluster.class);
   private final Queue<MatroskaFileFrame> frames = new ConcurrentLinkedQueue<>();
   private final Set<Integer> tracks = new HashSet<>();
+  private final List<Long> sliencedTracks = new ArrayList<>();
+
   public long clusterTimecode = Long.MAX_VALUE;
   private int sizeLimit = Integer.MAX_VALUE;
   private int totalSize = 0;
   private long durationLimit = Long.MAX_VALUE;
 
-  public MatroskaCluster(final byte[] type)
+  public MatroskaCluster()
   {
-    super(type);
   }
 
   void setLimitParameters(final long duration, final int size)
@@ -77,18 +83,32 @@ class MatroskaCluster extends MasterElement
       return 0;
     try
     {
-      final MasterElement clusterElem = (MasterElement) MatroskaDocType.obj.createElement(MatroskaDocType.Cluster_Id);
-      final UnsignedIntegerElement timecodeElem = (UnsignedIntegerElement) MatroskaDocType.obj.createElement(MatroskaDocType.ClusterTimecode_Id);
+      final MasterElement clusterElem = MatroskaDocTypes.Cluster.getInstance();
+      final UnsignedIntegerElement timecodeElem = MatroskaDocTypes.Timecode.getInstance();
       timecodeElem.setValue(clusterTimecode);
       clusterElem.addChildElement(timecodeElem);
+
+      if (!sliencedTracks.isEmpty())
+      {
+        final MasterElement silentElem = MatroskaDocTypes.SilentTracks.getInstance();
+        for (final Long silent: sliencedTracks)
+        {
+          final UnsignedIntegerElement silentTrackElem = MatroskaDocTypes.SilentTrackNumber.getInstance();
+          silentTrackElem.setValue(silent);
+          silentElem.addChildElement(silentTrackElem);
+        }
+        clusterElem.addChildElement(silentElem);
+      }
 
       MatroskaSimpleBlock block = null;
       boolean forceNew = true;
       long lastTimecode = 0;
       int lastTrackNumber = 0;
+      LOG.debug("Timecode for cluster set to {}", clusterTimecode);
       for (final MatroskaFileFrame frame: frames)
       {
         frame.setTimecode(frame.getTimecode() - clusterTimecode);
+        LOG.trace("Timecode for frame set to {}", frame.getTimecode());
         if (forceNew || lastTimecode != frame.getTimecode() || lastTrackNumber != frame.getTrackNo())
         {
           if (block != null)
@@ -124,5 +144,15 @@ class MatroskaCluster extends MasterElement
   public Collection<Integer> getTracks()
   {
     return tracks;
+  }
+
+  public void unsilenceTrack(final long trackNumber)
+  {
+    sliencedTracks.remove(trackNumber);
+  }
+
+  public void silenceTrack(final long trackNumber)
+  {
+    sliencedTracks.add(trackNumber);
   }
 }

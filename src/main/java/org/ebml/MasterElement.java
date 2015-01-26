@@ -33,6 +33,12 @@ public class MasterElement extends Element
     usedSize = 0;
   }
 
+  public MasterElement()
+  {
+    super();
+    usedSize = 0;
+  }
+
   public Element readNextChild(final EBMLReader reader)
   {
     if (usedSize >= this.getSize())

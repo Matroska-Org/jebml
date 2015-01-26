@@ -68,9 +68,6 @@ import org.slf4j.LoggerFactory;
 public class EBMLReader
 {
   protected DataSource source;
-  protected DocType doc;
-  protected ElementType elementTypes;
-  protected ElementType lastElementType;
 
   private static final Logger LOG = LoggerFactory.getLogger(EBMLReader.class);
 
@@ -81,11 +78,9 @@ public class EBMLReader
    * @param source DataSource to read from
    * @param doc DocType to use to validate the docment
    */
-  public EBMLReader(final DataSource source, final DocType doc)
+  public EBMLReader(final DataSource source)
   {
     this.source = source;
-    this.doc = doc;
-    this.elementTypes = doc.getElements();
   }
 
   final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
@@ -111,25 +106,24 @@ public class EBMLReader
       // Failed to read type id
       return null;
 
-    final Element elem = doc.createElement(elementType);
+    final Element elem = ProtoType.getInstance(elementType);
 
     if (elem == null)
     {
       return null;
     }
-    LOG.trace("Read element {}", bytesToHex(elementType));
+    LOG.trace("Read element {}", elem.getElementType().getName());
 
     // Read the size.
     final byte[] data = getEBMLCodeAsBytes(source);
     final long elementSize = parseEBMLCode(data);
     if (elementSize == 0)
       // Zero sized element is valid
-      LOG.error("Invalid element size for {}", doc.createElement(elementType).typeInfo.name);
+      LOG.error("Invalid element size for {}", elem.typeInfo.getName());
 
     // Set it's size
     elem.setSize(elementSize);
-    elem.setHeaderSize(data.length);
-    LOG.trace("Read element {} with size {}", elem.typeInfo.name, elem.getTotalSize());
+    LOG.trace("Read element {} with size {}", elem.typeInfo.getName(), elem.getTotalSize());
 
     // Setup a buffer for it's data
     // byte[] elementData = new byte[(int)elementSize];

@@ -7,7 +7,7 @@ import org.ebml.Element;
 public class MatroskaFileCues
 {
 
-  public MatroskaFileCues(final MatroskaDocType doc, final long filePointer)
+  public MatroskaFileCues(final long filePointer)
   {
   }
 
@@ -18,8 +18,7 @@ public class MatroskaFileCues
 
   Element toElement()
   {
-    // TODO: find/create appropriate type for cues
     // TODO: do the real stuff
-    return MatroskaDocType.obj.createElement(MatroskaDocType.Channels_Id);
+    return MatroskaDocTypes.Cues.getInstance();
   }
 }
