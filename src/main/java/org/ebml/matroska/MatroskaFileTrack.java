@@ -56,9 +56,11 @@ public class MatroskaFileTrack
     VIDEO(1),
     AUDIO(2),
     COMPLEX(3),
+    LOGO(0x10),
     SUBTITLE(0x11),
     BUTTONS(0x12),
     CONTROL(0x20);
+
     final byte type;
 
     private TrackType(final int type)
@@ -76,6 +78,8 @@ public class MatroskaFileTrack
           return AUDIO;
         case 3:
           return COMPLEX;
+        case 0x10:
+          return LOGO;
         case 0x11:
           return SUBTITLE;
         case 0x12:
