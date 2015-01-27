@@ -1,4 +1,4 @@
-package org.ebml.matroska;
+package org.ebml.matroska.util;
 
 import java.io.File;
 

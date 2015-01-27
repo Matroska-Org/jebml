@@ -4,10 +4,12 @@ package org.ebml.sample;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 
 import org.ebml.io.*;
 import org.ebml.matroska.*;
+import org.ebml.matroska.util.MatroskaFileFilter;
 
 // CSON: AvoidStarImport
 
@@ -102,7 +104,7 @@ public class EbmlSampleAppFrame extends JFrame
   {
     try
     {
-      jFileChooser1.setFileFilter(new org.ebml.matroska.MatroskaFileFilter());
+      jFileChooser1.setFileFilter(new MatroskaFileFilter());
 
       final int ret = jFileChooser1.showOpenDialog(this);
       if (ret == JFileChooser.APPROVE_OPTION)
