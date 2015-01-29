@@ -48,7 +48,7 @@ findbugsTest {
     }
 }
 
-project.version = '2.0'
+project.version = '2.0-SNAPSHOT'
 
 bundle {
     instructions << [
@@ -56,6 +56,7 @@ bundle {
         'Bundle-Version': version,
         'Bundle-License': 'LGPLv2',
         'Export-Package': 'org.ebml.*;-split-package:=merge-first',
+        'Import-Package': '*;resolution:=optional',
         '-nodefaultversion': true,
         '-noee': true
     ]
