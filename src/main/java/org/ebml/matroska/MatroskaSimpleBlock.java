@@ -9,9 +9,13 @@ import org.ebml.BinaryElement;
 import org.ebml.EBMLReader;
 import org.ebml.Element;
 import org.ebml.io.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class MatroskaSimpleBlock
 {
+  private static final Logger LOG = LoggerFactory.getLogger(MatroskaSimpleBlock.class);
+
   // Note: this max size based on libmatroska src
   private static final int MAX_LACE_SIZE = 6 * 0xFF;
   private int trackNumber = 0;
@@ -95,9 +99,10 @@ class MatroskaSimpleBlock
     }
     for (final MatroskaFileFrame frame: frames)
     {
+      LOG.trace("Writing frame {}", frame.getData().remaining());
       buf.put(frame.getData());
     }
-
+    buf.flip();
     return buf;
   }
 
@@ -187,6 +192,7 @@ class MatroskaSimpleBlock
 
   public boolean addFrame(final MatroskaFileFrame frame)
   {
+    LOG.trace("Adding frame {}", frame.getData().remaining());
     setTimecode(frame.getTimecode());
     setTrackNumber(frame.getTrackNo());
     totalSize += frame.getData().remaining();
