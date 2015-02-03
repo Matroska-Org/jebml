@@ -19,6 +19,8 @@
  */
 package org.ebml;
 
+import java.nio.ByteBuffer;
+
 /*
  * SignedInteger.java
  *
@@ -46,7 +48,7 @@ public class SignedIntegerElement extends BinaryElement
   public void setValue(final long value)
   {
     // System.out.println(Long.toHexString(value));
-    setData(packInt(value));
+    setData(ByteBuffer.wrap(packInt(value)));
     /*
      * for (int i = 0; i < data.length; i++) { System.out.print(Integer.toHexString(data[i]) + ", "); } System.out.print("\n");
      */
@@ -54,12 +56,13 @@ public class SignedIntegerElement extends BinaryElement
 
   public long getValue()
   {
+    final byte[] dataArray = data.array();
     long l = 0;
     long tmp = 0;
-    l |= ((long) data[0] << (56 - ((8 - data.length) * 8)));
-    for (int i = 1; i < data.length; i++)
+    l |= ((long) dataArray[0] << (56 - ((8 - dataArray.length) * 8)));
+    for (int i = 1; i < dataArray.length; i++)
     {
-      tmp = ((long) data[data.length - i]) << 56;
+      tmp = ((long) dataArray[dataArray.length - i]) << 56;
       tmp >>>= 56 - (8 * (i - 1));
       l |= tmp;
     }

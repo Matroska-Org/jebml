@@ -22,19 +22,24 @@ package org.ebml.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 public class FileDataSource implements DataSource
 {
   RandomAccessFile file = null;
+  FileChannel fc = null;
 
   public FileDataSource(final String filename) throws FileNotFoundException, IOException
   {
     file = new RandomAccessFile(filename, "r");
+    fc = file.getChannel();
   }
 
   public FileDataSource(final String filename, final String mode) throws FileNotFoundException, IOException
   {
     file = new RandomAccessFile(filename, mode);
+    fc = file.getChannel();
   }
 
   @Override
@@ -51,24 +56,11 @@ public class FileDataSource implements DataSource
   }
 
   @Override
-  public int read(final byte[] buff)
+  public int read(final ByteBuffer buff)
   {
     try
     {
-      return file.read(buff);
-    }
-    catch (final IOException ex)
-    {
-      return 0;
-    }
-  }
-
-  @Override
-  public int read(final byte[] buff, final int offset, final int length)
-  {
-    try
-    {
-      return file.read(buff, offset, length);
+      return fc.read(buff);
     }
     catch (final IOException ex)
     {

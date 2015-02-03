@@ -19,6 +19,8 @@
  */
 package org.ebml.io;
 
+import java.nio.ByteBuffer;
+
 /**
  * Defines the interface used for custom <code>DataWriter</code>'s. A <code>DataWriter</code> provides methods of writing bytes individually or in
  * arrays. These basic functions must be defined in any <code>DataWriter</code> objects to be used with the <code>EBMLWriter</code>.
@@ -29,7 +31,5 @@ public interface DataWriter extends DataSeekable
 {
   int write(byte b);
 
-  int write(byte[] buff);
-
-  int write(byte[] buff, int offset, int length);
+  int write(ByteBuffer buff);
 }

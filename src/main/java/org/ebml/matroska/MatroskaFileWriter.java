@@ -93,7 +93,7 @@ public class MatroskaFileWriter
 
   void writeSegmentHeader()
   {
-    final MatroskaSegment segmentElem = new MatroskaSegment(MatroskaDocTypes.Segment.getType());
+    final MatroskaSegment segmentElem = new MatroskaSegment();
     segmentElem.setUnknownSize(true);
     segmentElem.writeHeaderData(ioDW);
   }

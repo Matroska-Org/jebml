@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import org.ebml.EBMLReader;
@@ -160,7 +161,7 @@ public class MatroskaFileWriterTest
   private MatroskaFileFrame generateFrame(final String string, final int trackNo)
   {
     final MatroskaFileFrame frame = new MatroskaFileFrame();
-    frame.setData(string.getBytes(StandardCharsets.UTF_8));
+    frame.setData(ByteBuffer.wrap(string.getBytes(StandardCharsets.UTF_8)));
     frame.setTrackNo(trackNo);
     frame.setTimecode(++timecode);
     return frame;

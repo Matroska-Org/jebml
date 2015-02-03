@@ -19,9 +19,10 @@
  */
 package org.ebml.matroska;
 
+import java.nio.ByteBuffer;
+
 import org.ebml.EBMLReader;
 import org.ebml.Element;
-import org.ebml.util.ArrayCopy;
 
 public class MatroskaBlock
 {
@@ -30,9 +31,9 @@ public class MatroskaBlock
   protected int blockTimecode = 0;
   protected int trackNo = 0;
   private boolean keyFrame;
-  private final byte[] data;
+  private final ByteBuffer data;
 
-  public MatroskaBlock(final byte[] data)
+  public MatroskaBlock(final ByteBuffer data)
   {
     this.data = data;
   }
@@ -48,14 +49,10 @@ public class MatroskaBlock
     index = Element.codedSizeLength(trackNo);
     headerSize += index;
 
-    final short blockTimecode1 = (short) (data[index++] & 0xFF);
-    final short blockTimecode2 = (short) (data[index++] & 0xFF);
-    if (blockTimecode1 != 0 || blockTimecode2 != 0)
-    {
-      blockTimecode = (blockTimecode1 << 8) | blockTimecode2;
-    }
+    blockTimecode = data.getInt();
 
-    final int keyFlag = data[index] & 0x80;
+    final byte flagsByte = data.get();
+    final int keyFlag = flagsByte & 0x80;
     if (keyFlag > 0)
     {
       this.keyFrame = true;
@@ -65,14 +62,14 @@ public class MatroskaBlock
       this.keyFrame = false;
     }
 
-    final int laceFlag = data[index] & 0x06;
+    final int laceFlag = flagsByte & 0x06;
     index++;
     // Increase the HeaderSize by the number of bytes we have read
     headerSize += 3;
     if (laceFlag != 0x00)
     {
       // We have lacing
-      final byte laceCount = data[index++];
+      final byte laceCount = data.get();
       headerSize += 1;
       if (laceFlag == 0x02)
       { // Xiph Lacing
@@ -87,7 +84,7 @@ public class MatroskaBlock
       else if (laceFlag == 0x04)
       { // Fixed Size Lacing
         sizes = new int[laceCount + 1];
-        sizes[0] = (data.length - headerSize) / (laceCount + 1);
+        sizes[0] = (data.remaining() - headerSize) / (laceCount + 1);
         for (int s = 0; s < laceCount; s++)
         {
           sizes[s + 1] = sizes[0];
@@ -106,14 +103,14 @@ public class MatroskaBlock
   private int[] readEBMLLaceSizes(int index, final short laceCount)
   {
     final int[] laceSizes = new int[laceCount + 1];
-    laceSizes[laceCount] = data.length;
+    laceSizes[laceCount] = data.remaining();
 
     // This uses the DataSource.getBytePosition() for finding the header size
     // because of the trouble of finding the byte size of sized ebml coded integers
     // long ByteStartPos = source.getFilePointer();
     final int startIndex = index;
 
-    laceSizes[0] = (int) EBMLReader.readEBMLCode(data, index);
+    laceSizes[0] = (int) EBMLReader.readEBMLCode(data);
     index += Element.codedSizeLength(laceSizes[0]);
     laceSizes[laceCount] -= laceSizes[0];
 
@@ -121,7 +118,7 @@ public class MatroskaBlock
     long lastEBMLSize = 0;
     for (int l = 0; l < laceCount - 1; l++)
     {
-      lastEBMLSize = EBMLReader.readSignedEBMLCode(data, index);
+      lastEBMLSize = EBMLReader.readSignedEBMLCode(data);
       index += Element.codedSizeLength(lastEBMLSize);
 
       firstEBMLSize += lastEBMLSize;
@@ -139,10 +136,10 @@ public class MatroskaBlock
     return laceSizes;
   }
 
-  private int[] readXiphLaceSizes(int index, final short laceCount)
+  private int[] readXiphLaceSizes(final int index, final short laceCount)
   {
     final int[] laceSizes = new int[laceCount + 1];
-    laceSizes[laceCount] = data.length;
+    laceSizes[laceCount] = data.remaining();
 
     // long ByteStartPos = source.getFilePointer();
 
@@ -151,7 +148,7 @@ public class MatroskaBlock
       short laceSizeByte = 255;
       while (laceSizeByte == 255)
       {
-        laceSizeByte = (short) (data[index++] & 0xFF);
+        laceSizeByte = (short) (data.get() & 0xFF);
         headerSize += 1;
         laceSizes[l] += laceSizeByte;
       }
@@ -174,7 +171,7 @@ public class MatroskaBlock
     return sizes.length;
   }
 
-  public byte[] getFrame(final int frame)
+  public ByteBuffer getFrame(final int frame)
   {
     if (sizes == null)
     {
@@ -182,12 +179,8 @@ public class MatroskaBlock
       {
         throw new IllegalArgumentException("Tried to read laced frame on non-laced Block. MatroskaBlock.getFrame(frame > 0)");
       }
-      final byte[] frameData = new byte[data.length - headerSize];
-      ArrayCopy.arraycopy(data, headerSize, frameData, 0, frameData.length);
-
-      return frameData;
+      return data;
     }
-    final byte[] frameData = new byte[sizes[frame]];
 
     // Calc the frame data offset
     int startOffset = headerSize;
@@ -197,8 +190,9 @@ public class MatroskaBlock
     }
 
     // Copy the frame data
-    ArrayCopy.arraycopy(data, startOffset, frameData, 0, frameData.length);
-
+    final ByteBuffer frameData = data.duplicate();
+    frameData.position(startOffset);
+    frameData.limit(sizes[frame] + startOffset);
     return frameData;
   }
 

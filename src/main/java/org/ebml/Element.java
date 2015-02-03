@@ -25,11 +25,14 @@ package org.ebml;
  * Created on November 19, 2002, 9:11 PM
  */
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.ebml.io.DataSource;
 import org.ebml.io.DataWriter;
 import org.ebml.util.ArrayCopy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Defines the basic EBML element. Subclasses may provide child element access.
@@ -38,20 +41,20 @@ import org.ebml.util.ArrayCopy;
  */
 public class Element
 {
+  protected static final Logger LOG = LoggerFactory.getLogger(Element.class);
   private static int minSizeLength = 0;
 
   protected Element parent;
   protected ProtoType<?> typeInfo;
-  protected byte[] type = {
-      0x00 };
+  protected ByteBuffer type;
   protected long size = 0;
-  protected byte[] data = null;
+  protected ByteBuffer data = null;
   protected boolean dataRead = false;
 
   /** Creates a new instance of Element */
   public Element(final byte[] type)
   {
-    this.type = type;
+    this.type = ByteBuffer.wrap(type);
   }
 
   public Element()
@@ -64,9 +67,10 @@ public class Element
   public void readData(final DataSource source)
   {
     // Setup a buffer for it's data
-    this.data = new byte[(int) size];
+    this.data = ByteBuffer.allocate((int) size);
     // Read the data
-    source.read(this.data, 0, this.data.length);
+    source.read(this.data);
+    data.flip();
     dataRead = true;
     // System.out.printf("Read %d bytes from %s", size, typeInfo.name);
   }
@@ -86,6 +90,7 @@ public class Element
 
   public long writeElement(final DataWriter writer)
   {
+    LOG.trace("Writing element {} with size {}", typeInfo.getName(), getTotalSize());
     return writeHeaderData(writer) + writeData(writer);
   }
 
@@ -94,17 +99,21 @@ public class Element
    */
   public long writeHeaderData(final DataWriter writer)
   {
-    long len = 0;
 
-    len += type.length;
-    writer.write(type);
+    int len = 0;
+
+    len += getType().remaining();
 
     final byte[] encodedSize = Element.makeEbmlCodedSize(getSize());
     // System.out.printf("Writing header for element %s with size %d (%s)\n", typeInfo.name, getTotalSize(), EBMLReader.bytesToHex(size));
 
     len += encodedSize.length;
-    writer.write(encodedSize);
-
+    final ByteBuffer buf = ByteBuffer.allocate(len);
+    buf.put(getType());
+    buf.put(encodedSize);
+    buf.flip();
+    LOG.trace("Writing out header {}, {}", buf.remaining(), EBMLReader.bytesToHex(buf.array()));
+    writer.write(buf);
     return len;
   }
 
@@ -115,9 +124,18 @@ public class Element
   {
     if (data == null)
     {
-      throw new NullPointerException(String.format("No data to write: %s : %s", typeInfo.getName(), Arrays.toString(this.type)));
+      throw new NullPointerException(String.format("No data to write: %s : %s", typeInfo.getName(), Arrays.toString(this.type.array())));
     }
-    return writer.write(this.data);
+    data.mark();
+    try
+    {
+      LOG.trace("Writing data {} bytes of {}", data.remaining(), EBMLReader.bytesToHex(data.array()));
+      return writer.write(data);
+    }
+    finally
+    {
+      data.reset();
+    }
   }
 
   /**
@@ -126,9 +144,9 @@ public class Element
    * @return Value of property data.
    *
    */
-  public byte[] getData()
+  public ByteBuffer getData()
   {
-    return this.data;
+    return this.data.duplicate();
   }
 
   /**
@@ -137,10 +155,10 @@ public class Element
    * @param data New value of property data.
    *
    */
-  public void setData(final byte[] data)
+  public void setData(final ByteBuffer data)
   {
     this.data = data;
-    this.size = data.length;
+    this.size = data.remaining();
   }
 
   /**
@@ -179,7 +197,7 @@ public class Element
   public long getTotalSize()
   {
     long totalSize = 0;
-    totalSize += getType().length;
+    totalSize += getType().remaining();
     totalSize += Element.codedSizeLength(getSize());
     // totalSize += this.headerSize;
     totalSize += getSize();
@@ -192,9 +210,9 @@ public class Element
    * @return Value of property type.
    *
    */
-  public byte[] getType()
+  public ByteBuffer getType()
   {
-    return type;
+    return type.duplicate();
   }
 
   /**
@@ -204,6 +222,17 @@ public class Element
    *
    */
   public void setType(final byte[] type)
+  {
+    this.type = ByteBuffer.wrap(type);
+  }
+
+  /**
+   * Setter for property type.
+   * 
+   * @param type New value of property type.
+   *
+   */
+  public void setType(final ByteBuffer type)
   {
     this.type = type;
   }
@@ -240,18 +269,14 @@ public class Element
     this.parent = parent;
   }
 
-  public byte[] toByteArray()
-  {
-    final byte[] head = makeEbmlCode(type, size);
-    final byte[] ret = new byte[head.length + data.length];
-    org.ebml.util.ArrayCopy.arraycopy(head, 0, ret, 0, head.length);
-    org.ebml.util.ArrayCopy.arraycopy(data, 0, ret, head.length, data.length);
-    return ret;
-  }
-
   public boolean isType(final byte[] typeId)
   {
-    return Arrays.equals(this.type, typeId);
+    return Arrays.equals(this.type.array(), typeId);
+  }
+
+  public boolean isType(final ByteBuffer typeId)
+  {
+    return typeId.equals(type);
   }
 
   public static void setMinSizeLength(final int minSize)
@@ -368,10 +393,7 @@ public class Element
     {
       codedSize = minSizeLength;
     }
-    else
-    {
-      codedSize = 8;
-    }
+
     return codedSize;
   }
 

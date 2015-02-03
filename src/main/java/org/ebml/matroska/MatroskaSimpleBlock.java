@@ -46,7 +46,7 @@ class MatroskaSimpleBlock
     return blockElem;
   }
 
-  private byte[] createInnerData()
+  private ByteBuffer createInnerData()
   {
     final ByteBuffer buf = ByteBuffer.allocate(totalSize);
 
@@ -98,7 +98,7 @@ class MatroskaSimpleBlock
       buf.put(frame.getData());
     }
 
-    return buf.array();
+    return buf;
   }
 
   private MatroskaLaceMode pickBestLaceMode()
@@ -121,7 +121,7 @@ class MatroskaSimpleBlock
     buf.put((byte) (frames.size() - 1));
     for (int i = 0; i < frames.size() - 1; ++i)
     {
-      int tmpSize = frames.get(i).getData().length;
+      int tmpSize = frames.get(i).getData().remaining();
       while (tmpSize >= 0xFF)
       {
         buf.put((byte) 0xFF);
@@ -138,7 +138,7 @@ class MatroskaSimpleBlock
     buf.put((byte) (frames.size() - 1));
     for (int i = 0; i < frames.size() - 1; ++i)
     {
-      final int tmpSize = frames.get(i).getData().length;
+      final int tmpSize = frames.get(i).getData().remaining();
       buf.put(Element.makeEbmlCodedSize(tmpSize));
     }
     return buf;
@@ -189,9 +189,9 @@ class MatroskaSimpleBlock
   {
     setTimecode(frame.getTimecode());
     setTrackNumber(frame.getTrackNo());
-    totalSize += frame.getData().length;
+    totalSize += frame.getData().remaining();
     frames.add(frame);
-    if (frame.getData().length > MAX_LACE_SIZE)
+    if (frame.getData().remaining() > MAX_LACE_SIZE)
     {
       laceMode = MatroskaLaceMode.NONE;
       return false;

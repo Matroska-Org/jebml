@@ -19,6 +19,8 @@
  */
 package org.ebml.io;
 
+import java.nio.ByteBuffer;
+
 /*
  * DataSource.java
  *
@@ -38,9 +40,9 @@ public interface DataSource extends DataSeekable
 
   byte readByte();
 
-  int read(byte[] buff);
+  int read(ByteBuffer buff);
 
-  int read(byte[] buff, int offset, int length);
+  // int read(ByteBuffer buff, int length);
 
   /**
    * Skip a number of bytes in the <code>DataSeekable</code>

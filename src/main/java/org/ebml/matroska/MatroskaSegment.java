@@ -19,6 +19,8 @@
  */
 package org.ebml.matroska;
 
+import java.nio.ByteBuffer;
+
 import org.ebml.Element;
 import org.ebml.MasterElement;
 import org.ebml.io.DataWriter;
@@ -30,9 +32,9 @@ public class MatroskaSegment extends MasterElement
 {
   protected boolean bUnknownSize = false;
 
-  public MatroskaSegment(final byte[] type)
+  public MatroskaSegment()
   {
-    super(type);
+    super(MatroskaDocTypes.Segment.getType().array());
   }
 
   /**
@@ -43,8 +45,8 @@ public class MatroskaSegment extends MasterElement
   {
     long len = 0;
 
-    final byte[] type = getType();
-    len += type.length;
+    final ByteBuffer type = getType();
+    len += type.remaining();
     writer.write(type);
 
     byte[] size;
@@ -63,7 +65,7 @@ public class MatroskaSegment extends MasterElement
     }
 
     len += size.length;
-    writer.write(size);
+    writer.write(ByteBuffer.wrap(size));
 
     return len;
   }

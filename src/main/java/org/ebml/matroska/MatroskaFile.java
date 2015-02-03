@@ -35,6 +35,8 @@ import org.ebml.UnsignedIntegerElement;
 import org.ebml.DateElement;
 import org.ebml.EBMLReader;
 import org.ebml.io.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MatroskaFile
 {
@@ -42,6 +44,7 @@ public class MatroskaFile
    * Number of Clusters to search before assuming that a track has ended
    */
   public static final int CLUSTER_TRACK_SEARCH_COUNT = 4;
+  protected static final Logger LOG = LoggerFactory.getLogger(MatroskaFile.class);
 
   private final DataSource ioDS;
   private final EBMLReader reader;
@@ -444,7 +447,7 @@ public class MatroskaFile
     {
       final MatroskaFileFrame frame = iter.next();
       if (frame.getTrackNo() == 2
-          && frame.getData()[3] != 0x54)
+          && frame.getData().get(3) != 0x54)
       {
         throw new RuntimeException("Bad MP3 Header! Index: " + iter);
       }
@@ -491,6 +494,7 @@ public class MatroskaFile
       else if (level2.isType(MatroskaDocTypes.TimecodeScale.getType()))
       {
         level2.readData(ioDS);
+
         timecodeScale = ((UnsignedIntegerElement) level2).getValue();
       }
 

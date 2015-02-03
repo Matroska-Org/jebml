@@ -72,7 +72,7 @@ class MatroskaCluster
       clusterTimecode = frame.getTimecode();
     }
     frames.add(frame);
-    totalSize += frame.getData().length;
+    totalSize += frame.getData().remaining();
     tracks.add(frame.getTrackNo());
     return ((frame.getTimecode() - clusterTimecode) < durationLimit) && (totalSize < sizeLimit);
   }

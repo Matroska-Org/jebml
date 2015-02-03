@@ -19,6 +19,8 @@
  */
 package org.ebml;
 
+import java.nio.ByteBuffer;
+
 /*
  * UnsignedIntegerElement.java
  *
@@ -44,20 +46,13 @@ public class UnsignedIntegerElement extends BinaryElement
 
   public void setValue(final long value)
   {
-    setData(packIntUnsigned(value));
+    final ByteBuffer buf = ByteBuffer.wrap(packIntUnsigned(value));
+    LOG.trace("Setting value {} to {}", value, EBMLReader.bytesToHex(buf.array()));
+    setData(buf);
   }
 
   public long getValue()
   {
-    long l = 0;
-    long tmp = 0;
-    for (int i = 0; i < data.length; i++)
-    {
-      tmp = ((long) data[data.length - 1 - i]) << 56;
-      tmp >>>= (56 - (i * 8));
-      l |= tmp;
-    }
-    return l;
+    return EBMLReader.parseEBMLCode(data.duplicate());
   }
-
 }

@@ -19,6 +19,7 @@
  */
 package org.ebml;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -58,12 +59,12 @@ public class StringElement extends BinaryElement
 
   public String getValue()
   {
-    return new String(data, charset);
+    return new String(data.array(), charset);
   }
 
   public void setValue(final String value)
   {
-    setData(value.getBytes(charset));
+    setData(ByteBuffer.wrap(value.getBytes(charset)));
   }
 
   public Charset getEncoding()

@@ -19,11 +19,7 @@
  */
 package org.ebml;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class FloatElement extends BinaryElement
 {
@@ -45,35 +41,19 @@ public class FloatElement extends BinaryElement
    */
   public void setValue(final double value)
   {
-    try
+    if (value < Float.MAX_VALUE)
     {
-      if (value < Float.MAX_VALUE)
-      {
-        final ByteArrayOutputStream bIO = new ByteArrayOutputStream(4);
-        final DataOutputStream dIO = new DataOutputStream(bIO);
-        dIO.writeFloat((float) value);
-
-        setData(bIO.toByteArray());
-
-      }
-      else if (value < Double.MAX_VALUE)
-      {
-        final ByteArrayOutputStream bIO = new ByteArrayOutputStream(8);
-        final DataOutputStream dIO = new DataOutputStream(bIO);
-        dIO.writeDouble(value);
-
-        setData(bIO.toByteArray());
-
-      }
-      else
-      {
-        throw new ArithmeticException(
-                                      "80-bit floats are not supported, BTW How did you create such a large float in Java?");
-      }
+      final ByteBuffer buf = ByteBuffer.allocate(4);
+      buf.putFloat((float) value);
+      buf.flip();
+      setData(buf);
     }
-    catch (final IOException ex)
+    else
     {
-      return;
+      final ByteBuffer buf = ByteBuffer.allocate(4);
+      buf.putDouble(value);
+      buf.flip();
+      setData(buf);
     }
   }
 
@@ -85,35 +65,25 @@ public class FloatElement extends BinaryElement
    */
   public double getValue()
   {
+    data.mark();
     try
     {
       if (size == 4)
       {
-        float value = 0;
-        final ByteArrayInputStream bIS = new ByteArrayInputStream(data);
-        final DataInputStream dIS = new DataInputStream(bIS);
-        value = dIS.readFloat();
-        return value;
-
+        return data.getFloat();
       }
       else if (size == 8)
       {
-        double value = 0;
-        final ByteArrayInputStream bIS = new ByteArrayInputStream(data);
-        final DataInputStream dIS = new DataInputStream(bIS);
-        value = dIS.readDouble();
-        return value;
-
+        return data.getDouble();
       }
       else
       {
-        throw new ArithmeticException(
-                                      "80-bit floats are not supported");
+        throw new ArithmeticException("80-bit floats are not supported");
       }
     }
-    catch (final IOException ex)
+    finally
     {
-      return 0;
+      data.reset();
     }
   }
 }

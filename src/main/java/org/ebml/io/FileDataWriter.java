@@ -22,19 +22,24 @@ package org.ebml.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 public class FileDataWriter implements DataWriter
 {
   RandomAccessFile file = null;
+  FileChannel fc = null;
 
   public FileDataWriter(final String filename) throws FileNotFoundException, IOException
   {
     file = new RandomAccessFile(filename, "rw");
+    fc = file.getChannel();
   }
 
   public FileDataWriter(final String filename, final String mode) throws FileNotFoundException, IOException
   {
     file = new RandomAccessFile(filename, mode);
+    fc = file.getChannel();
   }
 
   @Override
@@ -52,26 +57,11 @@ public class FileDataWriter implements DataWriter
   }
 
   @Override
-  public int write(final byte[] buff)
+  public int write(final ByteBuffer buff)
   {
     try
     {
-      file.write(buff);
-      return buff.length;
-    }
-    catch (final IOException ex)
-    {
-      return 0;
-    }
-  }
-
-  @Override
-  public int write(final byte[] buff, final int offset, final int length)
-  {
-    try
-    {
-      file.write(buff, offset, length);
-      return length;
+      return fc.write(buff);
     }
     catch (final IOException ex)
     {

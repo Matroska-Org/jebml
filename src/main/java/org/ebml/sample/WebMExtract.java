@@ -89,13 +89,13 @@ public final class WebMExtract
 
           oFS.write("RIFF".getBytes(StandardCharsets.UTF_8));
 
-          writeIntLE(oFS, frame.getData().length + 20 - 8);
+          writeIntLE(oFS, frame.getData().remaining() + 20 - 8);
 
           oFS.write("WEBPVP8".getBytes(StandardCharsets.UTF_8));
           oFS.write(0x20);
-          writeIntLE(oFS, (frame.getData().length + 20 - 8) - 0xc);
+          writeIntLE(oFS, (frame.getData().remaining() + 20 - 8) - 0xc);
 
-          oFS.write(frame.getData());
+          oFS.write(frame.getData().array());
         }
         frame = mF.getNextFrame(track.getTrackNo());
         count++;

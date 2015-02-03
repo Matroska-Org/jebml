@@ -20,6 +20,7 @@
 
 package org.ebml.matroska;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.ebml.Element;
@@ -30,8 +31,6 @@ import org.ebml.io.DataWriter;
  */
 public class VoidElement extends Element
 {
-  private static final byte[] VOID_TYPE = new byte[] {(byte) 0xEC };
-
   /*
    * Creates a new instance of Element
    * 
@@ -39,7 +38,9 @@ public class VoidElement extends Element
    */
   public VoidElement(final long size)
   {
-    super(VOID_TYPE);
+    super();
+    setElementType(MatroskaDocTypes.Void);
+    setType(MatroskaDocTypes.Void.getType());
     setSize(size);
   }
 
@@ -48,13 +49,13 @@ public class VoidElement extends Element
   {
     final byte[] voids = new byte[(int) getSize()];
     Arrays.fill(voids, (byte) 1);
-    return ioDW.write(voids);
+    return ioDW.write(ByteBuffer.wrap(voids));
   }
 
   @Override
   public void setSize(final long size)
   {
-    super.setSize(size - Element.codedSizeLength(size) - type.length);
+    super.setSize(size - Element.codedSizeLength(size) - type.remaining());
     assert getTotalSize() == size;
   }
 

@@ -19,9 +19,8 @@
  */
 package org.ebml.matroska;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-
-import org.ebml.util.ArrayCopy;
 
 /**
  * Matroska Frame, holds a Matroska frame timecode, duration, and data
@@ -56,7 +55,7 @@ public class MatroskaFileFrame
   /**
    * The frame data
    */
-  private byte[] data;
+  private ByteBuffer data;
   private boolean keyFrame;
 
   /**
@@ -86,8 +85,7 @@ public class MatroskaFileFrame
     }
     if (copy.getData() != null)
     {
-      this.setData(new byte[copy.getData().length]);
-      ArrayCopy.arraycopy(copy.getData(), 0, this.getData(), 0, copy.getData().length);
+      this.setData(copy.getData().duplicate());
     }
   }
 
@@ -139,12 +137,12 @@ public class MatroskaFileFrame
     this.duration = duration;
   }
 
-  public byte[] getData()
+  public ByteBuffer getData()
   {
     return data;
   }
 
-  public void setData(final byte[] data)
+  public void setData(final ByteBuffer data)
   {
     this.data = data;
   }

@@ -19,6 +19,7 @@
  */
 package org.ebml.matroska;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import org.ebml.BinaryElement;
@@ -29,12 +30,16 @@ import org.ebml.MasterElement;
 import org.ebml.StringElement;
 import org.ebml.UnsignedIntegerElement;
 import org.ebml.io.DataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Matroska Track Class
  */
 public class MatroskaFileTrack
 {
+  private static final Logger LOG = LoggerFactory.getLogger(Element.class);
+
   private int trackNo = 1;
   private long trackUID = 1337;
   private boolean flagEnabled = true;
@@ -46,7 +51,7 @@ public class MatroskaFileTrack
   private String name = "unnamed";
   private String language = "eng";
   private String codecID;
-  private byte[] codecPrivate;
+  private ByteBuffer codecPrivate;
   private long defaultDuration;
   private boolean codecDecodeAll = true;
   private int seekPreroll = 0;
@@ -70,6 +75,7 @@ public class MatroskaFileTrack
 
     public static TrackType fromOrdinal(final long l)
     {
+      LOG.info("Track type from ordinal: {}", l);
       switch ((int) l)
       {
         case 1:
@@ -228,7 +234,7 @@ public class MatroskaFileTrack
     s += "\t\t" + "CodecID: " + getCodecID() + "\n";
     if (getCodecPrivate() != null)
     {
-      s += "\t\t" + "CodecPrivate: " + getCodecPrivate().length + " byte(s)" + "\n";
+      s += "\t\t" + "CodecPrivate: " + getCodecPrivate().remaining() + " byte(s)" + "\n";
     }
 
     if (getTrackType() == TrackType.VIDEO)
@@ -279,8 +285,9 @@ public class MatroskaFileTrack
       else if (level3.isType(MatroskaDocTypes.TrackType.getType()))
       {
         level3.readData(ioDS);
+        LOG.info("Track type {}", EBMLReader.bytesToHex(level3.getData().array()));
         track.setTrackType(TrackType.fromOrdinal(((UnsignedIntegerElement) level3).getValue()));
-
+        LOG.info("Track type set to {}", track.getTrackType());
       }
       else if (level3.isType(MatroskaDocTypes.DefaultDuration.getType()))
       {
@@ -401,6 +408,7 @@ public class MatroskaFileTrack
 
     final UnsignedIntegerElement trackTypeElem = MatroskaDocTypes.TrackType.getInstance();
     trackTypeElem.setValue(this.getTrackType().type);
+    LOG.info("Track type set to {}", getTrackType().type);
 
     final UnsignedIntegerElement trackFlagEnabledElem = MatroskaDocTypes.FlagEnabled.getInstance();
     trackFlagEnabledElem.setValue(this.isFlagEnabled() ? 1 : 0);
@@ -658,12 +666,12 @@ public class MatroskaFileTrack
     this.codecID = codecID;
   }
 
-  public byte[] getCodecPrivate()
+  public ByteBuffer getCodecPrivate()
   {
     return codecPrivate;
   }
 
-  public void setCodecPrivate(final byte[] codecPrivate)
+  public void setCodecPrivate(final ByteBuffer codecPrivate)
   {
     this.codecPrivate = codecPrivate;
   }

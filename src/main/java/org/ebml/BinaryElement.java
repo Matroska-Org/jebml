@@ -33,14 +33,7 @@ package org.ebml;
  */
 public class BinaryElement extends Element
 {
-
-  /*
-   * private byte[] type = { 0x00};
-   */
   private static int minSizeLength = 4;
-
-  // private long size = 0;
-  // protected byte[] data;
 
   /*
    * Creates a new instance of Element
@@ -55,89 +48,6 @@ public class BinaryElement extends Element
   public BinaryElement()
   {
     super();
-  }
-
-  /**
-   * Getter for property data.
-   * 
-   * @return Value of property data.
-   *
-   */
-  @Override
-  public byte[] getData()
-  {
-    return this.data;
-  }
-
-  /**
-   * Setter for property data.
-   * 
-   * @param data New value of property data.
-   *
-   */
-  @Override
-  public void setData(final byte[] data)
-  {
-    this.data = data;
-    this.size = data.length;
-  }
-
-  /**
-   * Getter for property size.
-   * 
-   * @return Value of property size.
-   *
-   */
-  @Override
-  public long getSize()
-  {
-    return size;
-  }
-
-  /**
-   * Setter for property size.
-   * 
-   * @param size New value of property size.
-   *
-   */
-  @Override
-  public void setSize(final long size)
-  {
-    this.size = size;
-  }
-
-  /**
-   * Getter for property type.
-   * 
-   * @return Value of property type.
-   *
-   */
-  @Override
-  public byte[] getType()
-  {
-    return type;
-  }
-
-  /**
-   * Setter for property type.
-   * 
-   * @param type New value of property type.
-   *
-   */
-  @Override
-  public void setType(final byte[] type)
-  {
-    this.type = type;
-  }
-
-  @Override
-  public byte[] toByteArray()
-  {
-    final byte[] head = makeEbmlCode(type, size);
-    final byte[] ret = new byte[head.length + data.length];
-    org.ebml.util.ArrayCopy.arraycopy(head, 0, ret, 0, head.length);
-    org.ebml.util.ArrayCopy.arraycopy(data, 0, ret, head.length, data.length);
-    return ret;
   }
 
   public static void setMinSizeLength(final int minSize)

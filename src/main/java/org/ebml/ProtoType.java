@@ -1,5 +1,6 @@
 package org.ebml;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import org.slf4j.Logger;
@@ -10,7 +11,7 @@ public class ProtoType<T extends Element>
   private static final Logger LOG = LoggerFactory.getLogger(ProtoType.class);
   private static final HashMap<Long, ProtoType<? extends Element>> CLASS_MAP = new HashMap<>();
   Class<T> clazz;
-  private final byte[] type;
+  private final ByteBuffer type;
 
   private final String name;
   private final int level;
@@ -18,11 +19,12 @@ public class ProtoType<T extends Element>
   public ProtoType(final Class<T> clazz, final String name, final byte[] type, final int level)
   {
     this.clazz = clazz;
-    this.type = type;
+    this.type = ByteBuffer.wrap(type);
     this.name = name;
     this.level = level;
-    final long codename = EBMLReader.parseEBMLCode(type);
+    final long codename = EBMLReader.parseEBMLCode(this.type);
     CLASS_MAP.put(codename, this);
+    LOG.trace("Associating {} with {}", name, codename);
   }
 
   public T getInstance()
@@ -42,10 +44,12 @@ public class ProtoType<T extends Element>
     }
   }
 
-  public static Element getInstance(final byte[] type)
+  public static Element getInstance(final ByteBuffer type)
   {
     final long codename = EBMLReader.parseEBMLCode(type);
-    return CLASS_MAP.get(Long.valueOf(codename)).getInstance();
+    final ProtoType<? extends Element> eType = CLASS_MAP.get(Long.valueOf(codename));
+    LOG.trace("Got codename {}, for element type {}", codename, eType.name);
+    return eType.getInstance();
   }
 
   public String getName()
@@ -58,7 +62,7 @@ public class ProtoType<T extends Element>
     return level;
   }
 
-  public byte[] getType()
+  public ByteBuffer getType()
   {
     return type;
   }

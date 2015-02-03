@@ -19,6 +19,7 @@
  */
 package org.ebml;
 
+import java.nio.ByteBuffer;
 import java.util.Date;
 
 public class DateElement extends SignedIntegerElement
@@ -45,7 +46,7 @@ public class DateElement extends SignedIntegerElement
   public void setDate(final Date value)
   {
     final long val = (value.getTime() - UnixEpochDelay) * 1000000000;
-    setData(packInt(val, MIN_SIZE_LENGTH));
+    setData(ByteBuffer.wrap(packInt(val, MIN_SIZE_LENGTH)));
   }
 
   /**
@@ -70,6 +71,6 @@ public class DateElement extends SignedIntegerElement
   @Override
   public void setValue(final long value)
   {
-    setData(packInt(value, MIN_SIZE_LENGTH));
+    setData(ByteBuffer.wrap(packInt(value, MIN_SIZE_LENGTH)));
   }
 }

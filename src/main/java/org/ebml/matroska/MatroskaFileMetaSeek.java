@@ -1,5 +1,7 @@
 package org.ebml.matroska;
 
+import java.nio.ByteBuffer;
+
 import org.ebml.BinaryElement;
 import org.ebml.Element;
 import org.ebml.MasterElement;
@@ -82,7 +84,7 @@ public class MatroskaFileMetaSeek
    * @param filePosition Position in the data stream where the element has been written.
    * @return
    */
-  public void addIndexedElement(final byte[] elementType, final long filePosition)
+  public void addIndexedElement(final ByteBuffer elementType, final long filePosition)
   {
     LOG.debug("Adding indexed element @ {}", filePosition - referencePosition);
     final MasterElement seekEntryElem = MatroskaDocTypes.Seek.getInstance();

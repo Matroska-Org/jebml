@@ -95,7 +95,7 @@ public final class CommandLineSample
         MatroskaFileFrame frame = mF.getNextFrame();
         while (frame != null)
         {
-          oFS.write(frame.getData());
+          oFS.write(frame.getData().array());
           // writer.WriteSampleData(frame.Data, 0, frame.Data.length);
           frame = mF.getNextFrame();
         }
