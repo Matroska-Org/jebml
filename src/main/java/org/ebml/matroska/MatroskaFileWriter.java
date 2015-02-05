@@ -23,12 +23,16 @@ import org.ebml.MasterElement;
 import org.ebml.StringElement;
 import org.ebml.UnsignedIntegerElement;
 import org.ebml.io.DataWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Summary description for MatroskaFileWriter.
  */
 public class MatroskaFileWriter
 {
+  private static final Logger LOG = LoggerFactory.getLogger(MatroskaFileWriter.class);
+
   protected DataWriter ioDW;
 
   private final MatroskaFileMetaSeek metaSeek;
@@ -176,8 +180,8 @@ public class MatroskaFileWriter
   {
     final long clusterPos = ioDW.getFilePointer();
     cueData.addCue(clusterPos, cluster.getClusterTimecode(), cluster.getTracks());
+    LOG.debug("Cluster flushing, timecode {}", cluster.getClusterTimecode());
     cluster.flush(ioDW);
-    System.out.println("Cluster-flush!");
   }
 
   /**
