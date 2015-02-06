@@ -15,7 +15,7 @@ public class UnsignedIntegerElementTest
   private static final Logger LOG = LoggerFactory.getLogger(UnsignedIntegerElementTest.class);
 
   private final MockWriter writer = new MockWriter();
-  private final ProtoType<UnsignedIntegerElement> typeInfo = new ProtoType<UnsignedIntegerElement>(UnsignedIntegerElement.class,
+  private final ProtoType<UnsignedIntegerElement> typeInfo = new ProtoType<>(UnsignedIntegerElement.class,
                                                                                                    "test",
                                                                                                    new byte[] {(byte) 0xC2 },
                                                                                                    1);

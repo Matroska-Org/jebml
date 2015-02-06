@@ -23,10 +23,10 @@ import java.util.ArrayList;
 
 public class MatroskaFileTagEntry
 {
-  public ArrayList<Long> trackUID = new ArrayList<Long>();
-  public ArrayList<Long> chapterUID = new ArrayList<Long>();
-  public ArrayList<Long> attachmentUID = new ArrayList<Long>();
-  public ArrayList<MatroskaFileSimpleTag> simpleTags = new ArrayList<MatroskaFileSimpleTag>();
+  public ArrayList<Long> trackUID = new ArrayList<>();
+  public ArrayList<Long> chapterUID = new ArrayList<>();
+  public ArrayList<Long> attachmentUID = new ArrayList<>();
+  public ArrayList<MatroskaFileSimpleTag> simpleTags = new ArrayList<>();
 
   @Override
   public String toString()

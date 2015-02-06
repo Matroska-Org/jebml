@@ -27,7 +27,7 @@ import org.ebml.io.DataWriter;
 public class MasterElement extends Element
 {
   protected long usedSize;
-  protected ArrayList<Element> children = new ArrayList<Element>();
+  protected ArrayList<Element> children = new ArrayList<>();
 
   public MasterElement(final byte[] type)
   {

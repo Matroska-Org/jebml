@@ -25,7 +25,7 @@ public class MatroskaFileSimpleTag
 {
   public String name;
   public String value;
-  public ArrayList<MatroskaFileSimpleTag> children = new ArrayList<MatroskaFileSimpleTag>();
+  public ArrayList<MatroskaFileSimpleTag> children = new ArrayList<>();
 
   public String toString(int depth)
   {

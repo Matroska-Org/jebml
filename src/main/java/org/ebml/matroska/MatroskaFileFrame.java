@@ -68,7 +68,7 @@ public class MatroskaFileFrame
    */
   public MatroskaFileFrame()
   {
-    references = new ArrayList<Long>();
+    references = new ArrayList<>();
     // System.out.println("new " + this);
   }
 
