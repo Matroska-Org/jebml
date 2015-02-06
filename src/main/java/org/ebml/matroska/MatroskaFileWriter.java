@@ -192,9 +192,8 @@ public class MatroskaFileWriter
   {
     flush();
 
-    // final Element cues = cueData.toElement();
     // metaSeek.addIndexedElement(cues, ioDW.getFilePointer());
-    // cues.writeElement(ioDW);
+    cueData.update(ioDW);
     metaSeek.update(ioDW);
     segmentInfoElem.update(ioDW);
     tracks.update(ioDW);
