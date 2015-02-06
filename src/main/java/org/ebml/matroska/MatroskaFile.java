@@ -55,8 +55,8 @@ public class MatroskaFile
   private String writingApp;
   private long timecodeScale = 1000000;
   private double duration;
-  private final ArrayList<MatroskaFileTrack> trackList = new ArrayList<MatroskaFileTrack>();
-  private final ArrayList<MatroskaFileTagEntry> tagList = new ArrayList<MatroskaFileTagEntry>();
+  private final ArrayList<MatroskaFileTrack> trackList = new ArrayList<>();
+  private final ArrayList<MatroskaFileTagEntry> tagList = new ArrayList<>();
   private final Queue<MatroskaFileFrame> frameQueue = new ConcurrentLinkedQueue<>();
   private boolean scanFirstCluster = true;
 
