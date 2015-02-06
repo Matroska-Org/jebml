@@ -32,7 +32,7 @@ public class MatroskaFileCues
     {
       UnsignedIntegerElement cueTrack = MatroskaDocTypes.CueTrack.getInstance();
       cueTrack.setValue(trackNumber);
-      UnsignedIntegerElement cueClusterPosition =MatroskaDocTypes.CueClusterPosition.getInstance();
+      UnsignedIntegerElement cueClusterPosition = MatroskaDocTypes.CueClusterPosition.getInstance();
       cueClusterPosition.setValue(position);
       
       cueTrackPositions.addChildElement(cueTrack);
