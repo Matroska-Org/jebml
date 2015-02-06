@@ -2,6 +2,7 @@ package org.ebml.matroska;
 
 import java.util.Collection;
 
+import org.ebml.Element;
 import org.ebml.MasterElement;
 import org.ebml.UnsignedIntegerElement;
 import org.ebml.io.DataWriter;
@@ -37,13 +38,13 @@ public class MatroskaFileCues
       cueTrackPositions.addChildElement(cueClusterPosition);
     }
     cuePoint.addChildElement(cueTime);
+    cuePoint.addChildElement(cueTrackPositions);
     cues.addChildElement(cuePoint);
   }
 
-  public void update(final DataWriter ioDW)
+  public Element writeAndReturnElement(final DataWriter ioDW)
   {
-    long start = ioDW.getFilePointer();
-    long amount = cues.writeElement(ioDW);
-    ioDW.seek(amount + start);
+    cues.writeElement(ioDW);
+    return cues;
   }
 }

@@ -19,6 +19,7 @@
  */
 package org.ebml.matroska;
 
+import org.ebml.Element;
 import org.ebml.MasterElement;
 import org.ebml.StringElement;
 import org.ebml.UnsignedIntegerElement;
@@ -188,8 +189,9 @@ public class MatroskaFileWriter
   {
     flush();
 
-    // metaSeek.addIndexedElement(cues, ioDW.getFilePointer());
-    cueData.update(ioDW);
+    long cuesPosition = ioDW.getFilePointer();
+    Element cues = cueData.writeAndReturnElement(ioDW);
+    metaSeek.addIndexedElement(cues, cuesPosition);
     metaSeek.update(ioDW);
     segmentInfoElem.update(ioDW);
     tracks.update(ioDW);
