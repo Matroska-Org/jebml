@@ -100,6 +100,7 @@ public class EBMLReader
   public Element readNextElement()
   {
     // Read the type.
+    final long position = source.getFilePointer();
     final ByteBuffer elementType = readEBMLCodeAsBytes(source);
 
     if (elementType == null)
@@ -107,7 +108,7 @@ public class EBMLReader
       // Failed to read type id
       return null;
     }
-    LOG.trace("Read element {}", bytesToHex(elementType.array()));
+
     final Element elem = ProtoType.getInstance(elementType);
 
     if (elem == null)
@@ -123,10 +124,12 @@ public class EBMLReader
       // Zero sized element is valid
       LOG.error("Invalid element size for {}", elem.typeInfo.getName());
     }
+    final long end = source.getFilePointer();
 
     // Set it's size
     elem.setSize(elementSize);
-    LOG.debug("Read element {} with size {}", elem.typeInfo.getName(), elem.getTotalSize());
+    elem.setHeadersSize(end - position);
+    LOG.trace("Read element {} with size {}", elem.typeInfo.getName(), elem.getTotalSize());
 
     // Setup a buffer for it's data
     // byte[] elementData = new byte[(int)elementSize];

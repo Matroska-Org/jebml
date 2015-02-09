@@ -26,31 +26,31 @@ import org.ebml.io.DataWriter;
 
 public class MasterElement extends Element
 {
-  protected long usedSize;
+  protected long usedSize = 0;
   protected ArrayList<Element> children = new ArrayList<>();
 
   public MasterElement(final byte[] type)
   {
     super(type);
-    usedSize = 0;
   }
 
   public MasterElement()
   {
     super();
-    usedSize = 0;
   }
 
   public Element readNextChild(final EBMLReader reader)
   {
     if (usedSize >= this.getSize())
     {
+      LOG.trace("Can't read any more children");
       return null;
     }
 
     final Element elem = reader.readNextElement();
     if (elem == null)
     {
+      LOG.debug("Reader returned null");
       return null;
     }
 
@@ -58,7 +58,7 @@ public class MasterElement extends Element
 
     usedSize += elem.getTotalSize();
 
-    // System.out.printf("Read element %s of size %d: %d remaining\n", elem.typeInfo.name, elem.getTotalSize(), size - usedSize);
+    LOG.trace("Read element {} of size {}: {} remaining", elem.typeInfo.getName(), elem.getTotalSize(), size - usedSize);
     return elem;
   }
 

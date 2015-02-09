@@ -30,7 +30,6 @@ import java.util.Arrays;
 
 import org.ebml.io.DataSource;
 import org.ebml.io.DataWriter;
-import org.ebml.util.ArrayCopy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +49,7 @@ public class Element
   protected long size = 0;
   protected ByteBuffer data = null;
   protected boolean dataRead = false;
+  private Long headersSize = null;
 
   /** Creates a new instance of Element */
   public Element(final byte[] type)
@@ -72,7 +72,8 @@ public class Element
     source.read(this.data);
     data.flip();
     dataRead = true;
-    // System.out.printf("Read %d bytes from %s", size, typeInfo.name);
+
+    LOG.trace("Read {} bytes from {}", size, typeInfo.getName());
   }
 
   /**
@@ -188,6 +189,8 @@ public class Element
    */
   public void setSize(final long size)
   {
+    // Clear headersSize because it is no longer valid.
+    headersSize = null;
     this.size = size;
   }
 
@@ -197,9 +200,16 @@ public class Element
   public long getTotalSize()
   {
     long totalSize = 0;
-    totalSize += getType().remaining();
-    totalSize += Element.codedSizeLength(getSize());
-    // totalSize += this.headerSize;
+
+    if (headersSize != null)
+    {
+      totalSize += headersSize;
+    }
+    else
+    {
+      totalSize += getType().array().length;
+      totalSize += Element.codedSizeLength(getSize());
+    }
     totalSize += getSize();
     return totalSize;
   }
@@ -289,16 +299,6 @@ public class Element
     return minSizeLength;
   }
 
-  public static byte[] makeEbmlCode(final byte[] typeID, final long size)
-  {
-    final int codedLen = codedSizeLength(size);
-    final byte[] ret = new byte[typeID.length + codedLen];
-    ArrayCopy.arraycopy(typeID, 0, ret, 0, typeID.length);
-    final byte[] codedSize = makeEbmlCodedSize(size);
-    ArrayCopy.arraycopy(codedSize, 0, ret, typeID.length, codedSize.length);
-    return ret;
-  }
-
   public static byte[] makeEbmlCodedSize(final long size)
   {
     final int len = codedSizeLength(size);
@@ -312,6 +312,7 @@ public class Element
     }
     // The first size bits should be clear, otherwise we have an error in the size determination.
     ret[0] |= 0x80 >> (len - 1);
+    LOG.trace("Ebml coded size {} for {}", EBMLReader.bytesToHex(ret), size);
     return ret;
   }
 
@@ -420,5 +421,10 @@ public class Element
       b--;
     }
     return ret;
+  }
+
+  public void setHeadersSize(final long headersSize)
+  {
+    this.headersSize = headersSize;
   }
 }

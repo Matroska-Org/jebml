@@ -30,7 +30,6 @@ import org.ebml.FloatElement;
 import org.ebml.MasterElement;
 import org.ebml.SignedIntegerElement;
 import org.ebml.StringElement;
-import org.ebml.BinaryElement;
 import org.ebml.UnsignedIntegerElement;
 import org.ebml.DateElement;
 import org.ebml.EBMLReader;
@@ -45,6 +44,12 @@ public class MatroskaFile
    */
   public static final int CLUSTER_TRACK_SEARCH_COUNT = 4;
   protected static final Logger LOG = LoggerFactory.getLogger(MatroskaFile.class);
+
+  static
+  {
+    // References DocTypes to force static init of its memebers
+    MatroskaDocTypes.Void.getLevel();
+  }
 
   private final DataSource ioDS;
   private final EBMLReader reader;
@@ -375,7 +380,6 @@ public class MatroskaFile
       }
       else if (level2.isType(MatroskaDocTypes.BlockGroup.getType()))
       {
-        final BinaryElement blockElem = MatroskaDocTypes.Block.getInstance();
         long blockDuration = 0;
         long blockReference = 0;
         level3 = ((MasterElement) level2).readNextChild(reader);
@@ -384,8 +388,8 @@ public class MatroskaFile
         {
           if (level3.isType(MatroskaDocTypes.Block.getType()))
           {
-            blockElem.readData(ioDS);
-            block = new MatroskaBlock(blockElem.getData());
+            level3.readData(ioDS);
+            block = new MatroskaBlock(level3.getData());
             block.parseBlock();
 
           }

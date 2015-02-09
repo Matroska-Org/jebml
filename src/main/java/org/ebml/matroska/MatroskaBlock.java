@@ -40,6 +40,7 @@ public class MatroskaBlock
 
   public MatroskaBlock(final ByteBuffer data)
   {
+    LOG.trace("Block created with data {}, {}", data.limit(), data.position());
     this.data = data;
   }
 
@@ -106,6 +107,7 @@ public class MatroskaBlock
     // data = new byte[(int)(this.getSize() - HeaderSize)];
     // source.read(data, 0, data.length);
     // this.dataRead = true;
+    headerSize = data.position();
   }
 
   private int[] readEBMLLaceSizes(int index, final short laceCount)
@@ -181,27 +183,30 @@ public class MatroskaBlock
 
   public ByteBuffer getFrame(final int frame)
   {
+    int startOffset = headerSize;
+    int endOffset;
     if (sizes == null)
     {
       if (frame != 0)
       {
         throw new IllegalArgumentException("Tried to read laced frame on non-laced Block. MatroskaBlock.getFrame(frame > 0)");
       }
-      return data;
+      endOffset = headerSize + data.remaining();
     }
-
-    // Calc the frame data offset
-    int startOffset = headerSize;
-    for (int s = 0; s < frame; s++)
+    else
     {
-      startOffset += sizes[s];
+      // Calc the frame data offset
+      for (int s = 0; s < frame; s++)
+      {
+        startOffset += sizes[s];
+      }
+      endOffset = sizes[frame] + startOffset;
     }
 
     // Copy the frame data
     final ByteBuffer frameData = data.duplicate();
-    LOG.trace("Slicing frame data from {} to {} (cap: {})", startOffset, sizes[frame] + startOffset, data.capacity());
     frameData.position(startOffset);
-    frameData.limit(sizes[frame] + startOffset);
+    frameData.limit(endOffset);
     return frameData;
   }
 

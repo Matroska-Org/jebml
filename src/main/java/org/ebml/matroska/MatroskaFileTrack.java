@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MatroskaFileTrack
 {
-  private static final Logger LOG = LoggerFactory.getLogger(Element.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MatroskaFileTrack.class);
 
   private int trackNo = 1;
   private long trackUID = 1337;
@@ -75,7 +75,7 @@ public class MatroskaFileTrack
 
     public static TrackType fromOrdinal(final long l)
     {
-      LOG.info("Track type from ordinal: {}", l);
+      LOG.debug("Track type from ordinal: {}", l);
       switch ((int) l)
       {
         case 1:
@@ -285,9 +285,7 @@ public class MatroskaFileTrack
       else if (level3.isType(MatroskaDocTypes.TrackType.getType()))
       {
         level3.readData(ioDS);
-        LOG.info("Track type {}", EBMLReader.bytesToHex(level3.getData().array()));
         track.setTrackType(TrackType.fromOrdinal(((UnsignedIntegerElement) level3).getValue()));
-        LOG.info("Track type set to {}", track.getTrackType());
       }
       else if (level3.isType(MatroskaDocTypes.DefaultDuration.getType()))
       {
