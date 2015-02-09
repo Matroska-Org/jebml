@@ -88,6 +88,8 @@ class MatroskaSimpleBlock
         bs.set(5);
         break;
       case NONE:
+        LOG.trace("Lace mode none!");
+        break;
       default:
         break;
     }
@@ -117,11 +119,13 @@ class MatroskaSimpleBlock
 
   private ByteBuffer fixedEncodeLaceSizes()
   {
+    LOG.trace("Encoding fixed lace sizes");
     return ByteBuffer.allocate(1).put((byte) (frames.size() - 1));
   }
 
   private ByteBuffer xiphEncodeLaceSizes()
   {
+    LOG.trace("Encoding xiph lace sizes");
     final ByteBuffer buf = ByteBuffer.allocate(30);
     buf.put((byte) (frames.size() - 1));
     for (int i = 0; i < frames.size() - 1; ++i)
@@ -139,6 +143,7 @@ class MatroskaSimpleBlock
 
   private ByteBuffer ebmlEncodeLaceSizes()
   {
+    LOG.trace("Encoding ebml lace sizes");
     final ByteBuffer buf = ByteBuffer.allocate(30);
     buf.put((byte) (frames.size() - 1));
     for (int i = 0; i < frames.size() - 1; ++i)

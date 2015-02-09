@@ -20,12 +20,17 @@
 package org.ebml.matroska;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.ebml.EBMLReader;
 import org.ebml.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MatroskaBlock
 {
+  private static final Logger LOG = LoggerFactory.getLogger(MatroskaBlock.class);
+
   protected int[] sizes = null;
   protected int headerSize = 0;
   protected int blockTimecode = 0;
@@ -49,7 +54,8 @@ public class MatroskaBlock
     index = Element.codedSizeLength(trackNo);
     headerSize += index;
 
-    blockTimecode = data.getInt();
+    blockTimecode = data.getShort();
+    LOG.trace("Block belongs to track {} @ {}", trackNo, blockTimecode);
 
     final byte flagsByte = data.get();
     final int keyFlag = flagsByte & 0x80;
@@ -73,16 +79,17 @@ public class MatroskaBlock
       headerSize += 1;
       if (laceFlag == 0x02)
       { // Xiph Lacing
+        LOG.trace("Reading xiph lace sizes");
         sizes = readXiphLaceSizes(index, laceCount);
-
       }
       else if (laceFlag == 0x06)
       { // EBML Lacing
+        LOG.trace("Reading ebml lace sizes");
         sizes = readEBMLLaceSizes(index, laceCount);
-
       }
       else if (laceFlag == 0x04)
       { // Fixed Size Lacing
+        LOG.trace("Fixed lace sizes");
         sizes = new int[laceCount + 1];
         sizes[0] = (data.remaining() - headerSize) / (laceCount + 1);
         for (int s = 0; s < laceCount; s++)
@@ -94,6 +101,7 @@ public class MatroskaBlock
       {
         throw new RuntimeException("Unsupported lacing type flag.");
       }
+      LOG.trace("Lace sizes: {}", Arrays.toString(sizes));
     }
     // data = new byte[(int)(this.getSize() - HeaderSize)];
     // source.read(data, 0, data.length);
@@ -191,6 +199,7 @@ public class MatroskaBlock
 
     // Copy the frame data
     final ByteBuffer frameData = data.duplicate();
+    LOG.trace("Slicing frame data from {} to {} (cap: {})", startOffset, sizes[frame] + startOffset, data.capacity());
     frameData.position(startOffset);
     frameData.limit(sizes[frame] + startOffset);
     return frameData;
