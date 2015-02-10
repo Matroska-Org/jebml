@@ -8,6 +8,8 @@ import java.util.List;
 import org.ebml.BinaryElement;
 import org.ebml.EBMLReader;
 import org.ebml.Element;
+import org.ebml.MasterElement;
+import org.ebml.UnsignedIntegerElement;
 import org.ebml.io.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,8 @@ class MatroskaSimpleBlock
   private final List<MatroskaFileFrame> frames = new ArrayList<>();
   private int totalSize = 18;
 
+  private long duration = Long.MIN_VALUE;
+
   public MatroskaSimpleBlock()
   {
 
@@ -45,9 +49,30 @@ class MatroskaSimpleBlock
 
   Element toElement()
   {
+    if (isSimpleBlock())
+    {
+      return toSimpleBlock();
+    }
+    return toBlockGroup();
+  }
+
+  Element toSimpleBlock()
+  {
     final BinaryElement blockElem = MatroskaDocTypes.SimpleBlock.getInstance();
     blockElem.setData(createInnerData());
     return blockElem;
+  }
+
+  Element toBlockGroup()
+  {
+    final MasterElement blockGroupElem = MatroskaDocTypes.BlockGroup.getInstance();
+    final BinaryElement blockElem = MatroskaDocTypes.Block.getInstance();
+    blockElem.setData(createInnerData());
+    final UnsignedIntegerElement durationElem = MatroskaDocTypes.BlockDuration.getInstance();
+    durationElem.setValue(duration);
+    blockGroupElem.addChildElement(blockElem);
+    blockGroupElem.addChildElement(durationElem);
+    return blockGroupElem;
   }
 
   private ByteBuffer createInnerData()
@@ -202,13 +227,19 @@ class MatroskaSimpleBlock
     setTrackNumber(frame.getTrackNo());
     totalSize += frame.getData().remaining();
     frames.add(frame);
+    if (frame.getDuration() != Long.MIN_VALUE)
+    {
+      duration = frame.getDuration();
+    }
+
     if (frame.getData().remaining() > MAX_LACE_SIZE)
     {
       laceMode = MatroskaLaceMode.NONE;
       return false;
     }
     totalSize += 4;
-    return !(laceMode.equals(MatroskaLaceMode.NONE) || frames.size() > 8);
+
+    return !isSimpleBlock() || !(laceMode.equals(MatroskaLaceMode.NONE) || frames.size() > 8);
   }
 
   public int getTrackNumber()
@@ -229,5 +260,20 @@ class MatroskaSimpleBlock
   public void setKeyFrame(final boolean keyFrame)
   {
     this.keyFrame = keyFrame;
+  }
+
+  public long getDuration()
+  {
+    return duration;
+  }
+
+  public void setDuration(final long duration)
+  {
+    this.duration = duration;
+  }
+
+  public boolean isSimpleBlock()
+  {
+    return duration == Long.MIN_VALUE;
   }
 }

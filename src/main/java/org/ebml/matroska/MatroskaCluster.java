@@ -106,7 +106,7 @@ class MatroskaCluster
       boolean forceNew = true;
       long lastTimecode = 0;
       int lastTrackNumber = 0;
-      LOG.debug("Timecode for cluster set to {}", clusterTimecode);
+      LOG.trace("Timecode for cluster set to {}", clusterTimecode);
       for (final MatroskaFileFrame frame: frames)
       {
         frame.setTimecode(frame.getTimecode() - clusterTimecode);

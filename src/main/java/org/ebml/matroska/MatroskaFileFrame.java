@@ -51,7 +51,7 @@ public class MatroskaFileFrame
   /**
    * The duration of this frame, it should also be in ms
    */
-  private long duration;
+  private long duration = Long.MIN_VALUE;
 
   /**
    * List of references
