@@ -48,7 +48,7 @@ public class MatroskaFileWriter
     writeEBMLHeader();
     writeSegmentHeader();
     metaSeek = new MatroskaFileMetaSeek(ioDW.getFilePointer());
-    cueData = new MatroskaFileCues(ioDW.getFilePointer());
+    cueData = new MatroskaFileCues();
     metaSeek.write(ioDW);
     segmentInfoElem = new MatroskaSegmentInfo(ioDW.getFilePointer());
     metaSeek.addIndexedElement(MatroskaDocTypes.Info.getType(), ioDW.getFilePointer());
