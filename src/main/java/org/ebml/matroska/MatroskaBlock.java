@@ -52,7 +52,7 @@ public class MatroskaBlock
   {
     int index = 0;
     trackNo = (int) EBMLReader.readEBMLCode(data);
-    index = Element.codedSizeLength(trackNo);
+    index = Element.codedSizeLength(trackNo, 0);
     headerSize += index;
 
     blockTimecode = data.getShort();
@@ -121,7 +121,7 @@ public class MatroskaBlock
     final int startIndex = index;
 
     laceSizes[0] = (int) EBMLReader.readEBMLCode(data);
-    index += Element.codedSizeLength(laceSizes[0]);
+    index += Element.codedSizeLength(laceSizes[0], 0);
     laceSizes[laceCount] -= laceSizes[0];
 
     long firstEBMLSize = laceSizes[0];
@@ -129,7 +129,7 @@ public class MatroskaBlock
     for (int l = 0; l < laceCount - 1; l++)
     {
       lastEBMLSize = EBMLReader.readSignedEBMLCode(data);
-      index += Element.codedSizeLength(lastEBMLSize);
+      index += Element.codedSizeLength(lastEBMLSize, 0);
 
       firstEBMLSize += lastEBMLSize;
       laceSizes[l + 1] = (int) firstEBMLSize;

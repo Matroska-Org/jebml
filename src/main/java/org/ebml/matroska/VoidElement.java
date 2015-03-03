@@ -23,6 +23,7 @@ package org.ebml.matroska;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import org.ebml.EBMLReader;
 import org.ebml.Element;
 import org.ebml.io.DataWriter;
 
@@ -31,6 +32,9 @@ import org.ebml.io.DataWriter;
  */
 public class VoidElement extends Element
 {
+  private static final long MAX_SIZE = (long) (Math.pow(2, 56) - 2);
+  private long realSize;
+
   /*
    * Creates a new instance of Element
    * 
@@ -44,6 +48,30 @@ public class VoidElement extends Element
     setSize(size);
   }
 
+  /**
+   * @see Element#writeHeaderData(DataWriter)
+   */
+  @Override
+  public long writeHeaderData(final DataWriter writer)
+  {
+
+    int len = 0;
+
+    len += getType().remaining();
+
+    final byte[] encodedSize = Element.makeEbmlCodedSize(getSize(), (int) Math.min(realSize - len, 8));
+    // System.out.printf("Writing header for element %s with size %d (%s)\n", typeInfo.name, getTotalSize(), EBMLReader.bytesToHex(size));
+
+    len += encodedSize.length;
+    final ByteBuffer buf = ByteBuffer.allocate(len);
+    buf.put(getType());
+    buf.put(encodedSize);
+    buf.flip();
+    LOG.trace("Writing out header {}, {}", buf.remaining(), EBMLReader.bytesToHex(buf.array()));
+    writer.write(buf);
+    return len;
+  }
+
   @Override
   public long writeData(final DataWriter ioDW)
   {
@@ -55,8 +83,16 @@ public class VoidElement extends Element
   @Override
   public void setSize(final long size)
   {
-    super.setSize(size - Element.codedSizeLength(size) - type.remaining());
-    assert getTotalSize() == size;
+    if (size < 2 || size > MAX_SIZE)
+    {
+      throw new IllegalArgumentException("Size must be greater than 2 and less than (2^52 - 2)");
+    }
+    // In order to be able to create voids of every possible size, we must force the size field to be larger than required
+    // The simplest thing to do is to first force the size field to the maximum, 8 bytes. So a 9 byte void will have 0 "body" bytes
+    // but 1 byte type header and 8 bytes size header.
+    realSize = size;
+    long partialSize = size - type.remaining();
+    super.setSize(partialSize - Math.min(partialSize, 8));
   }
 
   public void reduceSize(final long size)

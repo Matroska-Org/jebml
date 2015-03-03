@@ -208,7 +208,7 @@ public class Element
     else
     {
       totalSize += getType().array().length;
-      totalSize += Element.codedSizeLength(getSize());
+      totalSize += Element.codedSizeLength(getSize(), 0);
     }
     totalSize += getSize();
     return totalSize;
@@ -301,7 +301,12 @@ public class Element
 
   public static byte[] makeEbmlCodedSize(final long size)
   {
-    final int len = codedSizeLength(size);
+    return makeEbmlCodedSize(size, 0);
+  }
+
+  public static byte[] makeEbmlCodedSize(final long size, int minSizeLen)
+  {
+    final int len = codedSizeLength(size, minSizeLen);
     final byte[] ret = new byte[len];
     // byte[] packedSize = packIntUnsigned(size);
     long mask = 0x00000000000000FFL;
@@ -371,7 +376,7 @@ public class Element
     return 8;
   }
 
-  public static int codedSizeLength(final long value)
+  public static int codedSizeLength(final long value, int minSizeLen)
   {
     int codedSize = 0;
     if (value < 127)
@@ -390,9 +395,9 @@ public class Element
     {
       codedSize = 4;
     }
-    if ((minSizeLength > 0) && (codedSize <= minSizeLength))
+    if ((minSizeLen > 0) && (codedSize <= minSizeLen))
     {
-      codedSize = minSizeLength;
+      codedSize = minSizeLen;
     }
 
     return codedSize;
