@@ -48,7 +48,7 @@ findbugsTest {
     }
 }
 
-project.version = '2.0'
+project.version = '2.1'
 
 bundle {
     instructions << [
