@@ -19,7 +19,6 @@
  */
 package org.ebml.matroska;
 
-import org.ebml.Element;
 import org.ebml.MasterElement;
 import org.ebml.StringElement;
 import org.ebml.UnsignedIntegerElement;
@@ -47,8 +46,9 @@ public class MatroskaFileWriter
     ioDW = outputDataWriter;
     writeEBMLHeader();
     writeSegmentHeader();
-    metaSeek = new MatroskaFileMetaSeek(ioDW.getFilePointer());
-    cueData = new MatroskaFileCues();
+    long endOfSegmentHeader = ioDW.getFilePointer();
+    metaSeek = new MatroskaFileMetaSeek(endOfSegmentHeader);
+    cueData = new MatroskaFileCues(endOfSegmentHeader);
     metaSeek.write(ioDW);
     segmentInfoElem = new MatroskaSegmentInfo(ioDW.getFilePointer());
     metaSeek.addIndexedElement(MatroskaDocTypes.Info.getType(), ioDW.getFilePointer());
@@ -193,9 +193,7 @@ public class MatroskaFileWriter
   {
     flush();
 
-    long cuesPosition = ioDW.getFilePointer();
-    Element cues = cueData.writeAndReturnElement(ioDW);
-    metaSeek.addIndexedElement(cues, cuesPosition);
+    cueData.write(ioDW, metaSeek);
     metaSeek.update(ioDW);
     segmentInfoElem.update(ioDW);
     tracks.update(ioDW);
