@@ -48,6 +48,7 @@ findbugsTest {
     }
 }
 
+// Workaround so that packageinfo files get included for OSGi package versions
 sourceSets {
     main {
         resources.srcDirs = java.srcDirs
