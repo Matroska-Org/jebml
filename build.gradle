@@ -48,6 +48,13 @@ findbugsTest {
     }
 }
 
+sourceSets {
+    main {
+        resources.srcDirs = java.srcDirs
+        output.resourcesDir = output.classesDir
+    }
+}
+
 project.version = '2.1'
 
 bundle {
@@ -58,6 +65,7 @@ bundle {
         'Export-Package': 'org.ebml.*;-split-package:=merge-first',
         'Import-Package': '*;resolution:=optional',
         '-nodefaultversion': true,
-        '-noee': true
+        '-noee': true,
+        'majorMinor' : 1
     ]
 }
