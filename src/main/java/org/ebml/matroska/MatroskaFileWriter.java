@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Summary description for MatroskaFileWriter.
+ * Primary API entrypoint for writing Matroska files.
  */
 public class MatroskaFileWriter
 {
@@ -41,6 +41,9 @@ public class MatroskaFileWriter
   private final MatroskaSegmentInfo segmentInfoElem;
   private final MatroskaFileTracks tracks;
 
+  /**
+   * @param outputDataWriter DataWriter to write out to.
+   */
   public MatroskaFileWriter(final DataWriter outputDataWriter)
   {
     ioDW = outputDataWriter;
@@ -119,8 +122,7 @@ public class MatroskaFileWriter
   }
 
   /**
-   * Sets the time scale used in this file. This is the number of nanoseconds represented by the timecode unit in frames. Defaults to 1,000,000. Must
-   * be set before init() is called.
+   * Sets the time scale used in this file. This is the number of nanoseconds represented by the timecode unit in frames. Defaults to 1,000,000.
    * 
    * @param timecodeScale
    */
@@ -135,7 +137,7 @@ public class MatroskaFileWriter
   }
 
   /**
-   * Sets the duration of the file. Note that this may only be set with any effect prior to the init() method being called. Optional.
+   * Sets the duration of the file. Optional.
    * 
    * @param duration
    */
@@ -145,7 +147,7 @@ public class MatroskaFileWriter
   }
 
   /**
-   * Adds a track to the file. Note that this is required for every track to be included, and must be done prior to the init() method being called.
+   * Adds a track to the file. You may add tracks at any time before close()ing, even after adding frames for the track.
    * 
    * @param track
    */
@@ -154,11 +156,17 @@ public class MatroskaFileWriter
     tracks.addTrack(track);
   }
 
+  /**
+   * Adds the silent track notation for the given track to subsequent clusters, note that this has little effect on most players
+   */
   public void silenceTrack(final long trackNumber)
   {
     cluster.silenceTrack(trackNumber);
   }
 
+  /**
+   * Removes the silent track notation for this track
+   */
   public void unsilenceTrack(final long trackNumber)
   {
     cluster.unsilenceTrack(trackNumber);
@@ -177,6 +185,9 @@ public class MatroskaFileWriter
     }
   }
 
+  /**
+   * Flushes pending content to disk and starts a new cluster. This is typically not necessary to call manually. 
+   */
   public void flush()
   {
     final long clusterPos = ioDW.getFilePointer();
@@ -186,8 +197,7 @@ public class MatroskaFileWriter
   }
 
   /**
-   * Finalizes the file by writing the final headers, index, and last few frames.
-   *
+   * Finalizes the file by writing the final headers, index, and flushing data to the writer.
    */
   public void close()
   {

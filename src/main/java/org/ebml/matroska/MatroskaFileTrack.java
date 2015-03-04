@@ -34,7 +34,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Matroska Track Class
+ * <p>Matroska Track Class </p>
+ * <p>Mandatory fields are:
+ * <ul>
+ *    <li>Track Type</li>
+ *    <li>Codec ID</li>
+ *    <li>Default duration</li>
+ * </ul>
+ * </p>
+ * <p>Note that if the TrackType is Audio, you must add the AudioTrack member. Likewise VideoTrack for Video.</p>
  */
 public class MatroskaFileTrack
 {

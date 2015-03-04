@@ -26,23 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Matroska Frame, holds a Matroska frame timecode, duration, and data
+ * Matroska Frame, holds a Matroska frame timecode, duration, and data. <br>
+ * Note that the data, track number, and timecode fields are all mandatory. 
  */
 public class MatroskaFileFrame
 {
   private static final Logger LOG = LoggerFactory.getLogger(MatroskaFileFrame.class);
 
-  /**
-   * Matroska Frame Puller interface
-   */
-  public interface MatroskaFramePuller
-  {
-    void pushNewMatroskaFrame(MatroskaFileFrame frame);
-  };
-
-  /**
-   * The track this frame belongs to
-   */
   private int trackNo;
   /**
    * A timecode, it should be in ms
@@ -94,26 +84,49 @@ public class MatroskaFileFrame
     }
   }
 
+  /**
+   * @return true if this is a key frame
+   */
   public boolean isKeyFrame()
   {
     return keyFrame;
   }
 
+  /**
+   * @param keyFrame true if this is a key frame
+   */
+  public void setKeyFrame(final boolean keyFrame)
+  {
+    this.keyFrame = keyFrame;
+  }
+
+  /**
+   * @return The track this frame belongs to
+   */
   public int getTrackNo()
   {
     return trackNo;
   }
 
+  /**
+   * @param trackNo The track this frame belongs to
+   */
   public void setTrackNo(final int trackNo)
   {
     this.trackNo = trackNo;
   }
 
+  /**
+   * @return The list of frames that this frame references
+   */
   public ArrayList<Long> getReferences()
   {
     return references;
   }
 
+  /**
+   * @param references Some frames that this frame references, added to the list.
+   */
   public void addReferences(final long... references)
   {
     for (final Long ref: references)
@@ -122,39 +135,53 @@ public class MatroskaFileFrame
     }
   }
 
+  /**
+   * @return the presentation timecode that this frame is associated with
+   */
   public long getTimecode()
   {
     return timecode;
   }
 
+  /**
+   * @param timecode the presentation timecode that this frame is associated with
+   */
   public void setTimecode(final long timecode)
   {
     this.timecode = timecode;
   }
 
+  /**
+   * @return duration of this frame
+   */
   public long getDuration()
   {
     return duration;
   }
 
+  /**
+   * @param duration duration of this frame
+   */
   public void setDuration(final long duration)
   {
     this.duration = duration;
   }
 
+  /**
+   * @return the data contained in this frame.
+   */
   public ByteBuffer getData()
   {
-    return data;
+    return data.duplicate();
   }
 
+  /**
+   * @param data the data associated with this frame
+   */
   public void setData(final ByteBuffer data)
   {
     LOG.trace("Setting data with size {}", data.remaining());
-    this.data = data;
+    this.data = data.duplicate();
   }
 
-  public void setKeyFrame(final boolean keyFrame)
-  {
-    this.keyFrame = keyFrame;
-  }
 }

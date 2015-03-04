@@ -85,7 +85,7 @@ public class VoidElement extends Element
   {
     if (size < 2 || size > MAX_SIZE)
     {
-      throw new IllegalArgumentException("Size must be greater than 2 and less than (2^52 - 2)");
+      throw new IllegalArgumentException("Size must be greater than one and less than (2^52 - 2)");
     }
     // In order to be able to create voids of every possible size, we must force the size field to be larger than required
     // The simplest thing to do is to first force the size field to the maximum, 8 bytes. So a 9 byte void will have 0 "body" bytes
