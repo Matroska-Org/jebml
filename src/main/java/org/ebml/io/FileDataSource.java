@@ -25,7 +25,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-public class FileDataSource implements DataSource
+public class FileDataSource implements DataSource, AutoCloseable
 {
   RandomAccessFile file = null;
   FileChannel fc = null;
@@ -125,5 +125,12 @@ public class FileDataSource implements DataSource
     {
       return -1;
     }
+  }
+
+  @Override
+  public void close() throws IOException
+  {
+    fc.close();
+    file.close();
   }
 }
