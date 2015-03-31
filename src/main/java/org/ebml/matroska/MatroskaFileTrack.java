@@ -458,7 +458,7 @@ public class MatroskaFileTrack
     trackEntryElem.addChildElement(trackLangElem);
     trackEntryElem.addChildElement(trackCodecIDElem);
 
-    if (codecPrivate != null)
+    if (codecPrivate != null && codecPrivate.hasRemaining())
     {
       final BinaryElement trackCodecPrivateElem = MatroskaDocTypes.CodecPrivate.getInstance();
       trackCodecPrivateElem.setData(this.getCodecPrivate());
