@@ -20,19 +20,19 @@
 package org.ebml.matroska;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Queue;
-import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.ebml.DateElement;
+import org.ebml.EBMLReader;
 import org.ebml.Element;
 import org.ebml.FloatElement;
 import org.ebml.MasterElement;
 import org.ebml.SignedIntegerElement;
 import org.ebml.StringElement;
 import org.ebml.UnsignedIntegerElement;
-import org.ebml.DateElement;
-import org.ebml.EBMLReader;
 import org.ebml.io.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,10 +122,10 @@ public class MatroskaFile
     if (level0.isType(MatroskaDocTypes.Segment.getType()))
     {
       level1 = ((MasterElement) level0).readNextChild(reader);
-      System.out.println("Got segment element");
+      LOG.debug("Got segment element");
       while (level1 != null)
       {
-        System.out.printf("Got %s element in segment\n", level1.getElementType().getName());
+        LOG.debug("Got {} element in segment", level1.getElementType().getName());
         if (level1.isType(MatroskaDocTypes.Info.getType()))
         {
           parseSegmentInfo(level1, level2);

@@ -276,7 +276,7 @@ public class MatroskaFileTrack
     Element level3 = ((MasterElement) level2).readNextChild(reader);
     Element level4 = null;
     final MatroskaFileTrack track = new MatroskaFileTrack();
-    System.out.println("Reading track from doc!");
+    LOG.debug("Reading track from doc!");
     while (level3 != null)
     {
       if (level3.isType(MatroskaDocTypes.TrackNumber.getType()))
@@ -398,7 +398,7 @@ public class MatroskaFileTrack
       level3.skipData(ioDS);
       level3 = ((MasterElement) level2).readNextChild(reader);
     }
-    System.out.println("Read track from doc!");
+    LOG.debug("Read track from doc!");
     return track;
   }
 
