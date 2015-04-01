@@ -323,38 +323,8 @@ public class Element
 
   public static int getMinByteSize(final long value)
   {
-    if (value <= 0x7F && value >= 0x80)
-    {
-      return 1;
-    }
-    else if (value <= 0x7FFF && value >= 0x8000)
-    {
-      return 2;
-    }
-    else if (value <= 0x7FFFFF && value >= 0x800000)
-    {
-      return 3;
-    }
-    else if (value <= 0x7FFFFFFF && value >= 0x80000000)
-    {
-      return 4;
-    }
-    else if (value <= 0x7FFFFFFFFFL && value >= 0x8000000000L)
-    {
-      return 5;
-    }
-    else if (value <= 0x7FFFFFFFFFFFL && value >= 0x800000000000L)
-    {
-      return 6;
-    }
-    else if (value <= 0x7FFFFFFFFFFFFFL && value >= 0x80000000000000L)
-    {
-      return 7;
-    }
-    else
-    {
-      return 8;
-    }
+    long absValue = Math.abs(value);
+    return getMinByteSizeUnsigned(absValue << 1);
   }
 
   public static int getMinByteSizeUnsigned(final long value)
