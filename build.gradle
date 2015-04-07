@@ -56,7 +56,7 @@ sourceSets {
     }
 }
 
-project.version = '2.1'
+project.version = '2.2'
 
 bundle {
     instructions << [
