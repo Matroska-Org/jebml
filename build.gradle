@@ -1,0 +1,72 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'findbugs'
+apply plugin: 'checkstyle'
+apply plugin: 'org.dm.bundle'
+
+repositories {
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.dm.gradle:gradle-bundle-plugin:0.6.2'
+    }
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.5'
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-core:1.9.+'
+    testRuntime 'ch.qos.logback:logback-classic:1.1.2'
+}
+
+checkstyleMain {
+    configFile = file("tools/csMain.xml")
+}
+checkstyleTest {
+    configFile = file("tools/csTest.xml")
+}
+findbugs {
+    toolVersion = "3.+"
+    effort = "max"
+    reportLevel = "high"
+}
+findbugsMain {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+findbugsTest {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
+
+// Workaround so that packageinfo files get included for OSGi package versions
+sourceSets {
+    main {
+        resources.srcDirs = java.srcDirs
+        output.resourcesDir = output.classesDir
+    }
+}
+
+project.version = '2.2'
+
+bundle {
+    instructions << [
+        'Bundle-Name'   : 'JEBML',
+        'Bundle-Version': version,
+        'Bundle-License': 'LGPLv2',
+        'Export-Package': 'org.ebml.*;-split-package:=merge-first',
+        'Import-Package': '*;resolution:=optional',
+        '-nodefaultversion': true,
+        '-noee': true,
+        'majorMinor' : 1
+    ]
+}
