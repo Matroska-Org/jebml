@@ -146,7 +146,7 @@ public class MatroskaFile
           break;
 
         }
-        else if (level1.isType(MatroskaDocTypes.Tag.getType()))
+        else if (level1.isType(MatroskaDocTypes.Tags.getType()))
         {
           parseTags(level1, level2);
 
