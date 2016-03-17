@@ -23,7 +23,7 @@ class MatroskaSimpleBlock
   private int trackNumber = 0;
   private short timecode = 0;
   private boolean keyFrame = true;
-  private MatroskaLaceMode laceMode = MatroskaLaceMode.EBML;
+  private MatroskaLaceMode laceMode = MatroskaLaceMode.NONE;
   private boolean invisible = false;
   private boolean discardable = false;
   private final List<MatroskaFileFrame> frames = new ArrayList<>();
