@@ -68,7 +68,7 @@ publishing {
   }
 }
 
-project.version = '2.3.0'
+project.version = '2.2'
 
 bundle {
     instructions << [
