@@ -28,6 +28,7 @@ public class MatroskaFileWriterTest
   private File destination;
   private FileDataWriter ioDW;
   private MatroskaFileTrack testTrack;
+  private MatroskaFileTagEntry testTag;
   private int timecode = 1337;
 
   @Before
@@ -40,6 +41,11 @@ public class MatroskaFileWriterTest
     testTrack.setTrackType(TrackType.SUBTITLE);
     testTrack.setCodecID("some subtitle codec");
     testTrack.setDefaultDuration(33);
+    MatroskaFileSimpleTag simpleTag = new MatroskaFileSimpleTag();
+    simpleTag.setName("TITLE");
+    simpleTag.setValue("Canon in D");
+    testTag = new MatroskaFileTagEntry();
+    testTag.addSimpleTag(simpleTag);
   }
 
   @After
@@ -55,6 +61,7 @@ public class MatroskaFileWriterTest
     final MatroskaFileWriter writer = new MatroskaFileWriter(ioDW);
     writer.addTrack(testTrack);
     writer.addFrame(generateFrame("I know a song...", 42));
+    writer.addTag(testTag);
     writer.close();
 
     final FileDataSource inputDataSource = new FileDataSource(destination.getPath());
