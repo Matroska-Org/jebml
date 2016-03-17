@@ -463,7 +463,6 @@ public class MatroskaFileTrack
       final BinaryElement trackCodecPrivateElem = MatroskaDocTypes.CodecPrivate.getInstance();
       trackCodecPrivateElem.setData(this.getCodecPrivate());
       trackEntryElem.addChildElement(trackCodecPrivateElem);
-
     }
 
     final UnsignedIntegerElement trackDefaultDurationElem = MatroskaDocTypes.DefaultDuration.getInstance();

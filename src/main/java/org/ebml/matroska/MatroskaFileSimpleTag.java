@@ -20,12 +20,43 @@
 package org.ebml.matroska;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MatroskaFileSimpleTag
 {
-  public String name;
-  public String value;
-  public ArrayList<MatroskaFileSimpleTag> children = new ArrayList<>();
+  private String name;
+  private String value;
+  private List<MatroskaFileSimpleTag> children = new ArrayList<>();
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(final String name)
+  {
+    this.name = name;
+  }
+
+  public String getValue()
+  {
+    return value;
+  }
+
+  public void setValue(final String value)
+  {
+    this.value = value;
+  }
+
+  public List<MatroskaFileSimpleTag> getChildren()
+  {
+    return children;
+  }
+
+  public void setChildren(final List<MatroskaFileSimpleTag> children)
+  {
+    this.children = children;
+  }
 
   public String toString(int depth)
   {
