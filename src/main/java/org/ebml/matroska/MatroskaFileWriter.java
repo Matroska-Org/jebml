@@ -40,6 +40,7 @@ public class MatroskaFileWriter
   private final MatroskaCluster cluster;
   private final MatroskaSegmentInfo segmentInfoElem;
   private final MatroskaFileTracks tracks;
+  private final MatroskaFileTags tags;
 
   /**
    * @param outputDataWriter DataWriter to write out to.
@@ -59,6 +60,9 @@ public class MatroskaFileWriter
     metaSeek.addIndexedElement(MatroskaDocTypes.Tracks.getType(), ioDW.getFilePointer());
     tracks = new MatroskaFileTracks(ioDW.getFilePointer());
     tracks.writeTracks(ioDW);
+    metaSeek.addIndexedElement(MatroskaDocTypes.Tags.getType(), ioDW.getFilePointer());
+    tags = new MatroskaFileTags(ioDW.getFilePointer());
+    tags.writeTags(ioDW);
     cluster = new MatroskaCluster();
     cluster.setLimitParameters(5000, 128 * 1024);
     metaSeek.addIndexedElement(MatroskaDocTypes.Cluster.getType(), ioDW.getFilePointer());
@@ -116,6 +120,11 @@ public class MatroskaFileWriter
     tracks.update(ioDW);
   }
 
+  void writeTags()
+  {
+    tags.update(ioDW);
+  }
+
   public long getTimecodeScale()
   {
     return segmentInfoElem.getTimecodeScale();
@@ -154,6 +163,16 @@ public class MatroskaFileWriter
   public void addTrack(final MatroskaFileTrack track)
   {
     tracks.addTrack(track);
+  }
+
+  /**
+   * Adds a tag to the file. You may add tags at any time before close()ing.
+   * 
+   * @param tag
+   */
+  public void addTag(final MatroskaFileTagEntry tag)
+  {
+    tags.addTag(tag);
   }
 
   /**
@@ -207,5 +226,6 @@ public class MatroskaFileWriter
     metaSeek.update(ioDW);
     segmentInfoElem.update(ioDW);
     tracks.update(ioDW);
+    tags.update(ioDW);
   }
 }

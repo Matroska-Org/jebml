@@ -20,13 +20,46 @@
 package org.ebml.matroska;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import org.ebml.Element;
+import org.ebml.MasterElement;
+import org.ebml.UTF8StringElement;
 
 public class MatroskaFileTagEntry
 {
   public ArrayList<Long> trackUID = new ArrayList<>();
   public ArrayList<Long> chapterUID = new ArrayList<>();
   public ArrayList<Long> attachmentUID = new ArrayList<>();
-  public ArrayList<MatroskaFileSimpleTag> simpleTags = new ArrayList<>();
+  private List<MatroskaFileSimpleTag> simpleTags = new ArrayList<>();
+
+  public void addSimpleTag(final MatroskaFileSimpleTag simpleTag)
+  {
+    simpleTags.add(simpleTag);
+  }
+
+  Element toElement()
+  {
+    final MasterElement tagEntryElem = MatroskaDocTypes.Tag.getInstance();
+
+    for (MatroskaFileSimpleTag simpleTag : simpleTags)
+    {
+      final MasterElement simpleTagEntryElem = MatroskaDocTypes.SimpleTag.getInstance();
+
+      final UTF8StringElement simpleTagNameElem = MatroskaDocTypes.TagName.getInstance();
+      simpleTagNameElem.setValue(simpleTag.getName());
+
+      final UTF8StringElement simpleTagStringElem = MatroskaDocTypes.TagString.getInstance();
+      simpleTagStringElem.setValue(simpleTag.getValue());
+
+      simpleTagEntryElem.addChildElement(simpleTagNameElem);
+      simpleTagEntryElem.addChildElement(simpleTagStringElem);
+
+      tagEntryElem.addChildElement(simpleTagEntryElem);
+    }
+
+    return tagEntryElem;
+  }
 
   @Override
   public String toString()

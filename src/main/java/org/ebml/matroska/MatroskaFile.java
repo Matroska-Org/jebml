@@ -129,12 +129,10 @@ public class MatroskaFile
         if (level1.isType(MatroskaDocTypes.Info.getType()))
         {
           parseSegmentInfo(level1, level2);
-
         }
         else if (level1.isType(MatroskaDocTypes.Tracks.getType()))
         {
           parseTracks(level1, level2);
-
         }
         else if (level1.isType(MatroskaDocTypes.Cluster.getType()))
         {
@@ -144,12 +142,10 @@ public class MatroskaFile
           }
           // Break out of this loop, we should only parse the first cluster
           break;
-
         }
-        else if (level1.isType(MatroskaDocTypes.Tag.getType()))
+        else if (level1.isType(MatroskaDocTypes.Tags.getType()))
         {
           parseTags(level1, level2);
-
         }
 
         level1.skipData(ioDS);
@@ -547,13 +543,11 @@ public class MatroskaFile
               {
                 level4.readData(ioDS);
                 tag.trackUID.add(new Long(((UnsignedIntegerElement) level4).getValue()));
-
               }
               else if (level4.isType(MatroskaDocTypes.TagChapterUID.getType()))
               {
                 level4.readData(ioDS);
                 tag.chapterUID.add(new Long(((UnsignedIntegerElement) level4).getValue()));
-
               }
               else if (level4.isType(MatroskaDocTypes.TagAttachmentUID.getType()))
               {
@@ -564,11 +558,10 @@ public class MatroskaFile
               level4.skipData(ioDS);
               level4 = ((MasterElement) level3).readNextChild(reader);
             }
-
           }
           else if (level3.isType(MatroskaDocTypes.SimpleTag.getType()))
           {
-            tag.simpleTags.add(parseTagsSimpleTag(level3, level4));
+            tag.addSimpleTag(parseTagsSimpleTag(level3, level4));
           }
           level3.skipData(ioDS);
           level3 = ((MasterElement) level2).readNextChild(reader);
@@ -591,14 +584,14 @@ public class MatroskaFile
       if (level4.isType(MatroskaDocTypes.TagName.getType()))
       {
         level4.readData(ioDS);
-        simpleTag.name = ((StringElement) level4).getValue();
-
+        String tagName = ((StringElement) level4).getValue();
+        simpleTag.setName(tagName);
       }
       else if (level4.isType(MatroskaDocTypes.TagString.getType()))
       {
         level4.readData(ioDS);
-        simpleTag.value = ((StringElement) level4).getValue();
-
+        String tagString = ((StringElement) level4).getValue();
+        simpleTag.setValue(tagString);
       }
 
       level4.skipData(ioDS);
