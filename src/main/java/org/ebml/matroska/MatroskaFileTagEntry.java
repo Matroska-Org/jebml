@@ -40,16 +40,19 @@ public class MatroskaFileTagEntry
 
   Element toElement()
   {
-    final MasterElement tagEntryElem = MatroskaDocTypes.Tag.getInstance();
+    MasterElement tagEntryElem = MatroskaDocTypes.Tag.getInstance();
 
+    MasterElement targetsEntryElem = MatroskaDocTypes.Targets.getInstance();
+    tagEntryElem.addChildElement(targetsEntryElem);
+    
     for (MatroskaFileSimpleTag simpleTag : simpleTags)
     {
-      final MasterElement simpleTagEntryElem = MatroskaDocTypes.SimpleTag.getInstance();
+      MasterElement simpleTagEntryElem = MatroskaDocTypes.SimpleTag.getInstance();
 
-      final UTF8StringElement simpleTagNameElem = MatroskaDocTypes.TagName.getInstance();
+      UTF8StringElement simpleTagNameElem = MatroskaDocTypes.TagName.getInstance();
       simpleTagNameElem.setValue(simpleTag.getName());
 
-      final UTF8StringElement simpleTagStringElem = MatroskaDocTypes.TagString.getInstance();
+      UTF8StringElement simpleTagStringElem = MatroskaDocTypes.TagString.getInstance();
       simpleTagStringElem.setValue(simpleTag.getValue());
 
       simpleTagEntryElem.addChildElement(simpleTagNameElem);
