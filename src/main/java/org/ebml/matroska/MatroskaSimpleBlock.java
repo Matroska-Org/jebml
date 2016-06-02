@@ -36,11 +36,6 @@ class MatroskaSimpleBlock
 
   }
 
-  public MatroskaSimpleBlock(final long duration)
-  {
-
-  }
-
   static MatroskaSimpleBlock fromElement(final Element level3, final DataSource ioDS, final EBMLReader reader)
   {
     // TODO: make this work.
@@ -217,6 +212,7 @@ class MatroskaSimpleBlock
 
   public void setDiscardable(final boolean discardable)
   {
+    LOG.trace("Setting discardable to [{}] for SimpleBlock", discardable);
     this.discardable = discardable;
   }
 
@@ -225,6 +221,8 @@ class MatroskaSimpleBlock
     LOG.trace("Adding frame {}", frame.getData().remaining());
     setTimecode(frame.getTimecode());
     setTrackNumber(frame.getTrackNo());
+    setKeyFrame(isKeyFrame() && frame.isKeyFrame());
+    setDiscardable(!frame.isKeyFrame());
     totalSize += frame.getData().remaining();
     frames.add(frame);
     if (frame.getDuration() != Long.MIN_VALUE)
@@ -259,6 +257,7 @@ class MatroskaSimpleBlock
 
   public void setKeyFrame(final boolean keyFrame)
   {
+    LOG.trace("Setting keyFrame to [{}] for SimpleBlock", keyFrame);
     this.keyFrame = keyFrame;
   }
 
