@@ -85,12 +85,13 @@ public class EBMLReader
     this.source = source;
   }
 
-  public static String bytesToHex(final byte[] bytes)
+  public static String bytesToHex(final ByteBuffer data)
   {
-    final char[] hexChars = new char[bytes.length * 2];
-    for (int j = 0; j < bytes.length; j++)
+    ByteBuffer read = data.asReadOnlyBuffer();
+    final char[] hexChars = new char[data.remaining() * 2];
+    for (int j = 0; read.hasRemaining(); j++)
     {
-      final int v = bytes[j] & 0xFF;
+      final int v = read.get() & 0xFF;
       hexChars[j * 2] = HEX_ARRAY[v >>> 4];
       hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
     }
@@ -122,14 +123,14 @@ public class EBMLReader
     if (elementSize == 0)
     {
       // Zero sized element is valid
-      LOG.error("Invalid element size for {}", elem.typeInfo.getName());
+      LOG.error("Invalid element size for {}", elem.getElementType().getName());
     }
     final long end = source.getFilePointer();
 
     // Set it's size
     elem.setSize(elementSize);
     elem.setHeadersSize(end - position);
-    LOG.trace("Read element {} with size {}", elem.typeInfo.getName(), elem.getTotalSize());
+    LOG.trace("Read element {} with size {}", elem.getElementType().getName(), elem.getTotalSize());
 
     // Setup a buffer for it's data
     // byte[] elementData = new byte[(int)elementSize];
@@ -239,17 +240,16 @@ public class EBMLReader
     {
       return 0;
     }
-    data.mark();
+    ByteBuffer read = data.asReadOnlyBuffer();
 
     // Put this into a long
     long size = 0;
-    for (int i = data.remaining() - 1; i >= 0; i--)
+    for (int i = read.remaining() - 1; i >= 0; i--)
     {
-      final long n = data.get() & 0xFF;
+      final long n = read.get() & 0xFF;
       size = size | (n << (8 * i));
     }
-    data.reset();
-    LOG.trace("Parsed ebml code {} as {}", bytesToHex(data.array()), size);
+    LOG.trace("Parsed ebml code {} as {}", bytesToHex(data), size);
     return size;
   }
 
@@ -293,8 +293,9 @@ public class EBMLReader
    */
   public static long readSignedEBMLCode(final ByteBuffer source)
   {
+    ByteBuffer read = source.asReadOnlyBuffer();
     // Begin loop with byte set to newly read byte.
-    final byte firstByte = source.get();
+    final byte firstByte = read.get();
     final int numBytes = readEBMLCodeSize(firstByte);
     if (numBytes == 0)
     {
@@ -311,7 +312,7 @@ public class EBMLReader
     if (numBytes > 1)
     {
       // Read the rest of the size.
-      data.put(source);
+      data.put(read);
     }
     data.flip();
     // Put this into a long

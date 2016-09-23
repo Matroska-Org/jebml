@@ -43,12 +43,12 @@ public class Element
   protected static final Logger LOG = LoggerFactory.getLogger(Element.class);
   private static int minSizeLength = 0;
 
-  protected Element parent;
-  protected ProtoType<?> typeInfo;
-  protected ByteBuffer type;
-  protected long size = 0;
-  protected ByteBuffer data = null;
-  protected boolean dataRead = false;
+  private Element parent;
+  private ProtoType<?> typeInfo;
+  private ByteBuffer type;
+  private long size = 0;
+  private ByteBuffer data = null;
+  private boolean dataRead = false;
   private Long headersSize = null;
 
   /** Creates a new instance of Element */
@@ -108,7 +108,7 @@ public class Element
     buf.put(getType());
     buf.put(encodedSize);
     buf.flip();
-    LOG.trace("Writing out header {}, {}", buf.remaining(), EBMLReader.bytesToHex(buf.array()));
+    LOG.trace("Writing out header {}, {}", buf.remaining(), EBMLReader.bytesToHex(buf));
     writer.write(buf);
     return len;
   }
@@ -120,7 +120,7 @@ public class Element
   {
     if (data == null)
     {
-      throw new NullPointerException(String.format("No data to write: %s : %s", typeInfo.getName(), Arrays.toString(this.type.array())));
+      throw new NullPointerException(String.format("No data to write: %s : %s", typeInfo.getName(), EBMLReader.bytesToHex(this.type)));
     }
     data.mark();
     try
@@ -142,7 +142,22 @@ public class Element
    */
   public ByteBuffer getData()
   {
-    return this.data.duplicate();
+    if (data != null)
+    {
+      return this.data.asReadOnlyBuffer();
+    }
+    return ByteBuffer.allocate(0);
+  }
+
+  public byte[] getDataArray()
+  {
+    if (data != null)
+    {
+      byte[] bytes = new byte[data.remaining()];
+      data.slice().get(bytes);
+      return bytes;
+    }
+    return new byte[0];
   }
 
   /**
@@ -217,7 +232,7 @@ public class Element
    */
   public ByteBuffer getType()
   {
-    return type.duplicate();
+    return type.asReadOnlyBuffer();
   }
 
   /**
@@ -312,7 +327,7 @@ public class Element
     }
     // The first size bits should be clear, otherwise we have an error in the size determination.
     ret[0] |= 0x80 >> (len - 1);
-    LOG.trace("Ebml coded size {} for {}", EBMLReader.bytesToHex(ret), size);
+    LOG.trace("Ebml coded size {} for {}", EBMLReader.bytesToHex(ByteBuffer.wrap(ret)), size);
     return ret;
   }
 

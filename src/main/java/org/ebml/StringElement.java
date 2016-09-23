@@ -59,7 +59,7 @@ public class StringElement extends BinaryElement
 
   public String getValue()
   {
-    return new String(data.array(), charset);
+    return new String(getDataArray(), charset);
   }
 
   public void setValue(final String value)

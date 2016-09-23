@@ -65,25 +65,18 @@ public class FloatElement extends BinaryElement
    */
   public double getValue()
   {
-    data.mark();
-    try
+    long elemSize = getSize();
+    if (elemSize == 4)
     {
-      if (size == 4)
-      {
-        return data.getFloat();
-      }
-      else if (size == 8)
-      {
-        return data.getDouble();
-      }
-      else
-      {
-        throw new ArithmeticException("80-bit floats are not supported");
-      }
+      return getData().getFloat();
     }
-    finally
+    else if (elemSize == 8)
     {
-      data.reset();
+      return getData().getDouble();
+    }
+    else
+    {
+      throw new ArithmeticException("80-bit floats are not supported");
     }
   }
 }
