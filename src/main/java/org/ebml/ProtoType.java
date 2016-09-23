@@ -64,6 +64,6 @@ public class ProtoType<T extends Element>
 
   public ByteBuffer getType()
   {
-    return type.duplicate();
+    return type.asReadOnlyBuffer();
   }
 }

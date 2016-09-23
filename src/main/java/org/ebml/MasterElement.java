@@ -29,16 +29,6 @@ public class MasterElement extends Element
   protected long usedSize = 0;
   protected ArrayList<Element> children = new ArrayList<>();
 
-  public MasterElement(final byte[] type)
-  {
-    super(type);
-  }
-
-  public MasterElement()
-  {
-    super();
-  }
-
   public Element readNextChild(final EBMLReader reader)
   {
     if (usedSize >= this.getSize())

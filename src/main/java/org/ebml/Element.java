@@ -52,11 +52,6 @@ public class Element
   private Long headersSize = null;
 
   /** Creates a new instance of Element */
-  public Element(final byte[] type)
-  {
-    this.type = ByteBuffer.wrap(type);
-  }
-
   public Element()
   {
   }
@@ -130,7 +125,7 @@ public class Element
     data.mark();
     try
     {
-      LOG.trace("Writing data {} bytes of {}", data.remaining(), EBMLReader.bytesToHex(data.array()));
+      LOG.trace("Writing data {} bytes", data.remaining());
       return writer.write(data);
     }
     finally
@@ -207,7 +202,7 @@ public class Element
     }
     else
     {
-      totalSize += getType().array().length;
+      totalSize += getType().remaining();
       totalSize += Element.codedSizeLength(getSize(), 0);
     }
     totalSize += getSize();

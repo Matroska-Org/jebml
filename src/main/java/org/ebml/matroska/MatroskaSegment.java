@@ -34,7 +34,8 @@ public class MatroskaSegment extends MasterElement
 
   public MatroskaSegment()
   {
-    super(MatroskaDocTypes.Segment.getType().array());
+    super();
+    setType(MatroskaDocTypes.Segment.getType());
   }
 
   /**
