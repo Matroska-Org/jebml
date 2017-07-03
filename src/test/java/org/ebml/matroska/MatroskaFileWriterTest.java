@@ -1,13 +1,5 @@
 package org.ebml.matroska;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-
 import org.ebml.EBMLReader;
 import org.ebml.Element;
 import org.ebml.MasterElement;
@@ -22,6 +14,14 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.Assert.assertEquals;
+
 public class MatroskaFileWriterTest
 {
   private static final Logger LOG = LoggerFactory.getLogger(MatroskaFileWriterTest.class);
@@ -35,7 +35,7 @@ public class MatroskaFileWriterTest
   public void setUp() throws Exception
   {
     destination = File.createTempFile("test", ".mkv");
-    ioDW = new FileDataWriter(destination.getPath());
+    ioDW = createDataWriter(destination);
     testTrack = new MatroskaFileTrack();
     testTrack.setTrackNo(42);
     testTrack.setTrackType(TrackType.SUBTITLE);
@@ -46,6 +46,10 @@ public class MatroskaFileWriterTest
     simpleTag.setValue("Canon in D");
     testTag = new MatroskaFileTagEntry();
     testTag.addSimpleTag(simpleTag);
+  }
+
+  protected FileDataWriter createDataWriter(File destination) throws Exception {
+    return new FileDataWriter(destination.getPath());
   }
 
   @After
@@ -60,8 +64,8 @@ public class MatroskaFileWriterTest
   {
     final MatroskaFileWriter writer = new MatroskaFileWriter(ioDW);
     writer.addTrack(testTrack);
-    writer.addFrame(generateFrame("I know a song...", 42));
     writer.addTag(testTag);
+    writer.addFrame(generateFrame("I know a song...", 42));
     writer.close();
 
     final FileDataSource inputDataSource = new FileDataSource(destination.getPath());
@@ -78,25 +82,28 @@ public class MatroskaFileWriterTest
   {
     final MatroskaFileWriter writer = new MatroskaFileWriter(ioDW);
     writer.addTrack(testTrack);
-    writer.addFrame(generateFrame("I know a song...", 42));
+
     final MatroskaFileTrack nextTrack = new MatroskaFileTrack();
     nextTrack.setTrackNo(2);
     nextTrack.setTrackType(TrackType.CONTROL);
     nextTrack.setCodecID("some logo thingy");
     nextTrack.setDefaultDuration(4242);
     writer.addTrack(nextTrack);
-    writer.addFrame(generateFrame("that gets on everybody's nerves", 2));
 
     final MatroskaFileTrack virtualTrack = new MatroskaFileTrack();
     virtualTrack.setTrackNo(3);
     virtualTrack.setTrackType(TrackType.CONTROL);
     virtualTrack.setCodecID("virtual tracky!");
     virtualTrack.setDefaultDuration(1313);
+
     final TrackOperation operation = new TrackOperation();
     operation.addVirtualTrackPart(42);
     operation.addVirtualTrackPart(2);
     virtualTrack.setOperation(operation);
     writer.addTrack(virtualTrack);
+
+    writer.addFrame(generateFrame("I know a song...", 42));
+    writer.addFrame(generateFrame("that gets on everybody's nerves", 2));
 
     writer.close();
 

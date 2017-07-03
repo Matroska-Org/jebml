@@ -26,6 +26,9 @@ import org.ebml.io.DataWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Primary API entrypoint for writing Matroska files.
  */
@@ -35,12 +38,18 @@ public class MatroskaFileWriter
 
   protected DataWriter ioDW;
 
-  private final MatroskaFileMetaSeek metaSeek;
-  private final MatroskaFileCues cueData;
-  private final MatroskaCluster cluster;
-  private final MatroskaSegmentInfo segmentInfoElem;
-  private final MatroskaFileTracks tracks;
-  private final MatroskaFileTags tags;
+  private MatroskaFileMetaSeek metaSeek;
+  private MatroskaFileCues cueData;
+  private MatroskaCluster cluster;
+  private MatroskaSegmentInfo segmentInfoElem;
+  private MatroskaFileTracks tracks;
+  private MatroskaFileTags tags;
+
+  private Long defferedTimecodeScale;
+  private Double defferedDuration;
+  private List<MatroskaFileTrack> defferedTracks;
+  private List<MatroskaFileTagEntry> defferedTags;
+  private boolean initialized = false;
 
   /**
    * @param outputDataWriter DataWriter to write out to.
@@ -48,24 +57,55 @@ public class MatroskaFileWriter
   public MatroskaFileWriter(final DataWriter outputDataWriter)
   {
     ioDW = outputDataWriter;
+  }
+
+  void initialize() {
+    if (initialized) {
+      return;
+    }
+
     writeEBMLHeader();
     writeSegmentHeader();
+
     long endOfSegmentHeader = ioDW.getFilePointer();
+
     metaSeek = new MatroskaFileMetaSeek(endOfSegmentHeader);
     cueData = new MatroskaFileCues(endOfSegmentHeader);
     metaSeek.write(ioDW);
+
     segmentInfoElem = new MatroskaSegmentInfo(ioDW.getFilePointer());
     metaSeek.addIndexedElement(MatroskaDocTypes.Info.getType(), ioDW.getFilePointer());
+    if (defferedTimecodeScale != null) {
+      segmentInfoElem.setTimecodeScale(defferedTimecodeScale);
+    }
+    if (defferedDuration != null) {
+      segmentInfoElem.setDuration(defferedDuration);
+    }
     segmentInfoElem.writeElement(ioDW);
+
     metaSeek.addIndexedElement(MatroskaDocTypes.Tracks.getType(), ioDW.getFilePointer());
     tracks = new MatroskaFileTracks(ioDW.getFilePointer());
+    if (defferedTracks != null) {
+      for (MatroskaFileTrack track : defferedTracks) {
+        tracks.addTrack(track);
+      }
+    }
     tracks.writeTracks(ioDW);
+
     metaSeek.addIndexedElement(MatroskaDocTypes.Tags.getType(), ioDW.getFilePointer());
     tags = new MatroskaFileTags(ioDW.getFilePointer());
+    if (defferedTags != null) {
+      for (MatroskaFileTagEntry tag : defferedTags) {
+        tags.addTag(tag);
+      }
+    }
     tags.writeTags(ioDW);
+
     cluster = new MatroskaCluster();
     cluster.setLimitParameters(5000, 128 * 1024);
     metaSeek.addIndexedElement(MatroskaDocTypes.Cluster.getType(), ioDW.getFilePointer());
+
+    initialized = true;
   }
 
   void writeEBMLHeader()
@@ -137,6 +177,13 @@ public class MatroskaFileWriter
    */
   public void setTimecodeScale(final long timecodeScale)
   {
+    if (initialized && !ioDW.isSeekable()) {
+      throw new UnsupportedOperationException("DataWriter isn't seekable, can't change timecodeScale after starting writing");
+    }
+    if (!initialized) {
+      defferedTimecodeScale = timecodeScale;
+      return;
+    }
     segmentInfoElem.setTimecodeScale(timecodeScale);
   }
 
@@ -152,26 +199,57 @@ public class MatroskaFileWriter
    */
   public void setDuration(final double duration)
   {
+    if (initialized && !ioDW.isSeekable()) {
+      throw new UnsupportedOperationException("DataWriter isn't seekable, can't change duration after starting writing");
+    }
+    if (!initialized) {
+      defferedDuration = duration;
+      return;
+    }
     segmentInfoElem.setDuration(duration);
   }
 
   /**
-   * Adds a track to the file. You may add tracks at any time before close()ing, even after adding frames for the track.
+   * Adds a track to the file.
+   * <p></p>
+   * You may add tracks at any time before close()ing, only if DataWriter is seekable.
+   * Otherwise you may add tracks only before frames.
    * 
    * @param track
    */
   public void addTrack(final MatroskaFileTrack track)
   {
+    if (initialized && !ioDW.isSeekable()) {
+      throw new UnsupportedOperationException("DataWriter isn't seekable, can't add track after starting writing");
+    }
+    if (!initialized) {
+      if (defferedTracks == null) {
+        defferedTracks = new ArrayList<>();
+      }
+      defferedTracks.add(track);
+      return;
+    }
     tracks.addTrack(track);
   }
 
   /**
-   * Adds a tag to the file. You may add tags at any time before close()ing.
+   * Adds a tag to the file. You may add tags at any time before close()ing, only if DataWriter is seekable.
+   * Otherwise you may add tags only before frames.
    * 
    * @param tag
    */
   public void addTag(final MatroskaFileTagEntry tag)
   {
+    if (initialized && !ioDW.isSeekable()) {
+      throw new UnsupportedOperationException("DataWriter isn't seekable, can't add tag after starting writing");
+    }
+    if (!initialized) {
+      if (defferedTags == null) {
+        defferedTags = new ArrayList<>();
+      }
+      defferedTags.add(tag);
+      return;
+    }
     tags.addTag(tag);
   }
 
@@ -180,6 +258,7 @@ public class MatroskaFileWriter
    */
   public void silenceTrack(final long trackNumber)
   {
+    initialize();
     cluster.silenceTrack(trackNumber);
   }
 
@@ -188,6 +267,7 @@ public class MatroskaFileWriter
    */
   public void unsilenceTrack(final long trackNumber)
   {
+    initialize();
     cluster.unsilenceTrack(trackNumber);
   }
 
@@ -198,6 +278,7 @@ public class MatroskaFileWriter
    */
   public void addFrame(final MatroskaFileFrame frame)
   {
+    initialize();
     if (!cluster.addFrame(frame))
     {
       flush();
@@ -209,6 +290,7 @@ public class MatroskaFileWriter
    */
   public void flush()
   {
+    initialize();
     final long clusterPos = ioDW.getFilePointer();
     cueData.addCue(clusterPos, cluster.getClusterTimecode(), cluster.getTracks());
     LOG.debug("Cluster flushing, timecode {}", cluster.getClusterTimecode());
@@ -223,9 +305,12 @@ public class MatroskaFileWriter
     flush();
 
     cueData.write(ioDW, metaSeek);
-    metaSeek.update(ioDW);
-    segmentInfoElem.update(ioDW);
-    tracks.update(ioDW);
-    tags.update(ioDW);
+
+    if (ioDW.isSeekable()) {
+      metaSeek.update(ioDW);
+      segmentInfoElem.update(ioDW);
+      tracks.update(ioDW);
+      tags.update(ioDW);
+    }
   }
 }
