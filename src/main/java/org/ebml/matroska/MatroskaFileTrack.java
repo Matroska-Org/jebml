@@ -19,19 +19,13 @@
  */
 package org.ebml.matroska;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-
-import org.ebml.BinaryElement;
-import org.ebml.EBMLReader;
-import org.ebml.Element;
-import org.ebml.FloatElement;
-import org.ebml.MasterElement;
-import org.ebml.StringElement;
-import org.ebml.UnsignedIntegerElement;
+import org.ebml.*;
 import org.ebml.io.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 /**
  * <p>Matroska Track Class </p>
@@ -114,6 +108,7 @@ public class MatroskaFileTrack
     private short pixelHeight;
     private short displayWidth = 0;
     private short displayHeight = 0;
+    private byte[] colourSpace = null;
 
     public short getPixelWidth()
     {
@@ -153,6 +148,14 @@ public class MatroskaFileTrack
     public void setDisplayHeight(final short displayHeight)
     {
       this.displayHeight = displayHeight;
+    }
+
+    public byte[] getColourSpace() {
+      return colourSpace;
+    }
+
+    public void setColourSpace(byte[] colourSpace) {
+      this.colourSpace = colourSpace;
     }
   }
 
@@ -354,6 +357,11 @@ public class MatroskaFileTrack
             level4.readData(ioDS);
             track.video.setDisplayHeight((short) ((UnsignedIntegerElement) level4).getValue());
           }
+          else if (level4.isType(MatroskaDocTypes.ColourSpace.getType()))
+          {
+            level4.readData(ioDS);
+            track.video.setColourSpace(((BinaryElement) level4).getDataArray());
+          }
 
           level4.skipData(ioDS);
           level4 = ((MasterElement) level3).readNextChild(reader);
@@ -505,10 +513,19 @@ public class MatroskaFileTrack
       final UnsignedIntegerElement trackVideoDisplayHeightElem = MatroskaDocTypes.DisplayHeight.getInstance();
       trackVideoDisplayHeightElem.setValue(this.video.getDisplayHeight());
 
+      BinaryElement colourSpaceElem = null;
+      if (this.video.getColourSpace() != null) {
+        colourSpaceElem = MatroskaDocTypes.ColourSpace.getInstance();
+        colourSpaceElem.setData(ByteBuffer.wrap(this.video.getColourSpace()));
+      }
+
       trackVideoElem.addChildElement(trackVideoPixelWidthElem);
       trackVideoElem.addChildElement(trackVideoPixelHeightElem);
       trackVideoElem.addChildElement(trackVideoDisplayWidthElem);
       trackVideoElem.addChildElement(trackVideoDisplayHeightElem);
+      if (colourSpaceElem != null) {
+        trackVideoElem.addChildElement(colourSpaceElem);
+      }
 
       trackEntryElem.addChildElement(trackVideoElem);
     }
