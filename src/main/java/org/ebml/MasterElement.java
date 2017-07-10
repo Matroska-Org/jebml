@@ -29,16 +29,6 @@ public class MasterElement extends Element
   protected long usedSize = 0;
   protected ArrayList<Element> children = new ArrayList<>();
 
-  public MasterElement(final byte[] type)
-  {
-    super(type);
-  }
-
-  public MasterElement()
-  {
-    super();
-  }
-
   public Element readNextChild(final EBMLReader reader)
   {
     if (usedSize >= this.getSize())
@@ -58,7 +48,7 @@ public class MasterElement extends Element
 
     usedSize += elem.getTotalSize();
 
-    LOG.trace("Read element {} of size {}: {} remaining", elem.typeInfo.getName(), elem.getTotalSize(), size - usedSize);
+    LOG.trace("Read element {} of size {}: {} remaining", elem.getElementType().getName(), elem.getTotalSize(), getSize() - usedSize);
     return elem;
   }
 
@@ -67,7 +57,7 @@ public class MasterElement extends Element
   public void skipData(final DataSource source)
   {
     // Skip the child elements
-    source.skip(size - usedSize);
+    source.skip(getSize() - usedSize);
   }
 
   @Override
@@ -85,6 +75,6 @@ public class MasterElement extends Element
   public void addChildElement(final Element elem)
   {
     children.add(elem);
-    size += elem.getTotalSize();
+    super.setSize(getSize() + elem.getTotalSize());
   }
 }

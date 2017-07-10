@@ -34,7 +34,7 @@ public class MatroskaSegmentInfo
     writingAppElem.setValue("Matroska File Writer v1.0");
 
     final StringElement muxingAppElem = MatroskaDocTypes.MuxingApp.getInstance();
-    muxingAppElem.setValue("JEBML v1.0");
+    muxingAppElem.setValue("JEBML v2.2");
 
     final DateElement dateElem = MatroskaDocTypes.DateUTC.getInstance();
     dateElem.setDate(segmentDate);

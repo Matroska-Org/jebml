@@ -42,7 +42,8 @@ public class BinaryElement extends Element
    */
   public BinaryElement(final byte[] type)
   {
-    super(type);
+    super();
+    setType(type);
   }
 
   public BinaryElement()

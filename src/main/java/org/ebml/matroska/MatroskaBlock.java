@@ -44,10 +44,6 @@ public class MatroskaBlock
     this.data = data;
   }
 
-  // public void readData(DataSource source) {
-  // parseBlock();
-  // }
-
   public void parseBlock()
   {
     int index = 0;

@@ -10,7 +10,7 @@ public class ProtoType<T extends Element>
 {
   private static final Logger LOG = LoggerFactory.getLogger(ProtoType.class);
   private static final HashMap<Long, ProtoType<? extends Element>> CLASS_MAP = new HashMap<>();
-  Class<T> clazz;
+  private final Class<T> clazz;
   private final ByteBuffer type;
 
   private final String name;
@@ -64,7 +64,6 @@ public class ProtoType<T extends Element>
 
   public ByteBuffer getType()
   {
-    return type;
+    return type.asReadOnlyBuffer();
   }
-
 }

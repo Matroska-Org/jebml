@@ -47,16 +47,12 @@ public class SignedIntegerElement extends BinaryElement
 
   public void setValue(final long value)
   {
-    // System.out.println(Long.toHexString(value));
     setData(ByteBuffer.wrap(packInt(value)));
-    /*
-     * for (int i = 0; i < data.length; i++) { System.out.print(Integer.toHexString(data[i]) + ", "); } System.out.print("\n");
-     */
   }
 
   public long getValue()
   {
-    final byte[] dataArray = data.array();
+    final byte[] dataArray = getDataArray();
     long l = 0;
     long tmp = 0;
     l |= ((long) dataArray[0] << (56 - ((8 - dataArray.length) * 8)));
@@ -66,8 +62,6 @@ public class SignedIntegerElement extends BinaryElement
       tmp >>>= 56 - (8 * (i - 1));
       l |= tmp;
     }
-    // System.out.println(Long.toHexString(l));
     return l;
   }
-
 }

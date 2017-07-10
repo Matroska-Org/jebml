@@ -3,8 +3,10 @@ apply plugin: 'maven'
 apply plugin: 'findbugs'
 apply plugin: 'checkstyle'
 apply plugin: 'org.dm.bundle'
+apply plugin: 'maven-publish'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -54,6 +56,16 @@ sourceSets {
         resources.srcDirs = java.srcDirs
         output.resourcesDir = output.classesDir
     }
+}
+
+publishing {
+  publications {
+    "${project.name}Jar"(MavenPublication) {
+      from components.java
+      version project.version.toString()
+      artifactId project.name
+    }
+  }
 }
 
 project.version = '2.2'

@@ -51,9 +51,9 @@ public class MockSource implements DataSource
   @Override
   public int read(final ByteBuffer buff)
   {
-    buffer.get(buff.array(), buff.position(), buff.remaining());
-    buff.position(buff.limit());
-    return buff.remaining();
+    int bytes = buffer.remaining();
+    buff.put(buffer);
+    return bytes;
   }
 
   @Override

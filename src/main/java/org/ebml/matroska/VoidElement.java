@@ -67,7 +67,7 @@ public class VoidElement extends Element
     buf.put(getType());
     buf.put(encodedSize);
     buf.flip();
-    LOG.trace("Writing out header {}, {}", buf.remaining(), EBMLReader.bytesToHex(buf.array()));
+    LOG.trace("Writing out header {}, {}", buf.remaining(), EBMLReader.bytesToHex(buf));
     writer.write(buf);
     return len;
   }
@@ -91,7 +91,7 @@ public class VoidElement extends Element
     // The simplest thing to do is to first force the size field to the maximum, 8 bytes. So a 9 byte void will have 0 "body" bytes
     // but 1 byte type header and 8 bytes size header.
     realSize = size;
-    long partialSize = size - type.remaining();
+    long partialSize = size - getType().remaining();
     super.setSize(partialSize - Math.min(partialSize, 8));
   }
 

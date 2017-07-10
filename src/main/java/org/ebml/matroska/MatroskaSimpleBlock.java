@@ -2,10 +2,10 @@ package org.ebml.matroska;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import org.ebml.BinaryElement;
+import org.ebml.BitSet;
 import org.ebml.EBMLReader;
 import org.ebml.Element;
 import org.ebml.MasterElement;
@@ -23,7 +23,7 @@ class MatroskaSimpleBlock
   private int trackNumber = 0;
   private short timecode = 0;
   private boolean keyFrame = true;
-  private MatroskaLaceMode laceMode = MatroskaLaceMode.EBML;
+  private MatroskaLaceMode laceMode = MatroskaLaceMode.NONE;
   private boolean invisible = false;
   private boolean discardable = false;
   private final List<MatroskaFileFrame> frames = new ArrayList<>();
@@ -32,11 +32,6 @@ class MatroskaSimpleBlock
   private long duration = Long.MIN_VALUE;
 
   public MatroskaSimpleBlock()
-  {
-
-  }
-
-  public MatroskaSimpleBlock(final long duration)
   {
 
   }
@@ -124,7 +119,7 @@ class MatroskaSimpleBlock
     {
       buf.put(sizes);
     }
-    for (final MatroskaFileFrame frame: frames)
+    for (final MatroskaFileFrame frame : frames)
     {
       LOG.trace("Writing frame {}", frame.getData().remaining());
       buf.put(frame.getData());
@@ -217,6 +212,7 @@ class MatroskaSimpleBlock
 
   public void setDiscardable(final boolean discardable)
   {
+    LOG.trace("Setting discardable to [{}] for SimpleBlock", discardable);
     this.discardable = discardable;
   }
 
@@ -225,6 +221,8 @@ class MatroskaSimpleBlock
     LOG.trace("Adding frame {}", frame.getData().remaining());
     setTimecode(frame.getTimecode());
     setTrackNumber(frame.getTrackNo());
+    setKeyFrame(isKeyFrame() && frame.isKeyFrame());
+    setDiscardable(!frame.isKeyFrame());
     totalSize += frame.getData().remaining();
     frames.add(frame);
     if (frame.getDuration() != Long.MIN_VALUE)
@@ -259,6 +257,7 @@ class MatroskaSimpleBlock
 
   public void setKeyFrame(final boolean keyFrame)
   {
+    LOG.trace("Setting keyFrame to [{}] for SimpleBlock", keyFrame);
     this.keyFrame = keyFrame;
   }
 
