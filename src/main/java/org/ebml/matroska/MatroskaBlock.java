@@ -92,7 +92,7 @@ public class MatroskaBlock
       { // Fixed Size Lacing
         LOG.trace("Fixed lace sizes");
         sizes = new int[laceCount + 1];
-        sizes[0] = (data.remaining() - headerSize) / (laceCount + 1);
+        sizes[0] = data.remaining() / (laceCount + 1);
         for (int s = 0; s < laceCount; s++)
         {
           sizes[s + 1] = sizes[0];
