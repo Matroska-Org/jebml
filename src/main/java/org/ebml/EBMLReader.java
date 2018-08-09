@@ -279,7 +279,12 @@ public class EBMLReader
     if (numBytes > 1)
     {
       // Read the rest of the size.
-      data.put(source);
+      //data.put(source);
+      // bug java.nio.BufferOverflowException
+      for (int i = 1; i < numBytes; i++)
+      {
+        data.put(source.get());
+      }
     }
     data.flip();
     return parseEBMLCode(data);
@@ -311,7 +316,12 @@ public class EBMLReader
     if (numBytes > 1)
     {
       // Read the rest of the size.
-      data.put(source);
+      //data.put(source);
+      // bug java.nio.BufferOverflowException
+      for (int i = 1; i < numBytes; i++)
+      {
+        data.put(source.get());
+      }
     }
     data.flip();
     // Put this into a long
