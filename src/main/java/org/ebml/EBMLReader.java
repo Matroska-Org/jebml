@@ -276,11 +276,12 @@ public class EBMLReader
     // Clear the 1 at the front of this byte, all the way to the beginning of the size
     data.put((byte) (firstByte & ((0xFF >>> (numBytes)))));
 
-    if (numBytes > 1)
+    // Read the rest of the size.
+    for (int i = 1; i < numBytes; i++)
     {
-      // Read the rest of the size.
-      data.put(source);
+      data.put(source.get());
     }
+
     data.flip();
     return parseEBMLCode(data);
   }
@@ -308,11 +309,12 @@ public class EBMLReader
     // Clear the 1 at the front of this byte, all the way to the beginning of the size
     data.put((byte) (firstByte & ((0xFF >>> (numBytes)))));
 
-    if (numBytes > 1)
+    // Read the rest of the size.
+    for (int i = 1; i < numBytes; i++)
     {
-      // Read the rest of the size.
-      data.put(source);
+      data.put(source.get());
     }
+
     data.flip();
     // Put this into a long
     long size = parseEBMLCode(data);
