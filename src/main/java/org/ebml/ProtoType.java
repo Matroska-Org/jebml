@@ -48,6 +48,11 @@ public class ProtoType<T extends Element>
   {
     final long codename = EBMLReader.parseEBMLCode(type);
     final ProtoType<? extends Element> eType = CLASS_MAP.get(Long.valueOf(codename));
+
+    if (eType == null) {
+      return null;
+    }
+
     LOG.trace("Got codename {}, for element type {}", codename, eType.name);
     return eType.getInstance();
   }
