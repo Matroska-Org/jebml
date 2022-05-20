@@ -25,7 +25,7 @@ import java.util.Date;
 public class DateElement extends SignedIntegerElement
 {
   // const uint64 EbmlDate::UnixEpochDelay = 978307200; // 2001/01/01 00:00:00 UTC
-  public static final long UnixEpochDelay = 978307200; // 2001/01/01 00:00:00 UTC
+  public static final long UnixEpochDelay = 978307200000L; // 2001/01/01 00:00:00 UTC
   private static final int MIN_SIZE_LENGTH = 8;
 
   public DateElement(final byte[] type)
@@ -45,7 +45,7 @@ public class DateElement extends SignedIntegerElement
    */
   public void setDate(final Date value)
   {
-    final long val = (value.getTime() - UnixEpochDelay) * 1000000000;
+    final long val = (value.getTime() - UnixEpochDelay) * 1000000;
     setData(ByteBuffer.wrap(packInt(val, MIN_SIZE_LENGTH)));
   }
 
@@ -61,7 +61,7 @@ public class DateElement extends SignedIntegerElement
      * long diff1 = start.getTime(); long diff2 = end.getTime(); long diff3 = Date.UTC(2001, 1, 1, 0, 0, 0) - Date.UTC(1970, 1, 1, 0, 0, 0);
      */
     long val = getValue();
-    val = val / 1000000000 + UnixEpochDelay;
+    val = val / 1000000 + UnixEpochDelay;
     return new Date(val);
   }
 
