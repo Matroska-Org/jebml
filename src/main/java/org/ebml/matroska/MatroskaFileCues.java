@@ -29,9 +29,9 @@ public class MatroskaFileCues
     MasterElement cuePoint = MatroskaDocTypes.CuePoint.getInstance();
     MasterElement cueTrackPositions = createCueTrackPositions(positionInFile, clusterTrackNumbers);
     
-    cues.addChildElement(cuePoint);
     cuePoint.addChildElement(cueTime);
     cuePoint.addChildElement(cueTrackPositions);
+    cues.addChildElement(cuePoint);
     
     LOG.debug("Finished adding matroska cue to cues element");
   }
