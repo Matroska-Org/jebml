@@ -138,6 +138,7 @@ public final class MatroskaDocTypes
   public static final ProtoType<BinaryElement> ColourSpace = new ProtoType<>(BinaryElement.class, "ColourSpace", new byte[] {(byte) 0x2E, (byte) 0xB5, (byte) 0x24 }, 4);
   public static final ProtoType<FloatElement> GammaValue = new ProtoType<>(FloatElement.class, "GammaValue", new byte[] {(byte) 0x2F, (byte) 0xB5, (byte) 0x23 }, 4);
   public static final ProtoType<FloatElement> FrameRate = new ProtoType<>(FloatElement.class, "FrameRate", new byte[] {(byte) 0x23, (byte) 0x83, (byte) 0xE3 }, 4);
+  public static final ProtoType<MasterElement> Colour = new ProtoType<>(MasterElement.class, "Colour", new byte[] {(byte) 0x55, (byte) 0xB0 }, 4);
   public static final ProtoType<MasterElement> Audio = new ProtoType<>(MasterElement.class, "Audio", new byte[] {(byte) 0xE1 }, 3);
   public static final ProtoType<FloatElement> SamplingFrequency = new ProtoType<>(FloatElement.class, "SamplingFrequency", new byte[] {(byte) 0xB5 }, 4);
   public static final ProtoType<FloatElement> OutputSamplingFrequency = new ProtoType<>(FloatElement.class, "OutputSamplingFrequency", new byte[] {(byte) 0x78, (byte) 0xB5 }, 4);
